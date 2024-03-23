@@ -2,11 +2,12 @@
 import torch
 import torch.nn as nn
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class TabularBERT(nn.Module):
-    def __init__(self, num_nodes, embedding_dim, nhead, dag, batch_size, categorical_dims, continuous_dims):
+    def __init__(self, num_nodes, embedding_dim, nhead, dag, batch_size, categorical_dims, continuous_dims, device, dropout_rate):
         super(TabularBERT, self).__init__()
+        self.device = device
 
         # Total number of features
         # total_features = len(categorical_dims) + len(continuous_dims)
@@ -18,8 +19,10 @@ class TabularBERT(nn.Module):
         # print(self.embeddings)
         # batch_first will get me (batch, seq, feature)
         self.attention = nn.MultiheadAttention(embedding_dim, nhead, batch_first=True)
+        self.dropout1 = nn.Dropout(dropout_rate)
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=nhead, batch_first=True) ## check this line
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=1)
+        self.dropout2 = nn.Dropout(dropout_rate)
         self.decoder_layer = nn.TransformerDecoderLayer(d_model=embedding_dim, nhead=nhead, batch_first=True)
         self.transformer_decoder = nn.TransformerDecoder(self.decoder_layer, num_layers=1)
 

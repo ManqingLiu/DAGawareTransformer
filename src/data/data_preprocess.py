@@ -5,7 +5,20 @@ from src.models.utils import generate_dag_edges
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.preprocessing import KBinsDiscretizer
+from config import SEED_VALUE
 
+from torch.utils.data import Dataset
+
+
+class CustomDataset(Dataset):
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return idx, self.data[idx]
 
 class DataProcessor:
     def __init__(self, df):
@@ -62,6 +75,32 @@ class DataProcessor:
         # Identify continuous variables
         continuous_vars = [col for col in self.df.columns if self.detect_variable_type(col) == 'continuous']
 
+        # Temporary DataFrame to hold the binned columns
+        new_cols_df = pd.DataFrame(index=self.df.index)
+
+        # Apply KBinsDiscretizer to each continuous variable
+        for col in continuous_vars:
+            # Reshape data for KBinsDiscretizer
+            data_reshaped = self.df[col].values.reshape(-1, 1)
+            # Fit and transform the data, then save it in the temporary DataFrame
+            new_cols_df[f'{col}_bin'] = kbins.fit_transform(data_reshaped).astype(int)
+            self.kbins_models[col] = kbins  # Save the model for later use
+
+            # Repeat for '_hat' version if exists
+            if f'{col}_hat' in self.df:
+                data_reshaped_hat = self.df[f'{col}_hat'].values.reshape(-1, 1)
+                new_cols_df[f'{col}_hat_bin'] = kbins.fit_transform(data_reshaped_hat).astype(int)
+
+        # Concatenate the original DataFrame with the new columns all at once
+        self.df = pd.concat([self.df, new_cols_df], axis=1)
+    '''
+    def bin_continuous_variables(self, num_bins):
+        # Initialize the KBinsDiscretizer
+        kbins = KBinsDiscretizer(n_bins=num_bins, encode='ordinal', strategy='uniform')
+
+        # Identify continuous variables
+        continuous_vars = [col for col in self.df.columns if self.detect_variable_type(col) == 'continuous']
+
         # Apply KBinsDiscretizer to each continuous variable
         for col in continuous_vars:
             # Reshape data for KBinsDiscretizer
@@ -76,6 +115,8 @@ class DataProcessor:
             if f'{col}_hat' in self.df:
                 data_reshaped_hat = self.df[f'{col}_hat'].values.reshape(-1, 1)
                 self.df[f'{col}_hat_bin'] = kbins.fit_transform(data_reshaped_hat).astype(int)
+        '''
+
 
     def bin_to_original(self, binned_data, feature_name):
         kbins_model = self.kbins_models.get(feature_name)
@@ -139,7 +180,7 @@ class DataProcessor:
         tensor_data = torch.tensor(self.df[ordered_cols].values, dtype=torch.long)
         return tensor_data, ordered_cols
     '''
-
+    '''
     def generate_dimensions(self):
         # Count binary variables (including '_hat' versions)
         binary_vars = len([col for col in self.df.columns if self.detect_variable_type(col) == 'binary'])
@@ -156,6 +197,21 @@ class DataProcessor:
 
                 # Append the number of bins to continuous_dims twice (for the variable and its '_hat' counterpart)
                 continuous_dims.append(num_unique_bins)
+
+        return binary_dims, continuous_dims
+    '''
+
+    def generate_dimensions(self):
+        # Count binary variables (including '_hat' versions)
+        binary_vars = len([col for col in self.df.columns if self.detect_variable_type(col) == 'binary'])
+        binary_dims = [2] * binary_vars
+
+        # Find the maximum number of unique bins across all continuous variables
+        max_unique_bins = max([self.df[col].nunique() for col in self.df.columns if col.endswith('_bin')], default=0)
+
+        # The length of continuous_dims should be equal to the number of features ending with _bin,
+        # with each element set to the maximum number of unique bins found
+        continuous_dims = [max_unique_bins] * len([col for col in self.df.columns if col.endswith('_bin')])
 
         return binary_dims, continuous_dims
 
@@ -194,7 +250,7 @@ class DataProcessor:
         tensor_data = torch.tensor(self.df[ordered_cols].values, dtype=torch.long)
         return tensor_data, ordered_cols
 
-    def split_data_loaders(self, tensor_data, batch_size, test_size, random_state, seed_worker, feature_names, num_workers):
+    def split_data_loaders(self, tensor_data, batch_size, test_size, random_state,feature_names):
         """
         Splits the tensor data into training, validation, and test DataLoader objects.
 
@@ -218,22 +274,34 @@ class DataProcessor:
         val_data_A1[:, t_index] = 1
         val_data_A0 = val_data.clone()
         val_data_A0[:, t_index] = 0
+        train_data_A1 = train_data.clone()
+        train_data_A1[:, t_index] = 1
+        train_data_A0 = train_data.clone()
+        train_data_A0[:, t_index] = 0
 
+        '''
         # Convert subsets to TensorDataset
         train_dataset = TensorDataset(train_data)
         val_dataset = TensorDataset(val_data)
         val_dataset_A1 = TensorDataset(val_data_A1)
         val_dataset_A0 = TensorDataset(val_data_A0)
+        train_dataset_A1= TensorDataset(train_data_A1)
+        train_dataset_A0 = TensorDataset(train_data_A0)
         #test_dataset = TensorDataset(test_data)
+        '''
 
         # Create DataLoader objects
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=seed_worker)
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=seed_worker)
-        val_loader_A1 = DataLoader(val_dataset_A1, batch_size=batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=seed_worker)
-        val_loader_A0 = DataLoader(val_dataset_A0, batch_size=batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=seed_worker)
-        #test_loader = DataLoader(test_dataset, batch_size=batch_size)
+        # train_dataloader = DataLoader(CustomDataset(training_data, training_labels), batch_size=64, shuffle=True)
+        train_loader = DataLoader(CustomDataset(train_data), batch_size=batch_size, shuffle=True)
+        val_loader = DataLoader(CustomDataset(val_data), batch_size=batch_size, shuffle=True)
+        val_loader_A1 = DataLoader(CustomDataset(val_data_A1), batch_size=batch_size, shuffle=True)
+        val_loader_A0 = DataLoader(CustomDataset(val_data_A0), batch_size=batch_size, shuffle=True)
+        train_loader_A1 = DataLoader(CustomDataset(train_data_A1), batch_size=batch_size, shuffle=True)
+        train_loader_A0 = DataLoader(CustomDataset(train_data_A0), batch_size=batch_size, shuffle=True)
 
-        return train_loader, train_data, val_loader, val_data, val_loader_A1, val_data_A1, val_loader_A0, val_data_A0
+        return (train_loader, train_data, val_loader, val_data,
+                val_loader_A1, val_data_A1, val_loader_A0, val_data_A0,
+                train_loader_A1, train_data_A1, train_loader_A0, train_data_A0)
 
 def create_counterfactual_df(df, t=None):
     modified_df = df.copy()
@@ -244,7 +312,7 @@ def create_counterfactual_df(df, t=None):
 
 
 if __name__ == "__main__":
-    dataframe = pd.read_csv('data/realcause_datasets/lalonde_cps_sample0.csv')
+    dataframe = pd.read_csv('data/realcause_datasets/twins_sample0.csv')
     # remove last 3 columns of the dataframe
     dataframe = dataframe.iloc[:, :-3]
     num_bins = 15
@@ -264,28 +332,28 @@ if __name__ == "__main__":
     edges = generate_dag_edges(feature_names)
     print(edges)
     # Split data and create DataLoaders
-    train_loader, val_loader, test_loader = processor.split_data_loaders(tensor, batch_size=32,
-                                                                         holdout_size=0.4,
-                                                                         test_size=0.2, random_state=42)
+    train_loader, train_data, val_loader, val_data, \
+        val_loader_A1, val_data_A1, val_loader_A0, val_data_A0, \
+        train_loader_A1, train_data_A1, train_loader_A0, train_data_A0 = (
+        processor.split_data_loaders(tensor, batch_size=32, test_size=0.5, random_state=SEED_VALUE,
+                                     feature_names=feature_names))
 
     # print size of train_loader
     print(len(train_loader))
     print(len(train_loader.dataset))
     print(len(val_loader))
     print(len(val_loader.dataset))
-    print(len(test_loader))
-    print(len(test_loader.dataset))
 
 
     # Assuming num_features is defined
-    num_features = 20  # Example, adjust based on your actual number of features
+    num_features = len(feature_names)   # Example, adjust based on your actual number of features
 
     # Initialize storage for min and max values for each feature
     min_values = torch.full((num_features,), float('inf'))
     max_values = torch.full((num_features,), float('-inf'))
 
     # Loop through all batches in the DataLoader
-    for features, in val_loader:  # Assuming the dataset only contains features, no labels
+    for idx, features in val_loader:  # Assuming the dataset only contains features, no labels
         for i in range(num_features):
             # Extract the i-th feature across all samples in the batch
             feature_i = features[:, i]

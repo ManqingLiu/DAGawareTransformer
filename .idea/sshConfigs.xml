@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SshConfigs">
-    <configs>
-      <sshConfig authType="PASSWORD" host="transfer.rc.hms.harvard.edu" id="f02867db-c55f-48c6-9caa-39fe5c492816" port="22" nameFormat="DESCRIPTIVE" username="mal8830" useOpenSSHConfig="true" />
-    </configs>
-  </component>
-</project>
