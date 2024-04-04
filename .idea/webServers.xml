@@ -5,7 +5,7 @@
       <webServer id="ef23ecc7-d029-4580-a0da-a7656e9cd6d5" name="HMS O2">
         <fileTransfer accessType="SFTP" host="transfer.rc.hms.harvard.edu" port="22" sshConfigId="f02867db-c55f-48c6-9caa-39fe5c492816" sshConfig="mal8830@transfer.rc.hms.harvard.edu:22 password">
           <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
         </fileTransfer>
       </webServer>

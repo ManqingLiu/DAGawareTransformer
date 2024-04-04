@@ -1,29 +1,33 @@
 ## Import dataset in csv as pandas dataframe
 import pandas as pd
 import numpy as np
+
+# set print options to include all columns
+pd.set_option('display.max_columns', 100)
+
+'''
 # Load the dataset
 df = pd.read_csv('causal-predictive-analysis.csv')
 
-# Filter the dataframe where dataset equals 'lalonde_cps'
-cps = df[df['dataset'] == 'lalonde_cps']
+# Filter the dataframe where dataset equals 'twins'
+psid = df[df['dataset'] == 'twins']
 # Group the filtered dataframe by 'meta-estimator' and summarize 'ate_rmse'
-ate_rmse_summary = cps.groupby('meta-estimator')['ate_rmse'].agg(['mean', 'std'])
+ate_rmse_summary = psid.groupby('meta-estimator')['ate_rmse'].agg(['mean', 'std'])
 
 # Display the summary
 print(ate_rmse_summary)
 
-# set print options to include all columns
-pd.set_option('display.max_columns', 20)
 
-cps_outcome = cps[cps['meta-estimator'].isin(['standardization', 'stratified_standardization'])]
+
+psid_outcome = psid[psid['meta-estimator'].isin(['standardization', 'stratified_standardization'])]
 
 # adjust the code below to sort by min value of 'ate_rmse'
-ate_rmse_outcome = cps_outcome.groupby(['meta-estimator', 'outcome_model'])['ate_rmse'].agg(['min'])
+ate_rmse_outcome = psid_outcome.groupby(['meta-estimator', 'outcome_model'])['ate_rmse'].agg(['min'])
 ate_rmse_outcome = ate_rmse_outcome.sort_values(by='min')
 print(ate_rmse_outcome)
 
-cps_treatment = cps[cps['meta-estimator'].isin(['ipw','ipw_stabilized'])]
-ate_rmse_treatment = cps_treatment.groupby(['meta-estimator', 'prop_score_model'])['ate_rmse'].agg(['min'])
+psid_treatment = psid[psid['meta-estimator'].isin(['ipw','ipw_stabilized'])]
+ate_rmse_treatment = psid_treatment.groupby(['meta-estimator', 'prop_score_model'])['ate_rmse'].agg(['min'])
 ate_rmse_treatment = ate_rmse_treatment.sort_values(by='min')
 print(ate_rmse_treatment)
 
@@ -33,15 +37,40 @@ print(ate_rmse_treatment)
 ## Dataset: lalonde_cps, laonde_psid, twins
 ## outcome of laonde_cps and laonde_psid is continuous
 ## outcome of twins is binary
-
-
 '''
+
+
 # import the lalonde_cps_sample0 in csv as pandas dataframe
-lalonde_cps = pd.read_csv('data/realcause_datasets/lalonde_cps_sample0.csv')
+twins = pd.read_csv('data/realcause_datasets/twins_sample0.csv')
 
 # get summary statistics of every column the dataframe
-print(lalonde_cps.describe(include='all'))
+# print(twins.describe(include='all'))
 
+df = twins
+# Identify columns with dots in their names
+columns_with_dots = [col for col in df.columns if '.' in col]
+
+# Drop these columns from the DataFrame
+df = df.drop(columns=columns_with_dots)
+
+one_hot_columns = [f'gestatcat{i}' for i in range(1, 11)]
+
+df['GESTAT10'] = df[one_hot_columns].idxmax(axis=1)
+
+# Extract the category number from the column name and convert it to the original GESTAT10 values
+df['GESTAT10'] = df['GESTAT10'].str.extract('(\d+)').astype(int) - 1
+
+# Drop these columns from the DataFrame
+df = df.drop(columns=one_hot_columns)
+
+columns = ['GESTAT10'] + [col for col in df.columns if col != 'GESTAT10']
+df = df[columns]
+
+# get summary statistics of every column the dataframe
+print(df.describe(include='all'))
+print(df.columns)
+
+'''
 ## summary of lalonde cps dataset
 # continuous: age, education, re74, re75
 # binary: black, hispanic, married, nodegree

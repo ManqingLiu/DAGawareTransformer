@@ -24,52 +24,6 @@ def rmse(value1, value2):
     root_mean_square_error = math.sqrt(squared_difference)
     return root_mean_square_error
 
-def elastic_net_penalty(model, device, alpha, lambda_):
-    l1_penalty = torch.tensor(0., requires_grad=True, device=device)
-    l2_penalty = torch.tensor(0., requires_grad=True, device=device)
-    for param in model.parameters():
-        # Ensure that the operations are out-of-place
-        l1_penalty = l1_penalty + torch.norm(param, 1)
-        l2_penalty = l2_penalty + torch.norm(param, 2)**2
-
-    # Compute the final penalty
-    penalty = lambda_ * ((alpha * l1_penalty) + ((1 - alpha) / 2) * l2_penalty)
-    return penalty
-
-
-'''
-def generate_dag_edges(all_features):
-    """
-    Generates edges for a DAG based on specified rules.
-
-    Parameters:
-    - all_features: List of all feature names in the dataset.
-
-    Returns:
-    - edges: List of tuples representing the edges in the DAG.
-    """
-    # Identify key feature indices
-    t_index = all_features.index('t')
-    t_hat_index = all_features.index('t_hat')
-    #y_bin_index = all_features.index('y_bin')
-    y_hat_bin_index = all_features.index('y_hat_bin')
-
-    # Initialize the list of edges
-    edges = []
-
-    # Add edge from treatment to outcome_hat_binned
-    edges.append((t_index, y_hat_bin_index))
-
-    # Add edges from all original covariates to treatment_hat and outcome_hat_binned,
-    # but exclude edges from outcome_binned to both treatment_hat and outcome_hat_binned
-    for i, feature in enumerate(all_features):
-        if "_hat" not in feature and feature != 'y_bin':  # Exclude "_hat" features and outcome_binned
-            if feature != 't':  # Avoid adding edge from treatment to treatment_hat
-                edges.append((i, t_hat_index))
-            edges.append((i, y_hat_bin_index))
-
-    return edges
-'''
 
 
 def generate_dag_edges(all_features):
@@ -89,7 +43,8 @@ def generate_dag_edges(all_features):
     t_index = all_features.index('t')
     t_hat_index = all_features.index('t_hat')
     #y_hat_bin_index = all_features.index('y_hat_bin')
-    y_hat_index = all_features.index('y_hat')
+    y_hat_index = next(i for i, feature in enumerate(all_features) if feature.startswith('y_hat'))
+    #y_hat_index = all_features.index('y_hat')
 
     # Add edge from treatment to outcome_hat_binned
     #edges.add((t_index, y_hat_bin_index))
@@ -99,43 +54,61 @@ def generate_dag_edges(all_features):
     # but exclude edges from outcome_binned to both treatment_hat and outcome_hat_binned
     for i, feature in enumerate(all_features):
         #if "_hat" not in feature and feature != 'y_bin' and feature != 't':  # Exclude "_hat" features, outcome_binned, and 't'
-        if "_hat" not in feature and feature != 'y' and feature != 't':
+        if "_hat" not in feature and 'y' not in feature and feature != 't':
             edges.add((i, t_hat_index))
             #edges.add((i, y_hat_bin_index))
             edges.add((i, y_hat_index))
 
+    return list(edges)
+
+    '''
     # Check if 'u_hat_bin' is in the list of all features
     if 'u_hat_bin' in all_features:
         u_hat_bin_index = all_features.index('u_hat_bin')
         # Add edges from 'u_hat_bin' to 't_hat' and 'y_hat_bin'
         edges.add((u_hat_bin_index, t_hat_index))
-        #edges.add((u_hat_bin_index, y_hat_bin_index))
-        edges.add((u_hat_bin_index, y_hat_index))
+        edges.add((u_hat_bin_index, y_hat_bin_index))
+        #edges.add((u_hat_bin_index, y_hat_index))
+    '''
 
-    return list(edges)
 
 
-def save_model(model, dataset_type, fold_number, n_sample, n_epochs):
-    """
-    Saves the given model with a filename that reflects the training dataset type,
-    cross-validation fold, sample size, and epoch count.
 
-    Parameters:
-    - model: The model to be saved.
-    - dataset_type: A string, either 'train' or 'validation', indicating the dataset the model was trained on.
-    - fold_number: An integer representing the fold number in the cross-validation.
-    - n_sample: The number of samples used.
-    - n_epochs: The number of epochs the model was trained for.
-    """
-    model_path = f"experiments/model/model_cps_{dataset_type}_fold{fold_number}_sample{n_sample}_epoch{n_epochs}.pth"
+def save_model(model, dataset_type, loader_name, n_sample, n_epochs,
+               learning_rate, weight_decay, dropout_rate, batch_size, embedding_dim, nhead):
+    # write description of the model
+    model_path = (f"experiments/model/{dataset_type}/model_{dataset_type}_{loader_name}_sample{n_sample}_"
+                  f"epoch{n_epochs}_lr{learning_rate:.4f}_wd{weight_decay:.4f}_dr{dropout_rate:.4f}_bs{batch_size}_ed{embedding_dim}_nh{nhead}.pth")
     # Example path: "experiments/model/model_cps_train_fold1_sample100_epoch50.pth"
 
     # Assuming you're using PyTorch to save the model. Adjust accordingly for other frameworks.
     torch.save(model.state_dict(), model_path)
     print(f"Model saved to {model_path}")
 
-
+'''
 def predict_and_create_df(model, model_path, device, trainer, loader, data, processor, feature_names):
+    # Load the model
+    model.load_state_dict(torch.load(model_path))
+
+    # Assuming the trainer's model needs to be manually updated
+    trainer.model = model.to(device)
+
+    # Perform predictions
+    predictions = trainer.get_predictions(loader)
+    #print(predictions['y_hat_bin'])
+
+    # Create DataFrame from predictions
+    data = data.cpu()
+    df = pd.DataFrame(data.numpy(), columns=feature_names)
+    df['pred_y'] = processor.bin_to_original(predictions['y_hat_bin'], 'y_hat')
+
+    #df['pred_y'] = sigmoid(predictions['y_hat'])
+    df['pred_t'] = sigmoid(predictions['t_hat'])
+
+    return df
+'''
+
+def predict_and_create_df(model, model_path, device, trainer, loader, data, processor, feature_names, dataset_type):
     # Load the model
     model.load_state_dict(torch.load(model_path))
 
@@ -148,8 +121,13 @@ def predict_and_create_df(model, model_path, device, trainer, loader, data, proc
     # Create DataFrame from predictions
     data = data.cpu()
     df = pd.DataFrame(data.numpy(), columns=feature_names)
-    #df['pred_y'] = processor.bin_to_original(predictions['y_hat_bin'], 'y_hat')
-    df['pred_y'] = sigmoid(predictions['y_hat'])
+
+    # Check the dataset_type and perform the appropriate operation
+    if dataset_type == 'twins':
+        df['pred_y'] = sigmoid(predictions['y_hat'])
+    elif dataset_type.startswith('lalonde'):
+        df['pred_y'] = processor.bin_to_original(predictions['y_hat_bin'], 'y_hat')
+
     df['pred_t'] = sigmoid(predictions['t_hat'])
 
     return df
@@ -179,7 +157,7 @@ class ModelTrainer:
 
 
     def validate(self, loader):
-        torch.cuda.empty_cache()
+        #torch.cuda.empty_cache()
         self.model.eval()
         feature_names = self.feature_names
         #feature_names.remove('u_hat_bin')
@@ -192,6 +170,7 @@ class ModelTrainer:
                 batch_gpu = batch.to(self.device)
                 losses = self._compute_losses(batch_gpu, train=False)
                 for key, loss in losses.items():
+                    #print(loss)
                     total_loss_count[key] += loss
 
         # Average the losses over all batches
@@ -212,7 +191,7 @@ class ModelTrainer:
     #    return test_losses
 
 
-    def _compute_losses(self, batch_gpu, optimizer=None, train=True):
+    def _compute_losses(self, batch_gpu, optimizer=None, train=None):
         losses = {}
         num_feature_pairs = len(self.feature_names)
         feature_names = self.feature_names

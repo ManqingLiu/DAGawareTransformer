@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+from torch.optim import AdamW
 import torch.optim as optim
-from src.models.DAG_aware_transformer import TabularBERT
-from src.models.utils import generate_dag_edges, ModelTrainer, rmse, IPTW_stabilized, AIPW, set_seed, predict_and_create_df
+from src.models.DAG_aware_transformer_gate import TabularBERT
+from src.models.utils import *
 from src.data.data_preprocess import DataProcessor
 from sklearn.model_selection import train_test_split
 from config import *
@@ -15,12 +16,11 @@ import wandb
 set_seed()
 
 ##### Part I: data pre-processing #####
-n_sample = N_SAMPLE
-
-dataset_type = 'twins'  # Can be 'cps' or 'psid', depending on what you want to use
+dataset_type = 'lalonde_psid'  # Can be 'cps' or 'psid', depending on what you want to use
 
 # Use the variable in the file path
-dataframe = pd.read_csv(f'data/realcause_datasets/{dataset_type}_sample{n_sample}.csv')
+dataframe = pd.read_csv(f'data/realcause_datasets/{dataset_type}_sample{N_SAMPLE}.csv')
+
 
 # get true ATE: mean of y1 - mean of y0
 ATE_true = dataframe['y1'].mean() - dataframe['y0'].mean()
@@ -35,43 +35,47 @@ processor.bin_continuous_variables(num_bins)
 tensor, feature_names = processor.create_tensor()
 binary_dims, continuous_dims = processor.generate_dimensions()
 binary_features, _ = processor.get_feature_names()  # Get binary and continuous feature names
-dag = generate_dag_edges(feature_names)
-batch_size = 32
-test_size = TEST_SIZE
+fixed_edges, dynamic_edge_indices = generate_dag_edges(feature_names)
+#print(feature_names)
+#print(dag)
 # Split data and create DataLoaders
+
 
 train_loader, train_data, val_loader, val_data, \
 val_loader_A1, val_data_A1, val_loader_A0, val_data_A0, \
 train_loader_A1, train_data_A1, train_loader_A0, train_data_A0 = (
-    processor.split_data_loaders(tensor, batch_size=batch_size, test_size=test_size, random_state=SEED_VALUE,
+    processor.split_data_loaders(tensor, batch_size=BATCH_SIZE, test_size=TEST_SIZE, random_state=SEED_VALUE,
                                  feature_names=feature_names))
+
 
 
 ###### Part II: model training and validation ######
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# device = torch.device('cpu')
+#device = torch.device('cpu')
 # print(torch.cuda.is_available())
 # print(torch.cuda.get_device_name(0))
 
 
 # Create the model
 num_nodes = len(feature_names)  # Total number of nodes in the graph
-embedding_dim = 128  # Embedding dimension
-nhead = 4  # Number of heads in multihead attention
-learning_rate = LEARNING_RATE  # Learning rate
-n_epochs = N_EPOCHS  # Number of epochs
-n_sample = N_SAMPLE
+
 
 # Instantiate the model, optimizer, and loss function
-model = TabularBERT(num_nodes=num_nodes, embedding_dim=embedding_dim, nhead=nhead,
+model = TabularBERT(num_nodes=num_nodes, embedding_dim=EMBEDDING_DIM, nhead=N_HEAD,
+                    dag_edges=fixed_edges, dynamic_edge_indices=dynamic_edge_indices,
+                    batch_size=BATCH_SIZE,
                     categorical_dims=binary_dims, continuous_dims=continuous_dims,
-                    dag=dag, batch_size=batch_size, device = device, dropout_rate=DROPOUT_RATE)
-#optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+                    device=device, dropout_rate=DROPOUT_RATE, all_features=feature_names)
+
+# model.load_state_dict(torch.load(model_path))
+# optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
 criterion_binary = nn.BCEWithLogitsLoss()
 criterion_continuous = nn.MSELoss()
 
-trainer = ModelTrainer(model, train_loader, val_loader, binary_features, feature_names,
-                 criterion_binary, criterion_continuous, device)
+
+trainer = ModelTrainer(model, train_loader, val_loader, binary_features,
+                       feature_names, criterion_binary, criterion_continuous, device)
 
 train_dataset, val_dataset = train_test_split(df, test_size=TEST_SIZE, random_state=SEED_VALUE)
 
@@ -93,10 +97,11 @@ for condition, model_types in conditions.items():
 
     for model_type, (loader, data) in model_types.items():
         # Assume correct model_path is constructed
-        model_path = f"experiments/model/model_{dataset_type}_{model_type}_sample{n_sample}_epoch{n_epochs}.pth"
+        model_path = (f"experiments/model/{dataset_type}/model_{dataset_type}_{model_type}_sample{N_SAMPLE}_"
+                      f"epoch{N_EPOCHS}_lr{LEARNING_RATE:.4f}_wd{WEIGHT_DECAY:.4f}_dr{DROPOUT_RATE:.4f}_bs{BATCH_SIZE}_ed{EMBEDDING_DIM}_nh{N_HEAD}.pth")
 
         # Ensure correct data loading based on model type
-        df = predict_and_create_df(model, model_path, device, trainer, loader, data, processor, feature_names)
+        df = predict_and_create_df(model, model_path, device, trainer, loader, data, processor, feature_names, dataset_type)
 
         # Add a column to indicate the source of the data
         df['data_source'] = model_type  # Adds "train" or "val" to each row
@@ -113,11 +118,11 @@ df_standardization_A1 = dfs_standardization['A1']
 df_standardization_A0 = dfs_standardization['A0']
 
 ATE_estimated = mean_pred_y["A1"] - mean_pred_y["A0"]
-print(f"Predicted ATE from standardization: {ATE_estimated}")
+print(f"Predicted ATE from standardization: {ATE_estimated:.4f}")
 
 # Calculate RMSE assuming you have defined the rmse function and have the true ATE value
 rmse_standardization = rmse(ATE_estimated, ATE_true)
-print(f"RMSE from standardization: {rmse_standardization}")
+print(f"RMSE from standardization: {rmse_standardization:.4f}")
 
 
 
@@ -135,17 +140,19 @@ df_IPTW = pd.DataFrame()
 
 for model_type, (loader, data, dataset) in scenarios.items():
     #model.load_state_dict(torch.load(model_path))
-    model_path = f"experiments/model/model_{dataset_type}_{model_type}_sample{n_sample}_epoch{n_epochs}.pth"
-    df = predict_and_create_df(model, model_path, device, trainer, loader, data, processor, feature_names)
+    model_path = (f"experiments/model/{dataset_type}/model_{dataset_type}_{model_type}_sample{N_SAMPLE}_"
+                  f"epoch{N_EPOCHS}_lr{LEARNING_RATE:.4f}_wd{WEIGHT_DECAY:.4f}_dr{DROPOUT_RATE:.4f}_bs{BATCH_SIZE}_ed{EMBEDDING_DIM}_nh{N_HEAD}.pth")
+
+    df = predict_and_create_df(model, model_path, device, trainer, loader, data, processor, feature_names, dataset_type)
     df['y'] = dataset['y']
     df['data_source'] = model_type
     df_IPTW = pd.concat([df_IPTW, df])
 
 # Assuming 't' and 'y' columns exist in the combined_df or are added from the original dataset
 ATE_IPTW = IPTW_stabilized(df_IPTW['t'], df_IPTW['y'], df_IPTW['pred_t'])
-print("Predicted ATE from IPTW:", ATE_IPTW)
+print(f"Predicted ATE from IPTW: {ATE_IPTW:.4f}")
 rmse_IPTW = rmse(ATE_IPTW, ATE_true)
-print("RMSE from IPTW:", rmse_IPTW)
+print(f"RMSE from IPTW: {rmse_IPTW:.4f}")
 
 
 #### AIPW estimator
@@ -168,7 +175,7 @@ Y_a0_train = AIPW(train_df['t'], train_df_A0['pred_t'], train_df['y'], train_df_
 Y_a0 = (Y_a0_val + Y_a0_train)/2
 
 ATE_AIPW = Y_a1-Y_a0
-print(f"Estimated ATE from AIPW (DR): {ATE_AIPW}")
+print(f"Estimated ATE from AIPW (DR): {ATE_AIPW:.4f}")
 
 rmse_AIPW = rmse(ATE_AIPW, ATE_true)
-print("RMSE from AIPW (DR):", rmse_AIPW)
+print(f"RMSE from AIPW (DR): {rmse_AIPW:.4f}")

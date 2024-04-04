@@ -141,6 +141,33 @@ class DataProcessor:
 
         return original_values
 
+    '''
+    def bin_to_original(self, binned_data, feature_name):
+        kbins_model = self.kbins_models.get(feature_name)
+        if not kbins_model:
+            raise ValueError(f"No KBinsDiscretizer model found for feature '{feature_name}'.")
+
+        # Ensure binned_data is an array of integers
+        binned_data = np.array(binned_data).astype(int)
+
+        # Retrieve the bin edges for the feature
+        bin_edges = kbins_model.bin_edges_[0]
+
+        # Calculate bin centers from bin edges for the 'uniform' strategy
+        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+        # Map each binned index to its corresponding bin center
+        original_values = []
+        for bin_idx in binned_data:
+            if bin_idx < len(bin_centers):
+                original_values.append(bin_centers[bin_idx])
+            else:
+                original_values.append(np.nan)
+
+        return np.array(original_values)
+    '''
+
+
     def get_feature_names(self):
         binary_features = []
         continuous_features = []
@@ -312,7 +339,7 @@ def create_counterfactual_df(df, t=None):
 
 
 if __name__ == "__main__":
-    dataframe = pd.read_csv('data/realcause_datasets/twins_sample0.csv')
+    dataframe = pd.read_csv('data/realcause_datasets/lalonde_psid_sample0.csv')
     # remove last 3 columns of the dataframe
     dataframe = dataframe.iloc[:, :-3]
     num_bins = 15

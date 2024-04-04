@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from src.models.DAG_aware_transformer import TabularBERT
-from src.models.utils import generate_dag_edges, ModelTrainer, rmse, IPTW_stabilized, AIPW, set_seed, seed_worker
+from src.models.utils import generate_dag_edges, ModelTrainer, rmse, IPTW_stabilized, AIPW, set_seed
 from src.data.data_preprocess import DataProcessor
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
@@ -36,12 +36,11 @@ dag = generate_dag_edges(feature_names)
 batch_size = 32
 test_size = 0.5
 random_state = 1
-num_workers = 20
 # Split data and create DataLoaders
 
 train_loader, train_data, val_loader, val_data, val_loader_A1, val_data_A1, val_loader_A0, val_data_A0 = (
     processor.split_data_loaders(tensor, batch_size=batch_size,test_size=test_size, random_state=random_state,
-                                 feature_names=feature_names, num_workers=num_workers, seed_worker=seed_worker))
+                                 feature_names=feature_names))
 
 
 ###### Part II: model training and validation ######
@@ -56,9 +55,9 @@ num_nodes = len(feature_names)  # Total number of nodes in the graph
 embedding_dim = 128  # Embedding dimension
 nhead = 4  # Number of heads in multihead attention
 learning_rate = 1e-4  # Learning rate
-n_epochs = 5  # Number of epochs
+n_epochs = 1  # Number of epochs
 
-
+'''
 if wandb.run is not None:
     wandb.finish()
 # start a new wandb run to track this script
@@ -75,18 +74,22 @@ wandb.init(
         "epochs": n_epochs,
     }
 )
+'''
 
 model_path = f"experiments/model/model_cps_sample0_epoch{n_epochs}.pth"
 # Instantiate the model, optimizer, and loss function
 model = TabularBERT(num_nodes=num_nodes, embedding_dim=embedding_dim, nhead=nhead,
                     categorical_dims=binary_dims, continuous_dims=continuous_dims,
-                    dag=dag, batch_size=batch_size).to(device)
+                    dag=dag, batch_size=batch_size, device=device)
 
 
-model.load_state_dict(torch.load(model_path))
+#model.load_state_dict(torch.load(model_path))
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 criterion_binary = nn.BCEWithLogitsLoss()
 criterion_continuous = nn.MSELoss()
+
+#trainer = ModelTrainer(model, train_loader, val_loader, binary_features,
+#                       feature_names, criterion_binary, criterion_continuous, device)
 
 trainer = ModelTrainer(model, train_loader, val_loader, binary_features,
                        feature_names, criterion_binary, criterion_continuous, device)
@@ -94,28 +97,28 @@ trainer = ModelTrainer(model, train_loader, val_loader, binary_features,
 
 # Train the model
 for epoch in range(n_epochs):
-    '''
+
     train_losses = trainer.train(optimizer, train_loader)
     if epoch % 1 == 0:
         train_loss_strings = [f'{feature}: {loss:.5f}' for feature, loss in train_losses.items()]
-        #print(f'Epoch {epoch}, Training Losses: {", ".join(train_loss_strings)}')
-        wandb.log({f'Training Loss - {feature}': loss for feature, loss in train_losses.items()}, step=epoch)
+        print(f'Epoch {epoch}, Training Losses: {", ".join(train_loss_strings)}')
+        #wandb.log({f'Training Loss - {feature}': loss for feature, loss in train_losses.items()}, step=epoch)
 
-    '''
+    
     val_losses = trainer.validate(val_loader)
     if epoch % 1 == 0:
         val_loss_strings = [f'{feature}: {loss:.5f}' for feature, loss in val_losses.items()]
-        #print(f'Epoch {epoch}, Validation Losses: {", ".join(val_loss_strings)}')
-        wandb.log({f'Validation Loss - {feature}': loss for feature, loss in val_losses.items()}, step=epoch)
+        print(f'Epoch {epoch}, Validation Losses: {", ".join(val_loss_strings)}')
+        #wandb.log({f'Validation Loss - {feature}': loss for feature, loss in val_losses.items()}, step=epoch)
 
 
-'''
+
 # Assuming 'model' is your trained model instance
 model_path = f"experiments/model/model_cps_sample0_epoch{n_epochs}.pth"
 torch.save(model.state_dict(), model_path)
 
 
-
+'''
 #### Part IIII: Get quantities needed from predictions and derive ATE ####
 
 model_path = f"experiments/model/model_cps_sample0_epoch{n_epochs}.pth"
@@ -199,5 +202,6 @@ print(f"Estimated ATE from AIPW (DR): {ATE_AIPW}")
 
 rmse_AIPW = rmse(ATE_AIPW, ATE_true)
 print("RMSE from AIPW (DR):", rmse_AIPW)
-'''
+
 wandb.finish()
+'''

@@ -2,6 +2,10 @@
 import torch
 import torch.nn as nn
 
+##### DAG aware transformer - Model architecture
+import torch
+import torch.nn as nn
+
 #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class TabularBERT(nn.Module):
@@ -21,10 +25,10 @@ class TabularBERT(nn.Module):
         self.attention = nn.MultiheadAttention(embedding_dim, nhead, batch_first=True)
         self.dropout1 = nn.Dropout(dropout_rate)
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=nhead, batch_first=True) ## check this line
-        self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=1)
-        self.dropout2 = nn.Dropout(dropout_rate)
-        self.decoder_layer = nn.TransformerDecoderLayer(d_model=embedding_dim, nhead=nhead, batch_first=True)
-        self.transformer_decoder = nn.TransformerDecoder(self.decoder_layer, num_layers=1)
+        self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=1)  # hyperparameter: num_layers
+        #self.dropout2 = nn.Dropout(dropout_rate)
+        #self.decoder_layer = nn.TransformerDecoderLayer(d_model=embedding_dim, nhead=nhead, batch_first=True)
+        #self.transformer_decoder = nn.TransformerDecoder(self.decoder_layer, num_layers=1)
 
         self.adj_matrix = torch.zeros(num_nodes, num_nodes)
         for edge in dag:
@@ -72,13 +76,11 @@ class TabularBERT(nn.Module):
         # print(self.adj_mask.size())
         # print(attn_mask.size())
         #attn_output, _ = self.attention(x, x, x, attn_mask=attn_mask)
-        attn_output, _ = self.attention(x, x, x, attn_mask=self.adj_mask)
-        encoder_output = self.transformer_encoder(attn_output)
-        decoder_output = self.transformer_decoder(encoder_output, encoder_output)
-        #print(decoder_output.size())
-        #decoder_output = decoder_output.permute(1, 0, 2)
+        #attn_output, _ = self.attention(x, x, x, attn_mask=self.adj_mask)
+        #encoder_output = self.transformer_encoder(attn_output)
+        encoder_output = self.transformer_encoder(x, mask=self.adj_mask)
+        # encoder_output = self.dropout1(encoder_output)
 
-        outputs = [output_layer(decoder_output[:, i, :]) for i, output_layer in enumerate(self.output_layers)]
+
+        outputs = [output_layer(encoder_output[:, i, :]) for i, output_layer in enumerate(self.output_layers)]
         return torch.cat(outputs, dim=1)
-
-
