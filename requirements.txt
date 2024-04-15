@@ -1,7 +1,11 @@
+GPUtil
+numba
 torch
 numpy
 pandas
 scikit-learn
 wandb
+ray[tune]
 openpyxl
-matplotlib seaborn
+matplotlib
+seaborn

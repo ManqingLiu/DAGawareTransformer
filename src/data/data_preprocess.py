@@ -29,7 +29,7 @@ class DataProcessor:
     def detect_variable_type(self, col):
         # Detect if the variable is continuous or binary
         unique_values = self.df[col].unique()
-        if len(unique_values) == 2 and sorted(unique_values) == [0, 1]:
+        if len(unique_values) <= 2:
             return 'binary'
         else:
             return 'continuous'
@@ -117,7 +117,7 @@ class DataProcessor:
                 self.df[f'{col}_hat_bin'] = kbins.fit_transform(data_reshaped_hat).astype(int)
         '''
 
-
+    '''
     def bin_to_original(self, binned_data, feature_name):
         kbins_model = self.kbins_models.get(feature_name)
         if not kbins_model:
@@ -140,8 +140,8 @@ class DataProcessor:
             raise
 
         return original_values
-
     '''
+
     def bin_to_original(self, binned_data, feature_name):
         kbins_model = self.kbins_models.get(feature_name)
         if not kbins_model:
@@ -165,7 +165,7 @@ class DataProcessor:
                 original_values.append(np.nan)
 
         return np.array(original_values)
-    '''
+
 
 
     def get_feature_names(self):
@@ -339,7 +339,7 @@ def create_counterfactual_df(df, t=None):
 
 
 if __name__ == "__main__":
-    dataframe = pd.read_csv('data/realcause_datasets/lalonde_psid_sample0.csv')
+    dataframe = pd.read_csv('data/realcause_datasets/twins_sample0.csv').head(100)
     # remove last 3 columns of the dataframe
     dataframe = dataframe.iloc[:, :-3]
     num_bins = 15

@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torch.optim import AdamW
 import torch.optim as optim
-from src.models.DAG_aware_transformer_gate import TabularBERT
+from src.models.DAG_aware_transformer import TabularBERT
 from src.models.utils import *
 from src.data.data_preprocess import DataProcessor
 from sklearn.model_selection import train_test_split
@@ -35,7 +35,7 @@ processor.bin_continuous_variables(num_bins)
 tensor, feature_names = processor.create_tensor()
 binary_dims, continuous_dims = processor.generate_dimensions()
 binary_features, _ = processor.get_feature_names()  # Get binary and continuous feature names
-fixed_edges, dynamic_edge_indices = generate_dag_edges(feature_names)
+dag = generate_dag_edges(feature_names)
 #print(feature_names)
 #print(dag)
 # Split data and create DataLoaders
@@ -62,10 +62,8 @@ num_nodes = len(feature_names)  # Total number of nodes in the graph
 
 # Instantiate the model, optimizer, and loss function
 model = TabularBERT(num_nodes=num_nodes, embedding_dim=EMBEDDING_DIM, nhead=N_HEAD,
-                    dag_edges=fixed_edges, dynamic_edge_indices=dynamic_edge_indices,
-                    batch_size=BATCH_SIZE,
-                    categorical_dims=binary_dims, continuous_dims=continuous_dims,
-                    device=device, dropout_rate=DROPOUT_RATE, all_features=feature_names)
+                    dag=dag, batch_size=BATCH_SIZE,  categorical_dims=binary_dims, continuous_dims=continuous_dims,
+                    device=device, dropout_rate=DROPOUT_RATE)
 
 # model.load_state_dict(torch.load(model_path))
 # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -155,27 +153,46 @@ rmse_IPTW = rmse(ATE_IPTW, ATE_true)
 print(f"RMSE from IPTW: {rmse_IPTW:.4f}")
 
 
-#### AIPW estimator
-val_df_A1 = df_standardization_A1.loc[df_standardization_A1['data_source'] == 'val']
-train_df_A1 = df_standardization_A1.loc[df_standardization_A1['data_source'] == 'train']
-val_df = df_IPTW.loc[df_IPTW['data_source'] == 'val']
-train_df = df_IPTW.loc[df_IPTW['data_source'] == 'train']
-Y_a1_val = AIPW(val_df['t'], val_df_A1['pred_t'], val_df['y'], val_df_A1['pred_y'])
-Y_a1_train = AIPW(train_df['t'], train_df_A1['pred_t'], train_df['y'], train_df_A1['pred_y'])
+## stratified standardization (stratify in prediction step)
+del df
 
-Y_a1 = (Y_a1_val + Y_a1_train)/2
+scenarios = {
+    "train": (val_loader, val_data, val_dataset),  # Model trained on training data predicting on validation data
+    "val": (train_loader, train_data, train_dataset)  # Model trained on validation data predicting on training data
+}
 
+# Combine predictions from both models
+df_stratified_std = pd.DataFrame()
 
-# repeat for a0
-val_df_A0 = df_standardization_A0.loc[df_standardization_A0['data_source'] == 'val']
-train_df_A0 = df_standardization_A0.loc[df_standardization_A0['data_source'] == 'train']
-Y_a0_val = AIPW(val_df['t'], val_df_A0['pred_t'], val_df['y'], val_df_A0['pred_y'])
-Y_a0_train = AIPW(train_df['t'], train_df_A0['pred_t'], train_df['y'], train_df_A0['pred_y'])
+for model_type, (loader, data, dataset) in scenarios.items():
+    #model.load_state_dict(torch.load(model_path))
+    model_path = (f"experiments/model/{dataset_type}/model_{dataset_type}_{model_type}_sample{N_SAMPLE}_"
+                  f"epoch{N_EPOCHS}_lr{LEARNING_RATE:.4f}_wd{WEIGHT_DECAY:.4f}_dr{DROPOUT_RATE:.4f}_bs{BATCH_SIZE}_ed{EMBEDDING_DIM}_nh{N_HEAD}.pth")
 
-Y_a0 = (Y_a0_val + Y_a0_train)/2
+    df = predict_and_create_df(model, model_path, device, trainer, loader, data, processor, feature_names, dataset_type)
+    df['y'] = dataset['y']
+    df['data_source'] = model_type
+    df_stratified_std = pd.concat([df_stratified_std, df])
 
-ATE_AIPW = Y_a1-Y_a0
-print(f"Estimated ATE from AIPW (DR): {ATE_AIPW:.4f}")
+# Assuming 't' and 'y' columns exist in the combined_df or are added from the original dataset
+df_stratified_std_A1 = df_stratified_std[df_stratified_std['t'] == 1].copy()
+df_stratified_std_A0 = df_stratified_std[df_stratified_std['t'] == 0].copy()
+ATE_stratified_std = stratified_standardization(df_stratified_std_A1['pred_y'], df_stratified_std_A0['pred_y'])
+print(f"Predicted ATE from stratified standardization: {ATE_stratified_std:.4f}")
+rmse_stratified_std = rmse(ATE_stratified_std, ATE_true)
+print(f"RMSE from stratified standardization: {rmse_stratified_std:.4f}")
 
-rmse_AIPW = rmse(ATE_AIPW, ATE_true)
-print(f"RMSE from AIPW (DR): {rmse_AIPW:.4f}")
+####  AIPW estimator
+
+val_df_outcome = df_stratified_std.loc[df_stratified_std['data_source'] == 'val']
+train_df_outcome = df_stratified_std.loc[df_stratified_std['data_source'] == 'train']
+val_df_treatment = df_IPTW.loc[df_IPTW['data_source'] == 'val']
+train_df_treatment = df_IPTW.loc[df_IPTW['data_source'] == 'train']
+ATE_val = AIPW(train_df_treatment['t'], train_df_treatment['pred_t'], train_df_outcome['y'], train_df_outcome['pred_y'])
+ATE_train = AIPW(val_df_treatment['t'], val_df_treatment['pred_t'], val_df_outcome['y'], val_df_outcome['pred_y'])
+
+ATE_AIPW_str = (ATE_val + ATE_train)/2
+print(f"Estimated ATE from stratified AIPW (DR): {ATE_AIPW_str:.4f}")
+
+rmse_AIPW_str = rmse(ATE_AIPW_str, ATE_true)
+print(f"RMSE from stratified AIPW (DR): {rmse_AIPW_str:.4f}")

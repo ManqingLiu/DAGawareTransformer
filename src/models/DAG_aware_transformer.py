@@ -1,6 +1,7 @@
 ##### DAG aware transformer - Model architecture
 import torch
 import torch.nn as nn
+from config import *
 
 ##### DAG aware transformer - Model architecture
 import torch
@@ -20,12 +21,13 @@ class TabularBERT(nn.Module):
         self.embeddings = nn.ModuleList([
             nn.Embedding(dim, embedding_dim) for dim in categorical_dims + continuous_dims
         ])
+        #self.embeddings = nn.ModuleList([nn.Embedding(2+NUM_BINS, embedding_dim)])
         # print(self.embeddings)
         # batch_first will get me (batch, seq, feature)
         self.attention = nn.MultiheadAttention(embedding_dim, nhead, batch_first=True)
         self.dropout1 = nn.Dropout(dropout_rate)
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_dim, nhead=nhead, batch_first=True) ## check this line
-        self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=1)  # hyperparameter: num_layers
+        self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=3)  # hyperparameter: num_layers
         #self.dropout2 = nn.Dropout(dropout_rate)
         #self.decoder_layer = nn.TransformerDecoderLayer(d_model=embedding_dim, nhead=nhead, batch_first=True)
         #self.transformer_decoder = nn.TransformerDecoder(self.decoder_layer, num_layers=1)
@@ -33,7 +35,12 @@ class TabularBERT(nn.Module):
         self.adj_matrix = torch.zeros(num_nodes, num_nodes)
         for edge in dag:
             self.adj_matrix[edge[0], edge[1]] = 1
-        self.adj_mask = (1 - self.adj_matrix) * -1e9
+        # change self.adj_mask to boolean matrix where if adj_matrix = 1, return False, else True
+        self.adj_matrix = self.adj_matrix+torch.eye(num_nodes).unsqueeze(0)
+        #print(self.adj_matrix)
+        self.adj_mask = ~(self.adj_matrix.bool())
+        #print(self.adj_mask)
+        #self.adj_mask = (1 - self.adj_matrix) * -1e9
         self.adj_mask = self.adj_mask.to(device)
 
         self.output_layers = nn.ModuleList([nn.Linear(embedding_dim, 1) for _ in range(num_nodes)])
@@ -71,15 +78,17 @@ class TabularBERT(nn.Module):
         # print(x.size())
         x = x.permute(1, 0, 2)  # Transformer expects batch_size, seq_len, input_dim
         # print(x.size())
-        # batch_size = x.size(1)
-        # attn_mask = self.adj_mask.repeat(self.batch_size * self.nhead, 1, 1)
+        # Compute the actual batch size
+        actual_batch_size = x.size(0)
+        attn_mask = self.adj_mask.repeat(actual_batch_size * self.nhead, 1, 1)
         # print(self.adj_mask.size())
         # print(attn_mask.size())
         #attn_output, _ = self.attention(x, x, x, attn_mask=attn_mask)
         #attn_output, _ = self.attention(x, x, x, attn_mask=self.adj_mask)
         #encoder_output = self.transformer_encoder(attn_output)
-        encoder_output = self.transformer_encoder(x, mask=self.adj_mask)
-        # encoder_output = self.dropout1(encoder_output)
+        #encoder_output = self.transformer_encoder(x, mask=attn_mask)
+        encoder_output = self.transformer_encoder(x)
+        encoder_output = self.dropout1(encoder_output)
 
 
         outputs = [output_layer(encoder_output[:, i, :]) for i, output_layer in enumerate(self.output_layers)]

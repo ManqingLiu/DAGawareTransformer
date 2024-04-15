@@ -24,7 +24,11 @@ def rmse(value1, value2):
     root_mean_square_error = math.sqrt(squared_difference)
     return root_mean_square_error
 
-
+## define a function calculating mean absolute error
+def mae(value1, value2):
+    absolute_difference = np.abs(value1 - value2)
+    mean_absolute_error = np.mean(absolute_difference)
+    return mean_absolute_error
 
 def generate_dag_edges(all_features):
     """
@@ -78,6 +82,18 @@ def save_model(model, dataset_type, loader_name, n_sample, n_epochs,
                learning_rate, weight_decay, dropout_rate, batch_size, embedding_dim, nhead):
     # write description of the model
     model_path = (f"experiments/model/{dataset_type}/model_{dataset_type}_{loader_name}_sample{n_sample}_"
+                  f"epoch{n_epochs}_lr{learning_rate:.4f}_wd{weight_decay:.4f}_dr{dropout_rate:.4f}_bs{batch_size}_ed{embedding_dim}_nh{nhead}.pth")
+    # Example path: "experiments/model/model_cps_train_fold1_sample100_epoch50.pth"
+
+    # Assuming you're using PyTorch to save the model. Adjust accordingly for other frameworks.
+    torch.save(model.state_dict(), model_path)
+    print(f"Model saved to {model_path}")
+
+
+def save_model_stratified_std(model, treatment, dataset_type, loader_name, n_sample, n_epochs,
+               learning_rate, weight_decay, dropout_rate, batch_size, embedding_dim, nhead):
+    # write description of the model
+    model_path = (f"experiments/model/{dataset_type}/model_treatment{treatment}_{dataset_type}_{loader_name}_sample{n_sample}_"
                   f"epoch{n_epochs}_lr{learning_rate:.4f}_wd{weight_decay:.4f}_dr{dropout_rate:.4f}_bs{batch_size}_ed{embedding_dim}_nh{nhead}.pth")
     # Example path: "experiments/model/model_cps_train_fold1_sample100_epoch50.pth"
 
@@ -144,7 +160,7 @@ class ModelTrainer:
         self.criterion_continuous = criterion_continuous
         self.device = device
 
-
+    '''
     def train(self, optimizer, loader):
         self.model.train()
 
@@ -154,10 +170,30 @@ class ModelTrainer:
             optimizer.zero_grad()
             train_losses = self._compute_losses(batch_gpu, optimizer=optimizer, train=True)
             return train_losses
+    '''
+    def train(self, optimizer, loader):
+        self.model.train()
+        #train_losses = {}
+        optimizer.zero_grad()
+        feature_names = self.feature_names
+        # feature_names.remove('u_hat_bin')
+        total_loss_count = {feature_name + '_hat': 0 for feature_name in feature_names if '_hat' not in feature_name}
+
+        for idx, batch in loader:  # Process each batch
+            batch_gpu = batch.to(self.device)
+            losses = self._compute_losses(batch_gpu, optimizer=optimizer, train=True)
+            for key, loss in losses.items():
+                # print(loss)
+                total_loss_count[key] += loss
+
+        # Average the losses over all batches
+        num_batches = len(loader)
+        avg_losses = {key: total_loss / num_batches for key, total_loss in total_loss_count.items()}
+        return avg_losses
 
 
     def validate(self, loader):
-        #torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
         self.model.eval()
         feature_names = self.feature_names
         #feature_names.remove('u_hat_bin')
@@ -179,23 +215,11 @@ class ModelTrainer:
         return avg_losses
 
 
-
-    
-
-
-
-
-    #def test(self):
-    #    self.model.eval()
-    #    test_losses = self._evaluate(self.test_loader)
-    #    return test_losses
-
-
-    def _compute_losses(self, batch_gpu, optimizer=None, train=None):
+    def _compute_losses(self, batch_gpu, optimizer=None, train=False):
         losses = {}
         num_feature_pairs = len(self.feature_names)
         feature_names = self.feature_names
-        batch_gpu = batch_gpu.to(self.device)
+        #batch_gpu = batch_gpu.to(self.device)
         model = self.model.to(self.device)
 
         for i in range(0, num_feature_pairs - 1, 2):
@@ -213,11 +237,12 @@ class ModelTrainer:
             loss = criterion(output.float(), true_values.float())
 
             if train:
-                loss.backward(retain_graph=True)
+                loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()
             losses[feature_name_hat] = loss.item()
         return losses
+
 
     def get_predictions(self, loader):
         """Generates predictions for the data provided by the given DataLoader, ordered by the original dataset order."""
@@ -234,10 +259,12 @@ class ModelTrainer:
 
                 # Store indices and predictions for this batch
                 all_indices.append(idx.cpu())  # Move indices to CPU
-                all_predictions.append(predictions.cpu())  # Move predictions to CPU
+                #all_predictions.append(predictions.cpu())  # Move predictions to CPU
+                all_predictions.append(predictions)
+
 
         # Concatenate all indices and batch predictions
-        all_indices = torch.cat(all_indices, dim=0)
+        all_indices = torch.cat(all_indices, dim=0).to(self.device)
         all_predictions = torch.cat(all_predictions, dim=0)
 
         # Sort predictions based on indices to return to original order
@@ -246,7 +273,7 @@ class ModelTrainer:
 
         num_feature_pairs = len(feature_names)
         # Assuming feature_names[0] is not an ID column and starts with actual features
-        pred_dict = {feature_names[i]: sorted_predictions[:, i].numpy() for i in range(num_feature_pairs)}
+        pred_dict = {feature_names[i]: sorted_predictions[:, i].cpu().numpy() for i in range(num_feature_pairs)}
 
         return pred_dict
 
@@ -312,7 +339,91 @@ def IPTW_stabilized(t, y, pred_t):
 
     return tau_hat
 
+def IPTW_unstabilized(t, y, pred_t):
+    """
+    Calculate the treatment effect using Stabilized Inverse Probability of Treatment Weighting (IPTW) without trimming.
 
+    Parameters:
+    - t (array-like): Treatment indicator variable (1 for treated, 0 for untreated).
+    - y (array-like): Outcome variable.
+    - pred_t (array-like): Predicted propensity score, e(w), for receiving treatment.
+
+    Returns:
+    - tau_hat (float): Estimated treatment effect, stabilized.
+    """
+
+    # Ensure inputs are numpy arrays for element-wise operations
+    #t = np.array(t)
+    #y = np.array(y)
+    #pred_t = np.array(pred_t)
+
+    # Calculate stabilized weights without applying trimming
+    weights_treated = 1 / pred_t
+    weights_untreated = 1 / (1 - pred_t)
+
+    # Calculate the numerator for each observation
+    numerator = (t * y * weights_treated) - ((1 - t) * y * weights_untreated)
+
+
+    # Sum over all observations and divide by the number of observations to get tau_hat
+    tau_hat = np.sum(numerator) / len(t)
+
+    return tau_hat
+
+def AIPW(t, pred_t, y, pred_y):
+    """
+    Calculate the Average Treatment Effect (ATE) using Augmented Inverse Probability of Treatment Weighting (AIPW).
+
+    Parameters:
+    - t (array-like): Treatment indicator variable (1 for treated, 0 for untreated).
+    - y (array-like): Outcome variable.
+    - pred_t (array-like): Predicted propensity score, e(w), for receiving treatment.
+    - pred_y (array-like): Predicted outcome variable.
+
+    Returns:
+    - tau_hat (float): Estimated treatment effect.
+    """
+
+    # Ensure inputs are numpy arrays for element-wise operations
+    # t = np.array(t)
+    # y = np.array(y)
+    # pred_t = np.array(pred_t)
+    # pred_y = np.array(pred_y)
+
+    # Calculate the proportion of treated and untreated
+    # pt_1 = np.mean(t)
+    # pt_0 = 1 - pt_1
+
+    # Calculate stabilized weights without applying trimming
+    weights_treated = 1 / pred_t
+    weights_untreated = 1 / (1 - pred_t)
+
+    # caculate Y^{a=1}
+    y1 = t * (pred_y + (y-pred_y)*weights_treated)
+    y0 = (1-t)*(pred_y + (y-pred_y)*weights_untreated)
+
+    # Calculate the AIPW estimate
+    tau_hat = np.mean(y1)-np.mean(y0)
+
+    return tau_hat
+
+# stratified standardization estimator
+def stratified_standardization(outcome_hat_A1, outcome_hat_A0):
+    '''
+    Args:
+        outcome_hat_A1: prediction of outcome given treatment A1
+        outcome_hat_A0: prediction of outcome given treatment A0
+
+    Returns:
+        tau_hat: mean of the difference between outcome_hat_A1 and outcome_hat_A0
+    '''
+
+    tau = outcome_hat_A1-outcome_hat_A0
+    tau_hat = np.mean(tau)
+
+    return tau_hat
+
+'''
 def AIPW(treatment, treatment_hat, outcome, outcome_hat):
     """
     Calculates the full sample AIPW estimator of E[Y^a].
@@ -327,13 +438,12 @@ def AIPW(treatment, treatment_hat, outcome, outcome_hat):
     - float, E[Y^a].
     """
 
-    if len(treatment) != len(treatment_hat) or len(outcome) != len(outcome_hat) or len(treatment) != len(outcome):
-        raise ValueError("All input arrays must have the same length.")
+    #if len(treatment) != len(treatment_hat) or len(outcome) != len(outcome_hat) or len(treatment) != len(outcome):
+    #    raise ValueError("All input arrays must have the same length.")
 
     Y_a = outcome_hat + (treatment / treatment_hat) * (outcome - outcome_hat)
     return np.mean(Y_a)
-
-
+'''
 
 
 
