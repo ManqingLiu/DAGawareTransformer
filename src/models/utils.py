@@ -30,6 +30,7 @@ def mae(value1, value2):
     mean_absolute_error = np.mean(absolute_difference)
     return mean_absolute_error
 
+# TODO: Might want to create more general creation and representation machinary
 def generate_dag_edges(all_features):
     """
     Generates edges for a DAG based on specified rules.
@@ -232,6 +233,7 @@ class ModelTrainer:
             if feature_name in self.binary_features:
                 criterion = self.criterion_binary
             else:
+                print("feature_name:", feature_name)
                 criterion = self.criterion_continuous
 
             loss = criterion(output.float(), true_values.float())

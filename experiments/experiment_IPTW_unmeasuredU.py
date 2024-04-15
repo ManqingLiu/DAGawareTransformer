@@ -74,7 +74,6 @@ wandb.init(
     }
 )
 
-
 # Instantiate the model, optimizer, and loss function
 model = TabularBERT(num_nodes=num_nodes, embedding_dim=embedding_dim, nhead=nhead,
                     categorical_dims=binary_dims, continuous_dims=continuous_dims,
