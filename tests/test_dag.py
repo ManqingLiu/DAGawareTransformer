@@ -50,6 +50,7 @@ class MyTestCase(unittest.TestCase):
         model = DAGTransformer(dag=self.dag)
         outputs = model(self.x)
 
+        # TODO: Move this to its own function
         loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
         losses = []
         for output_name in outputs.keys():
@@ -59,7 +60,7 @@ class MyTestCase(unittest.TestCase):
 
         total_loss = sum(losses) / len(losses)
         total_loss.backward()
-        assert torch.isnan(total_loss) == False
+        self.assertFalse(torch.isnan(total_loss))
 
     def test_one_step(self):
         model = DAGTransformer(dag=self.dag)
