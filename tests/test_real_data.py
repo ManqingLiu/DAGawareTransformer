@@ -103,7 +103,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_dataloader_twoepochs(self):
         batch_size = 64
-        dataset = CausalDataset(self.data_file, self.config_file)
+        data = pd.read_csv(self.data_file)
+        data = data[self.dag['nodes']]
+        dataset = CausalDataset(data, self.dag)
         dataloader = DataLoader(dataset,
                                 batch_size=batch_size,
                                 num_workers=4,
