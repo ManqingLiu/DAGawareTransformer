@@ -19,12 +19,12 @@ dataframe = pd.read_csv(f'data/realcause_datasets/{dataset_type}_sample{N_SAMPLE
 df = dataframe.iloc[:, :-3].copy()
 num_bins = NUM_BINS
 processor = DataProcessor(df)
-processor.sample_variables()
+#processor.sample_variables()
 processor.bin_continuous_variables(num_bins)
 tensor, feature_names = processor.create_tensor()
 binary_dims, continuous_dims = processor.generate_dimensions()
 binary_features, _ = processor.get_feature_names()  # Get binary and continuous feature names
-dag = generate_dag_edges(feature_names)
+#dag = generate_dag_edges(feature_names)
 print(feature_names)
 print(dag)
 
