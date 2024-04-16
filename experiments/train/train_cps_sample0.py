@@ -6,11 +6,13 @@ from torch.optim import AdamW
 from src.models.DAG_aware_transformer import *
 from src.models.utils import *
 from src.data.data_preprocess import DataProcessor
+# TODO: Convert config to a json file
 from config import *
 import wandb
 
 set_seed()
 ##### Part I: data pre-processing #####
+# TODO: Convert to config files and command line arguments
 dataset_type = 'lalonde_psid'  # Can be 'cps' or 'psid', depending on what you want to use
 
 # Use the variable in the file path
@@ -22,13 +24,14 @@ processor = DataProcessor(df)
 #processor.sample_variables()
 processor.bin_continuous_variables(num_bins)
 tensor, feature_names = processor.create_tensor()
+# TODO: This is due to the list of embeddings
 binary_dims, continuous_dims = processor.generate_dimensions()
 binary_features, _ = processor.get_feature_names()  # Get binary and continuous feature names
 #dag = generate_dag_edges(feature_names)
 print(feature_names)
 print(dag)
 
-
+# TODO Refactor this to several explicit steps
 train_loader, train_data, val_loader, val_data, \
 val_loader_A1, val_data_A1, val_loader_A0, val_data_A0, \
 train_loader_A1, train_data_A1, train_loader_A0, train_data_A0 = (
@@ -51,9 +54,15 @@ num_nodes = len(feature_names)  # Total number of nodes in the graph
 
 
 # Instantiate the model, optimizer, and loss function
-model = TabularBERT(num_nodes=num_nodes, embedding_dim=EMBEDDING_DIM, nhead=N_HEAD,
-                    dag=dag, batch_size=BATCH_SIZE,  categorical_dims=binary_dims, continuous_dims=continuous_dims,
-                    device=device, dropout_rate=DROPOUT_RATE)
+model = TabularBERT(num_nodes=num_nodes,
+                    embedding_dim=EMBEDDING_DIM,
+                    nhead=N_HEAD,
+                    dag=dag,
+                    batch_size=BATCH_SIZE,
+                    categorical_dims=binary_dims,
+                    continuous_dims=continuous_dims,
+                    device=device,
+                    dropout_rate=DROPOUT_RATE)
 
 # num_nodes, embedding_dim, nhead, dag, batch_size, categorical_dims, continuous_dims, device, dropout_rate
 
@@ -61,9 +70,12 @@ model = TabularBERT(num_nodes=num_nodes, embedding_dim=EMBEDDING_DIM, nhead=N_HE
 # optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 optimizer = AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
 criterion_binary = nn.BCEWithLogitsLoss()
+
+# TODO: Investigate the loss function for continuous variables
 criterion_continuous = nn.MSELoss()
 
-trainer = ModelTrainer(model, train_loader, val_loader, binary_features,
+trainer = ModelTrainer(model,
+                       train_loader, val_loader, binary_features,
                            feature_names, criterion_binary, criterion_continuous, device)
 
 # Train the model
