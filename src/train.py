@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import torch
 
 from model import DAGTransformer, causal_loss_fun
-from data import CausalDataset
+from dataset import CausalDataset
 
 from typing import Dict
 

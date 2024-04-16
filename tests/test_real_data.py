@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from src.model import DAGTransformer, causal_loss_fun
-from src.data import CausalDataset
+from src.dataset import CausalDataset
 
 from tqdm import tqdm
 
