@@ -11,7 +11,10 @@ from dataset import CausalDataset
 
 from typing import Dict
 
+from tqdm import tqdm
+
 import wandb
+
 
 def train(model: nn.Module, dataloader: DataLoader, config: Dict):
 
@@ -26,8 +29,9 @@ def train(model: nn.Module, dataloader: DataLoader, config: Dict):
     opt = torch.optim.AdamW(model.parameters(),
                             weight_decay=config['weight_decay'],
                             lr=config['learning_rate'])
+
     num_epochs = config['num_epochs']
-    for epoch in range(num_epochs):
+    for epoch in tqdm(range(num_epochs)):
         for batch in dataloader:
             opt.zero_grad()
             batch = {k: v.to(device) for k, v in batch.items()}
@@ -38,8 +42,9 @@ def train(model: nn.Module, dataloader: DataLoader, config: Dict):
 
             batch_loss.backward()
             opt.step()
-            wandb.log({'loss': batch_loss})
+            wandb.log({'loss': batch_loss.item()})
 
+    wandb.finish()
 
 
 if __name__ == '__main__':
@@ -58,22 +63,26 @@ if __name__ == '__main__':
         print(f'Loading config file from {args.config}')
         config = json.load(f)
 
+    train_config = config['training']
+    model_config = config['model']
+
     # Move all of this to a utils function for load_dag and load_data
     num_nodes = len(dag['nodes'])
     dag['node_ids'] = dict(zip(dag['nodes'], range(num_nodes)))
 
-    model = DAGTransformer(dag)
+    model = DAGTransformer(dag=dag,
+                           **model_config)
 
     data = pd.read_csv(args.data_file)
     data = data[dag['nodes']]
     dataset = CausalDataset(data, dag)
 
-    batch_size = config['batch_size']
+    batch_size = train_config['batch_size']
     dataloader = DataLoader(dataset,
                             batch_size=batch_size,
                             shuffle=True,
                             collate_fn=dataset.collate_fn)
 
-    train(model, dataloader, config)
+    train(model, dataloader, train_config)
     print('Done training.')
 

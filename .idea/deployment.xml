@@ -5,21 +5,7 @@
       <paths name="HMS O2">
         <serverdata>
           <mappings>
-            <mapping deploy="/n/data2/hms/dbmi/beamlab/manqing/DAGawareTransformer_NeurIPS" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="mal8830@transfer.rc.hms.harvard.edu:22 password">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/tmp/pycharm_project_751" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="mal8830@transfer.rc.hms.harvard.edu:22 password (2)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/tmp/pycharm_project_782" local="$PROJECT_DIR$" />
+            <mapping deploy="/n/data2/hms/dbmi/beamlab/andy/dag_transformer" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

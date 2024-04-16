@@ -16,7 +16,6 @@
     "t": {"num_categories":  2},
     "y": {"num_categories":  10}
     },
-
   "edges": {
     "age": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75"],
     "education": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75"],

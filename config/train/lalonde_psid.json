@@ -1,9 +1,16 @@
 {
-  "num_epochs": 100,
-  "batch_size": 128,
-  "learning_rate": 0.001,
-  "num_layers": 2,
-  "dropout": 0.1,
-  "weight_decay": 0.0,
-  "project_tag": "lalonde_psid"
+  "training": {
+    "num_epochs": 1000,
+    "batch_size": 512,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "project_tag": "lalonde_psid"
+  },
+  "model": {
+    "num_layers": 2,
+    "dropout_rate": 0.1,
+    "embedding_dim": 128,
+    "num_heads": 4,
+    "num_layers": 3
+  }
 }
