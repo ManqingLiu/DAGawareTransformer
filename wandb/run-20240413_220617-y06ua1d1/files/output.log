@@ -1,0 +1,553 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevconsole.py", line 364, in runcode
+    coro = func()
+  File "<input>", line 35, in <module>
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/utils.py", line 171, in train
+    train_losses = self._compute_losses(batch_gpu, optimizer=optimizer, train=True)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/utils.py", line 221, in _compute_losses
+    output = model(batch_gpu)[:, i + 1].unsqueeze(1)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/DAG_aware_transformer.py", line 69, in forward
+    embeddings = [self.embeddings[i](x[:, i]) for i in range(x.size(1))]
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/DAG_aware_transformer.py", line 69, in <listcomp>
+    embeddings = [self.embeddings[i](x[:, i]) for i in range(x.size(1))]
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/sparse.py", line 163, in forward
+    return F.embedding(
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/functional.py", line 2237, in embedding
+    return torch.embedding(weight, input, padding_idx, scale_grad_by_freq, sparse)
+IndexError: index out of range in self
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevconsole.py", line 364, in runcode
+    coro = func()
+  File "<input>", line 35, in <module>
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/utils.py", line 171, in train
+    train_losses = self._compute_losses(batch_gpu, optimizer=optimizer, train=True)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/utils.py", line 221, in _compute_losses
+    output = model(batch_gpu)[:, i + 1].unsqueeze(1)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/DAG_aware_transformer.py", line 69, in forward
+    embeddings = [self.embeddings[i](x[:, i]) for i in range(x.size(1))]
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/DAG_aware_transformer.py", line 69, in <listcomp>
+    embeddings = [self.embeddings[i](x[:, i]) for i in range(x.size(1))]
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/sparse.py", line 163, in forward
+    return F.embedding(
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/functional.py", line 2237, in embedding
+    return torch.embedding(weight, input, padding_idx, scale_grad_by_freq, sparse)
+IndexError: index out of range in self
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevconsole.py", line 364, in runcode
+    coro = func()
+  File "<input>", line 1, in <module>
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/parsers/readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/parsers/readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/parsers/readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/parsers/readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/common.py", line 873, in get_handle
+    handle = open(
+FileNotFoundError: [Errno 2] No such file or directory: 'data/realcause_datasets/lalonde_twins_sample0.csv'
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevconsole.py", line 364, in runcode
+    coro = func()
+  File "<input>", line 1, in <module>
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/parsers/readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/parsers/readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/parsers/readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/parsers/readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/io/common.py", line 873, in get_handle
+    handle = open(
+FileNotFoundError: [Errno 2] No such file or directory: 'data/realcause_datasets/twins_sample0.csv'
+TabularBERT(
+  (embeddings): ModuleList(
+    (0-111): 112 x Embedding(2, 512)
+    (112-153): 42 x Embedding(15, 512)
+  )
+  (attention): MultiheadAttention(
+    (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
+  )
+  (dropout1): Dropout(p=0.05, inplace=False)
+  (encoder_layer): TransformerEncoderLayer(
+    (self_attn): MultiheadAttention(
+      (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
+    )
+    (linear1): Linear(in_features=512, out_features=2048, bias=True)
+    (dropout): Dropout(p=0.1, inplace=False)
+    (linear2): Linear(in_features=2048, out_features=512, bias=True)
+    (norm1): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+    (norm2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+    (dropout1): Dropout(p=0.1, inplace=False)
+    (dropout2): Dropout(p=0.1, inplace=False)
+  )
+  (transformer_encoder): TransformerEncoder(
+    (layers): ModuleList(
+      (0-2): 3 x TransformerEncoderLayer(
+        (self_attn): MultiheadAttention(
+          (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
+        )
+        (linear1): Linear(in_features=512, out_features=2048, bias=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+        (linear2): Linear(in_features=2048, out_features=512, bias=True)
+        (norm1): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+        (norm2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+        (dropout1): Dropout(p=0.1, inplace=False)
+        (dropout2): Dropout(p=0.1, inplace=False)
+      )
+    )
+  )
+  (output_layers): ModuleList(
+    (0-153): 154 x Linear(in_features=512, out_features=1, bias=True)
+  )
+)
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+['eclamp', 'eclamp_hat', 'gestatcat1', 'gestatcat1_hat', 'gestatcat2', 'gestatcat2_hat', 'gestatcat3', 'gestatcat3_hat', 'gestatcat4', 'gestatcat4_hat', 'gestatcat5', 'gestatcat5_hat', 'gestatcat6', 'gestatcat6_hat', 'gestatcat7', 'gestatcat7_hat', 'gestatcat8', 'gestatcat8_hat', 'gestatcat9', 'gestatcat9_hat', 'gestatcat10', 'gestatcat10_hat', 'gestatcat1.1', 'gestatcat1.1_hat', 'gestatcat2.1', 'gestatcat2.1_hat', 'gestatcat3.1', 'gestatcat3.1_hat', 'bord', 'bord_hat', 'gestatcat4.1', 'gestatcat4.1_hat', 'gestatcat6.1', 'gestatcat6.1_hat', 'gestatcat7.1', 'gestatcat7.1_hat', 'gestatcat8.1', 'gestatcat8.1_hat', 'gestatcat9.1', 'gestatcat9.1_hat', 'gestatcat10.1', 'gestatcat10.1_hat', 'gestatcat1.2', 'gestatcat1.2_hat', 'gestatcat2.2', 'gestatcat2.2_hat', 'gestatcat3.2', 'gestatcat3.2_hat', 'gestatcat4.2', 'gestatcat4.2_hat', 'gestatcat5.1', 'gestatcat5.1_hat', 'gestatcat6.2', 'gestatcat6.2_hat', 'gestatcat7.2', 'gestatcat7.2_hat', 'gestatcat8.2', 'gestatcat8.2_hat', 'gestatcat5.2', 'gestatcat5.2_hat', 'gestatcat9.2', 'gestatcat9.2_hat', 'gestatcat10.2', 'gestatcat10.2_hat', 'othermr', 'othermr_hat', 'dmar', 'dmar_hat', 'csex', 'csex_hat', 'cardiac', 'cardiac_hat', 'uterine', 'uterine_hat', 'lung', 'lung_hat', 'diabetes', 'diabetes_hat', 'herpes', 'herpes_hat', 'anemia', 'anemia_hat', 'hydra', 'hydra_hat', 'chyper', 'chyper_hat', 'phyper', 'phyper_hat', 'incervix', 'incervix_hat', 'pre4000', 'pre4000_hat', 'preterm', 'preterm_hat', 'renal', 'renal_hat', 'rh', 'rh_hat', 'hemo', 'hemo_hat', 'ormoth', 'ormoth_hat', 'birattnd', 'birattnd_hat', 'pldel', 'pldel_hat', 'data_year', 'data_year_hat', 't', 't_hat', 'y', 'y_hat', 'tobacco_bin', 'tobacco_hat_bin', 'alcohol_bin', 'alcohol_hat_bin', 'orfath_bin', 'orfath_hat_bin', 'adequacy_bin', 'adequacy_hat_bin', 'drink5_bin', 'drink5_hat_bin', 'mpre5_bin', 'mpre5_hat_bin', 'meduc6_bin', 'meduc6_hat_bin', 'mrace_bin', 'mrace_hat_bin', 'frace_bin', 'frace_hat_bin', 'stoccfipb_reg_bin', 'stoccfipb_reg_hat_bin', 'mplbir_reg_bin', 'mplbir_reg_hat_bin', 'cigar6_bin', 'cigar6_hat_bin', 'mager8_bin', 'mager8_hat_bin', 'brstate_reg_bin', 'brstate_reg_hat_bin', 'feduc6_bin', 'feduc6_hat_bin', 'dfageq_bin', 'dfageq_hat_bin', 'nprevistq_bin', 'nprevistq_hat_bin', 'crace_bin', 'crace_hat_bin', 'birmon_bin', 'birmon_hat_bin', 'dtotord_min_bin', 'dtotord_min_hat_bin', 'dlivord_min_bin', 'dlivord_min_hat_bin']
+[(124, 111), (44, 109), (88, 109), (16, 111), (48, 109), (114, 109), (20, 111), (152, 111), (50, 109), (116, 109), (10, 109), (44, 111), (76, 109), (88, 111), (48, 111), (114, 111), (12, 109), (78, 109), (144, 109), (50, 111), (116, 111), (10, 111), (76, 111), (146, 109), (40, 109), (150, 109), (12, 111), (78, 111), (144, 111), (42, 109), (148, 111), (2, 109), (46, 109), (68, 109), (112, 109), (136, 109), (146, 111), (6, 109), (40, 111), (72, 109), (150, 111), (4, 109), (70, 109), (8, 109), (30, 109), (108, 111), (42, 111), (74, 109), (140, 109), (2, 111), (46, 111), (68, 111), (112, 111), (6, 111), (72, 111), (142, 109), (4, 111), (36, 109), (70, 111), (102, 109), (126, 109), (8, 111), (30, 111), (74, 111), (140, 111), (38, 109), (104, 109), (64, 109), (142, 111), (36, 111), (102, 111), (0, 109), (66, 109), (132, 109), (26, 109), (38, 111), (104, 111), (64, 111), (134, 109), (28, 109), (94, 109), (138, 109), (0, 111), (32, 109), (66, 111), (98, 109), (122, 109), (132, 111), (26, 111), (136, 111), (34, 109), (56, 109), (100, 109), (134, 111), (28, 111), (60, 109), (94, 111), (138, 111), (32, 111), (98, 111), (18, 109), (62, 109), (152, 109), (128, 109), (34, 111), (56, 111), (22, 109), (100, 111), (60, 111), (126, 111), (130, 109), (24, 109), (90, 109), (18, 111), (62, 111), (128, 111), (22, 111), (92, 109), (52, 109), (96, 109), (130, 111), (24, 111), (90, 111), (54, 109), (120, 109), (14, 109), (58, 109), (80, 109), (92, 111), (124, 109), (148, 109), (80, 111), (52, 111), (96, 111), (16, 109), (122, 111), (20, 109), (54, 111), (120, 111), (14, 111), (58, 111)]
+[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+[15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]
+Feature 1: Min = 0.0, Max = 0.0
+Feature 2: Min = 0.0, Max = 0.0
+Feature 3: Min = 0.0, Max = 1.0
+Feature 4: Min = 0.0, Max = 1.0
+Feature 5: Min = 0.0, Max = 1.0
+Feature 6: Min = 0.0, Max = 1.0
+Feature 7: Min = 0.0, Max = 1.0
+Feature 8: Min = 0.0, Max = 1.0
+Feature 9: Min = 0.0, Max = 1.0
+Feature 10: Min = 0.0, Max = 1.0
+Feature 11: Min = 0.0, Max = 1.0
+Feature 12: Min = 0.0, Max = 1.0
+Feature 13: Min = 0.0, Max = 1.0
+Feature 14: Min = 0.0, Max = 1.0
+Feature 15: Min = 0.0, Max = 1.0
+Feature 16: Min = 0.0, Max = 1.0
+Feature 17: Min = 0.0, Max = 1.0
+Feature 18: Min = 0.0, Max = 1.0
+Feature 19: Min = 0.0, Max = 1.0
+Feature 20: Min = 0.0, Max = 1.0
+Feature 21: Min = 0.0, Max = 1.0
+Feature 22: Min = 0.0, Max = 1.0
+Feature 23: Min = 0.0, Max = 1.0
+Feature 24: Min = 0.0, Max = 1.0
+Feature 25: Min = 0.0, Max = 1.0
+Feature 26: Min = 0.0, Max = 1.0
+Feature 27: Min = 0.0, Max = 1.0
+Feature 28: Min = 0.0, Max = 1.0
+Feature 29: Min = 0.0, Max = 1.0
+Feature 30: Min = 0.0, Max = 1.0
+Feature 31: Min = 0.0, Max = 1.0
+Feature 32: Min = 0.0, Max = 1.0
+Feature 33: Min = 0.0, Max = 1.0
+Feature 34: Min = 0.0, Max = 1.0
+Feature 35: Min = 0.0, Max = 1.0
+Feature 36: Min = 0.0, Max = 1.0
+Feature 37: Min = 0.0, Max = 1.0
+Feature 38: Min = 0.0, Max = 1.0
+Feature 39: Min = 0.0, Max = 1.0
+Feature 40: Min = 0.0, Max = 1.0
+Feature 41: Min = 0.0, Max = 1.0
+Feature 42: Min = 0.0, Max = 1.0
+Feature 43: Min = 0.0, Max = 1.0
+Feature 44: Min = 0.0, Max = 1.0
+Feature 45: Min = 0.0, Max = 1.0
+Feature 46: Min = 0.0, Max = 1.0
+Feature 47: Min = 0.0, Max = 1.0
+Feature 48: Min = 0.0, Max = 1.0
+Feature 49: Min = 0.0, Max = 1.0
+Feature 50: Min = 0.0, Max = 1.0
+Feature 51: Min = 0.0, Max = 1.0
+Feature 52: Min = 0.0, Max = 1.0
+Feature 53: Min = 0.0, Max = 1.0
+Feature 54: Min = 0.0, Max = 1.0
+Feature 55: Min = 0.0, Max = 1.0
+Feature 56: Min = 0.0, Max = 1.0
+Feature 57: Min = 0.0, Max = 1.0
+Feature 58: Min = 0.0, Max = 1.0
+Feature 59: Min = 0.0, Max = 1.0
+Feature 60: Min = 0.0, Max = 1.0
+Feature 61: Min = 0.0, Max = 1.0
+Feature 62: Min = 0.0, Max = 1.0
+Feature 63: Min = 0.0, Max = 1.0
+Feature 64: Min = 0.0, Max = 1.0
+Feature 65: Min = 0.0, Max = 1.0
+Feature 66: Min = 0.0, Max = 1.0
+Feature 67: Min = 0.0, Max = 1.0
+Feature 68: Min = 0.0, Max = 1.0
+Feature 69: Min = 0.0, Max = 1.0
+Feature 70: Min = 0.0, Max = 1.0
+Feature 71: Min = 0.0, Max = 0.0
+Feature 72: Min = 0.0, Max = 0.0
+Feature 73: Min = 0.0, Max = 1.0
+Feature 74: Min = 0.0, Max = 1.0
+Feature 75: Min = 0.0, Max = 0.0
+Feature 76: Min = 0.0, Max = 0.0
+Feature 77: Min = 0.0, Max = 1.0
+Feature 78: Min = 0.0, Max = 0.0
+Feature 79: Min = 0.0, Max = 0.0
+Feature 80: Min = 0.0, Max = 0.0
+Feature 81: Min = 0.0, Max = 1.0
+Feature 82: Min = 0.0, Max = 1.0
+Feature 83: Min = 0.0, Max = 1.0
+Feature 84: Min = 0.0, Max = 0.0
+Feature 85: Min = 0.0, Max = 1.0
+Feature 86: Min = 0.0, Max = 0.0
+Feature 87: Min = 0.0, Max = 1.0
+Feature 88: Min = 0.0, Max = 1.0
+Feature 89: Min = 0.0, Max = 0.0
+Feature 90: Min = 0.0, Max = 0.0
+Feature 91: Min = 0.0, Max = 0.0
+Feature 92: Min = 0.0, Max = 0.0
+Feature 93: Min = 0.0, Max = 1.0
+Feature 94: Min = 0.0, Max = 0.0
+Feature 95: Min = 0.0, Max = 0.0
+Feature 96: Min = 0.0, Max = 0.0
+Feature 97: Min = 0.0, Max = 0.0
+Feature 98: Min = 0.0, Max = 0.0
+Feature 99: Min = 0.0, Max = 0.0
+Feature 100: Min = 0.0, Max = 0.0
+Feature 101: Min = 0.0, Max = 0.0
+Feature 102: Min = 0.0, Max = 0.0
+Feature 103: Min = 0.0, Max = 0.0
+Feature 104: Min = 0.0, Max = 1.0
+Feature 105: Min = 0.0, Max = 0.0
+Feature 106: Min = 0.0, Max = 1.0
+Feature 107: Min = 0.0, Max = 0.0
+Feature 108: Min = 0.0, Max = 0.0
+Feature 109: Min = 0.0, Max = 1.0
+Feature 110: Min = 0.0, Max = 1.0
+Feature 111: Min = 0.0, Max = 1.0
+Feature 112: Min = 0.0, Max = 1.0
+Feature 113: Min = 0.0, Max = 14.0
+Feature 114: Min = 0.0, Max = 14.0
+Feature 115: Min = 0.0, Max = 14.0
+Feature 116: Min = 0.0, Max = 14.0
+Feature 117: Min = 0.0, Max = 14.0
+Feature 118: Min = 0.0, Max = 14.0
+Feature 119: Min = 0.0, Max = 14.0
+Feature 120: Min = 0.0, Max = 14.0
+Feature 121: Min = 0.0, Max = 14.0
+Feature 122: Min = 0.0, Max = 14.0
+Feature 123: Min = 0.0, Max = 14.0
+Feature 124: Min = 0.0, Max = 14.0
+Feature 125: Min = 0.0, Max = 14.0
+Feature 126: Min = 0.0, Max = 14.0
+Feature 127: Min = 0.0, Max = 14.0
+Feature 128: Min = 0.0, Max = 13.0
+Feature 129: Min = 0.0, Max = 14.0
+Feature 130: Min = 0.0, Max = 14.0
+Feature 131: Min = 0.0, Max = 14.0
+Feature 132: Min = 0.0, Max = 14.0
+Feature 133: Min = 1.0, Max = 14.0
+Feature 134: Min = 2.0, Max = 14.0
+Feature 135: Min = 0.0, Max = 14.0
+Feature 136: Min = 0.0, Max = 11.0
+Feature 137: Min = 0.0, Max = 14.0
+Feature 138: Min = 0.0, Max = 14.0
+Feature 139: Min = 0.0, Max = 14.0
+Feature 140: Min = 0.0, Max = 14.0
+Feature 141: Min = 0.0, Max = 14.0
+Feature 142: Min = 0.0, Max = 14.0
+Feature 143: Min = 0.0, Max = 14.0
+Feature 144: Min = 0.0, Max = 14.0
+Feature 145: Min = 0.0, Max = 14.0
+Feature 146: Min = 0.0, Max = 12.0
+Feature 147: Min = 0.0, Max = 14.0
+Feature 148: Min = 0.0, Max = 13.0
+Feature 149: Min = 0.0, Max = 14.0
+Feature 150: Min = 0.0, Max = 14.0
+Feature 151: Min = 0.0, Max = 14.0
+Feature 152: Min = 0.0, Max = 14.0
+Feature 153: Min = 0.0, Max = 14.0
+Feature 154: Min = 0.0, Max = 13.0
+['eclamp', 'gestatcat1', 'gestatcat2', 'gestatcat3', 'gestatcat4', 'gestatcat5', 'gestatcat6', 'gestatcat7', 'gestatcat8', 'gestatcat9', 'gestatcat10', 'gestatcat1.1', 'gestatcat2.1', 'gestatcat3.1', 'bord', 'gestatcat4.1', 'gestatcat6.1', 'gestatcat7.1', 'gestatcat8.1', 'gestatcat9.1', 'gestatcat10.1', 'gestatcat1.2', 'gestatcat2.2', 'gestatcat3.2', 'gestatcat4.2', 'gestatcat5.1', 'gestatcat6.2', 'gestatcat7.2', 'gestatcat8.2', 'gestatcat5.2', 'gestatcat9.2', 'gestatcat10.2', 'othermr', 'dmar', 'csex', 'cardiac', 'uterine', 'lung', 'diabetes', 'herpes', 'anemia', 'hydra', 'chyper', 'phyper', 'incervix', 'pre4000', 'preterm', 'renal', 'rh', 'hemo', 'ormoth', 'birattnd', 'pldel', 'data_year', 't', 'y', 'eclamp_hat', 'gestatcat1_hat', 'gestatcat2_hat', 'gestatcat3_hat', 'gestatcat4_hat', 'gestatcat5_hat', 'gestatcat6_hat', 'gestatcat7_hat', 'gestatcat8_hat', 'gestatcat9_hat', 'gestatcat10_hat', 'gestatcat1.1_hat', 'gestatcat2.1_hat', 'gestatcat3.1_hat', 'bord_hat', 'gestatcat4.1_hat', 'gestatcat6.1_hat', 'gestatcat7.1_hat', 'gestatcat8.1_hat', 'gestatcat9.1_hat', 'gestatcat10.1_hat', 'gestatcat1.2_hat', 'gestatcat2.2_hat', 'gestatcat3.2_hat', 'gestatcat4.2_hat', 'gestatcat5.1_hat', 'gestatcat6.2_hat', 'gestatcat7.2_hat', 'gestatcat8.2_hat', 'gestatcat5.2_hat', 'gestatcat9.2_hat', 'gestatcat10.2_hat', 'othermr_hat', 'dmar_hat', 'csex_hat', 'cardiac_hat', 'uterine_hat', 'lung_hat', 'diabetes_hat', 'herpes_hat', 'anemia_hat', 'hydra_hat', 'chyper_hat', 'phyper_hat', 'incervix_hat', 'pre4000_hat', 'preterm_hat', 'renal_hat', 'rh_hat', 'hemo_hat', 'ormoth_hat', 'birattnd_hat', 'pldel_hat', 'data_year_hat', 't_hat', 'y_hat']
+['eclamp', 'eclamp_hat', 'gestatcat1', 'gestatcat1_hat', 'gestatcat2', 'gestatcat2_hat', 'gestatcat3', 'gestatcat3_hat', 'gestatcat4', 'gestatcat4_hat', 'gestatcat5', 'gestatcat5_hat', 'gestatcat6', 'gestatcat6_hat', 'gestatcat7', 'gestatcat7_hat', 'gestatcat8', 'gestatcat8_hat', 'gestatcat9', 'gestatcat9_hat', 'gestatcat10', 'gestatcat10_hat', 'gestatcat1.1', 'gestatcat1.1_hat', 'gestatcat2.1', 'gestatcat2.1_hat', 'gestatcat3.1', 'gestatcat3.1_hat', 'bord', 'bord_hat', 'gestatcat4.1', 'gestatcat4.1_hat', 'gestatcat6.1', 'gestatcat6.1_hat', 'gestatcat7.1', 'gestatcat7.1_hat', 'gestatcat8.1', 'gestatcat8.1_hat', 'gestatcat9.1', 'gestatcat9.1_hat', 'gestatcat10.1', 'gestatcat10.1_hat', 'gestatcat1.2', 'gestatcat1.2_hat', 'gestatcat2.2', 'gestatcat2.2_hat', 'gestatcat3.2', 'gestatcat3.2_hat', 'gestatcat4.2', 'gestatcat4.2_hat', 'gestatcat5.1', 'gestatcat5.1_hat', 'gestatcat6.2', 'gestatcat6.2_hat', 'gestatcat7.2', 'gestatcat7.2_hat', 'gestatcat8.2', 'gestatcat8.2_hat', 'gestatcat5.2', 'gestatcat5.2_hat', 'gestatcat9.2', 'gestatcat9.2_hat', 'gestatcat10.2', 'gestatcat10.2_hat', 'othermr', 'othermr_hat', 'dmar', 'dmar_hat', 'csex', 'csex_hat', 'cardiac', 'cardiac_hat', 'uterine', 'uterine_hat', 'lung', 'lung_hat', 'diabetes', 'diabetes_hat', 'herpes', 'herpes_hat', 'anemia', 'anemia_hat', 'hydra', 'hydra_hat', 'chyper', 'chyper_hat', 'phyper', 'phyper_hat', 'incervix', 'incervix_hat', 'pre4000', 'pre4000_hat', 'preterm', 'preterm_hat', 'renal', 'renal_hat', 'rh', 'rh_hat', 'hemo', 'hemo_hat', 'ormoth', 'ormoth_hat', 'birattnd', 'birattnd_hat', 'pldel', 'pldel_hat', 'data_year', 'data_year_hat', 't', 't_hat', 'y', 'y_hat', 'tobacco_bin', 'tobacco_hat_bin', 'alcohol_bin', 'alcohol_hat_bin', 'orfath_bin', 'orfath_hat_bin', 'adequacy_bin', 'adequacy_hat_bin', 'drink5_bin', 'drink5_hat_bin', 'mpre5_bin', 'mpre5_hat_bin', 'meduc6_bin', 'meduc6_hat_bin', 'mrace_bin', 'mrace_hat_bin', 'frace_bin', 'frace_hat_bin', 'stoccfipb_reg_bin', 'stoccfipb_reg_hat_bin', 'mplbir_reg_bin', 'mplbir_reg_hat_bin', 'cigar6_bin', 'cigar6_hat_bin', 'mager8_bin', 'mager8_hat_bin', 'brstate_reg_bin', 'brstate_reg_hat_bin', 'feduc6_bin', 'feduc6_hat_bin', 'dfageq_bin', 'dfageq_hat_bin', 'nprevistq_bin', 'nprevistq_hat_bin', 'crace_bin', 'crace_hat_bin', 'birmon_bin', 'birmon_hat_bin', 'dtotord_min_bin', 'dtotord_min_hat_bin', 'dlivord_min_bin', 'dlivord_min_hat_bin']
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/sklearn/preprocessing/_discretization.py:248: FutureWarning: In version 1.5 onwards, subsample=200_000 will be used by default. Set subsample explicitly to silence this warning in the mean time. Set subsample=None to disable subsampling explicitly.
+  warnings.warn(
+['eclamp', 'eclamp_hat', 'gestatcat1', 'gestatcat1_hat', 'gestatcat2', 'gestatcat2_hat', 'gestatcat3', 'gestatcat3_hat', 'gestatcat4', 'gestatcat4_hat', 'gestatcat5', 'gestatcat5_hat', 'gestatcat6', 'gestatcat6_hat', 'gestatcat7', 'gestatcat7_hat', 'gestatcat8', 'gestatcat8_hat', 'gestatcat9', 'gestatcat9_hat', 'gestatcat10', 'gestatcat10_hat', 'gestatcat1.1', 'gestatcat1.1_hat', 'gestatcat2.1', 'gestatcat2.1_hat', 'gestatcat3.1', 'gestatcat3.1_hat', 'bord', 'bord_hat', 'gestatcat4.1', 'gestatcat4.1_hat', 'gestatcat6.1', 'gestatcat6.1_hat', 'gestatcat7.1', 'gestatcat7.1_hat', 'gestatcat8.1', 'gestatcat8.1_hat', 'gestatcat9.1', 'gestatcat9.1_hat', 'gestatcat10.1', 'gestatcat10.1_hat', 'gestatcat1.2', 'gestatcat1.2_hat', 'gestatcat2.2', 'gestatcat2.2_hat', 'gestatcat3.2', 'gestatcat3.2_hat', 'gestatcat4.2', 'gestatcat4.2_hat', 'gestatcat5.1', 'gestatcat5.1_hat', 'gestatcat6.2', 'gestatcat6.2_hat', 'gestatcat7.2', 'gestatcat7.2_hat', 'gestatcat8.2', 'gestatcat8.2_hat', 'gestatcat5.2', 'gestatcat5.2_hat', 'gestatcat9.2', 'gestatcat9.2_hat', 'gestatcat10.2', 'gestatcat10.2_hat', 'othermr', 'othermr_hat', 'dmar', 'dmar_hat', 'csex', 'csex_hat', 'cardiac', 'cardiac_hat', 'uterine', 'uterine_hat', 'lung', 'lung_hat', 'diabetes', 'diabetes_hat', 'herpes', 'herpes_hat', 'anemia', 'anemia_hat', 'hydra', 'hydra_hat', 'chyper', 'chyper_hat', 'phyper', 'phyper_hat', 'incervix', 'incervix_hat', 'pre4000', 'pre4000_hat', 'preterm', 'preterm_hat', 'renal', 'renal_hat', 'rh', 'rh_hat', 'hemo', 'hemo_hat', 'data_year', 'data_year_hat', 't', 't_hat', 'y', 'y_hat', 'tobacco_bin', 'tobacco_hat_bin', 'alcohol_bin', 'alcohol_hat_bin', 'orfath_bin', 'orfath_hat_bin', 'adequacy_bin', 'adequacy_hat_bin', 'drink5_bin', 'drink5_hat_bin', 'mpre5_bin', 'mpre5_hat_bin', 'meduc6_bin', 'meduc6_hat_bin', 'mrace_bin', 'mrace_hat_bin', 'ormoth_bin', 'ormoth_hat_bin', 'frace_bin', 'frace_hat_bin', 'birattnd_bin', 'birattnd_hat_bin', 'stoccfipb_reg_bin', 'stoccfipb_reg_hat_bin', 'mplbir_reg_bin', 'mplbir_reg_hat_bin', 'cigar6_bin', 'cigar6_hat_bin', 'mager8_bin', 'mager8_hat_bin', 'pldel_bin', 'pldel_hat_bin', 'brstate_reg_bin', 'brstate_reg_hat_bin', 'feduc6_bin', 'feduc6_hat_bin', 'dfageq_bin', 'dfageq_hat_bin', 'nprevistq_bin', 'nprevistq_hat_bin', 'crace_bin', 'crace_hat_bin', 'birmon_bin', 'birmon_hat_bin', 'dtotord_min_bin', 'dtotord_min_hat_bin', 'dlivord_min_bin', 'dlivord_min_hat_bin']
+[(66, 103), (42, 103), (132, 103), (26, 103), (2, 103), (136, 103), (64, 105), (40, 105), (134, 103), (4, 103), (94, 103), (70, 103), (138, 103), (32, 103), (8, 103), (42, 105), (98, 103), (108, 105), (132, 105), (2, 105), (46, 105), (68, 105), (136, 105), (6, 105), (56, 103), (4, 105), (60, 103), (70, 105), (94, 105), (126, 103), (138, 105), (8, 105), (30, 105), (98, 105), (62, 103), (38, 103), (128, 103), (22, 103), (60, 105), (36, 105), (126, 105), (130, 103), (0, 103), (90, 103), (38, 105), (128, 105), (92, 103), (52, 103), (28, 103), (96, 103), (118, 103), (130, 105), (0, 105), (90, 105), (66, 105), (122, 103), (26, 105), (120, 103), (58, 103), (34, 103), (80, 103), (124, 103), (134, 105), (28, 105), (96, 105), (118, 105), (32, 105), (122, 105), (20, 103), (18, 103), (120, 105), (152, 103), (80, 105), (34, 105), (56, 105), (124, 105), (88, 103), (48, 103), (24, 103), (114, 103), (18, 105), (62, 105), (152, 105), (22, 105), (116, 103), (10, 103), (76, 103), (24, 105), (114, 105), (78, 103), (54, 103), (144, 103), (14, 103), (116, 105), (92, 105), (148, 103), (76, 105), (52, 105), (146, 103), (40, 103), (16, 103), (106, 103), (150, 103), (54, 105), (110, 103), (144, 105), (14, 105), (58, 105), (148, 105), (108, 103), (46, 103), (44, 103), (68, 103), (146, 105), (6, 103), (16, 105), (72, 103), (106, 105), (150, 105), (20, 105), (110, 105), (30, 103), (74, 103), (50, 103), (140, 103), (44, 105), (88, 105), (72, 105), (48, 105), (142, 103), (36, 103), (12, 103), (74, 105), (50, 105), (140, 105), (10, 105), (64, 103), (142, 105), (12, 105), (102, 105), (78, 105)]

@@ -1,0 +1,35 @@
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_setup.py:_flush():76] Current SDK version is 0.16.6
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_setup.py:_flush():76] Configure stats pid to 90975
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_setup.py:_flush():76] Loading settings from /Users/manqingliu/.config/wandb/settings
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_setup.py:_flush():76] Loading settings from /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/wandb/settings
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2024-04-06 13:11:01,172 WARNING MainThread:90975 [wandb_setup.py:_flush():76] Could not find program at <input>
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': None, 'program': '<input>'}
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_setup.py:_flush():76] Applying login settings: {}
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_init.py:_log_setup():521] Logging user logs to /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/wandb/run-20240406_131101-ckezbvz7/logs/debug.log
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_init.py:_log_setup():522] Logging internal logs to /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/wandb/run-20240406_131101-ckezbvz7/logs/debug-internal.log
+2024-04-06 13:11:01,172 INFO    MainThread:90975 [wandb_init.py:init():561] calling init triggers
+2024-04-06 13:11:01,173 INFO    MainThread:90975 [wandb_init.py:init():568] wandb.init called with sweep_config: {}
+config: {'learning_rate': 0.0005438095887661997, 'architecture': 'Transformer', 'dataset': 'lalonde_cps data (sample 0)', 'masking': 'without masking', 'treatment': '0', 'weight decay': '0', 'dropout rate': '0', 'batch size': '128', 'embedding dimension': '512', 'nhead': '16', 'loader': '<torch.utils.data.dataloader.DataLoader object at 0x7fa33a5be0b0>', 'epochs': 10}
+2024-04-06 13:11:01,173 INFO    MainThread:90975 [wandb_init.py:init():611] starting backend
+2024-04-06 13:11:01,173 INFO    MainThread:90975 [wandb_init.py:init():615] setting up manager
+2024-04-06 13:11:01,175 INFO    MainThread:90975 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2024-04-06 13:11:01,177 INFO    MainThread:90975 [wandb_init.py:init():623] backend started and connected
+2024-04-06 13:11:01,203 INFO    MainThread:90975 [wandb_init.py:init():715] updated telemetry
+2024-04-06 13:11:01,463 INFO    MainThread:90975 [wandb_init.py:init():748] communicating run to backend with 90.0 second timeout
+2024-04-06 13:11:01,863 INFO    MainThread:90975 [wandb_run.py:_on_init():2357] communicating current version
+2024-04-06 13:11:02,051 INFO    MainThread:90975 [wandb_run.py:_on_init():2366] got version response 
+2024-04-06 13:11:02,051 INFO    MainThread:90975 [wandb_init.py:init():799] starting run threads in backend
+2024-04-06 13:11:06,685 INFO    MainThread:90975 [wandb_run.py:_console_start():2335] atexit reg
+2024-04-06 13:11:06,685 INFO    MainThread:90975 [wandb_run.py:_redirect():2190] redirect: wrap_raw
+2024-04-06 13:11:06,685 INFO    MainThread:90975 [wandb_run.py:_redirect():2255] Wrapping output streams.
+2024-04-06 13:11:06,685 INFO    MainThread:90975 [wandb_run.py:_redirect():2280] Redirects installed.
+2024-04-06 13:11:06,686 INFO    MainThread:90975 [wandb_init.py:init():842] run started, returning control to user process
+2024-04-06 13:25:25,406 INFO    MainThread:90975 [wandb_run.py:_finish():2064] finishing run mliu7/dag-aware-transformer-lalonde_cps-stratified-std/ckezbvz7
+2024-04-06 13:25:25,410 INFO    MainThread:90975 [wandb_run.py:_atexit_cleanup():2304] got exitcode: 0
+2024-04-06 13:25:25,413 INFO    MainThread:90975 [wandb_run.py:_restore():2287] restore
+2024-04-06 13:25:25,414 INFO    MainThread:90975 [wandb_run.py:_restore():2293] restore done
+2024-04-06 13:25:50,633 INFO    MainThread:90975 [wandb_run.py:_footer_history_summary_info():3936] rendering history
+2024-04-06 13:25:50,652 INFO    MainThread:90975 [wandb_run.py:_footer_history_summary_info():3968] rendering summary
+2024-04-06 13:25:50,699 INFO    MainThread:90975 [wandb_run.py:_footer_sync_info():3895] logging synced files

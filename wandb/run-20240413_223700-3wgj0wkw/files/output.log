@@ -1,0 +1,41 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevconsole.py", line 364, in runcode
+    coro = func()
+  File "<input>", line 51, in <module>
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/utils.py", line 171, in train
+    train_losses = self._compute_losses(batch_gpu, optimizer=optimizer, train=True)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/utils.py", line 221, in _compute_losses
+    output = model(batch_gpu)[:, i + 1].unsqueeze(1)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/DAG_aware_transformer.py", line 70, in forward
+    embeddings = [self.embeddings[i](x[:, i]) for i in range(x.size(1))]
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/DAG_aware_transformer.py", line 70, in <listcomp>
+    embeddings = [self.embeddings[i](x[:, i]) for i in range(x.size(1))]
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/container.py", line 295, in __getitem__
+    return self._modules[self._get_abs_string_index(idx)]
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/container.py", line 285, in _get_abs_string_index
+    raise IndexError(f'index {idx} is out of range')
+IndexError: index 1 is out of range
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevconsole.py", line 364, in runcode
+    coro = func()
+  File "<input>", line 51, in <module>
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/utils.py", line 171, in train
+    train_losses = self._compute_losses(batch_gpu, optimizer=optimizer, train=True)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/utils.py", line 221, in _compute_losses
+    output = model(batch_gpu)[:, i + 1].unsqueeze(1)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/DAG_aware_transformer.py", line 70, in forward
+    embeddings = [self.embeddings[i](x[:, i]) for i in range(x.size(1))]
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/models/DAG_aware_transformer.py", line 70, in <listcomp>
+    embeddings = [self.embeddings[i](x[:, i]) for i in range(x.size(1))]
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/container.py", line 295, in __getitem__
+    return self._modules[self._get_abs_string_index(idx)]
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/container.py", line 285, in _get_abs_string_index
+    raise IndexError(f'index {idx} is out of range')

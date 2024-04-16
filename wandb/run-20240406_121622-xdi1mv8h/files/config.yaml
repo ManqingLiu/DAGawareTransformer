@@ -1,0 +1,66 @@
+wandb_version: 1
+
+learning_rate:
+  desc: null
+  value: 0.0001
+architecture:
+  desc: null
+  value: Transformer
+dataset:
+  desc: null
+  value: lalonde_cps data (sample 0)
+masking:
+  desc: null
+  value: without masking
+weight decay:
+  desc: null
+  value: '0'
+dropout rate:
+  desc: null
+  value: '0'
+batch size:
+  desc: null
+  value: '32'
+embedding dimension:
+  desc: null
+  value: '512'
+nhead:
+  desc: null
+  value: '32'
+loader:
+  desc: null
+  value: <torch.utils.data.dataloader.DataLoader object at 0x7f9c4b94ff40>
+epochs:
+  desc: null
+  value: 1
+_wandb:
+  desc: null
+  value:
+    python_version: 3.10.14
+    cli_version: 0.16.6
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1712420182.0
+    t:
+      1:
+      - 1
+      - 5
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 53
+      - 55
+      3:
+      - 2
+      - 13
+      - 16
+      - 23
+      - 61
+      4: 3.10.14
+      5: 0.16.6
+      8:
+      - 5
+      13: darwin-x86_64

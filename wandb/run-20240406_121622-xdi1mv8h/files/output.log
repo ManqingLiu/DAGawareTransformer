@@ -1,0 +1,2 @@
+Val Loader, Epoch 0, Training Losses: black_hat: 0.15903, hispanic_hat: 0.08382, married_hat: 0.31467, nodegree_hat: 0.54437, t_hat: 0.20605, age_bin_hat: 27.22292, education_bin_hat: 35.62411, re74_bin_hat: 8.93570, re75_bin_hat: 1.15787, y_bin_hat: 15.07611
+Val Loader, Epoch 0, Validation Losses: black_hat: 0.14069, hispanic_hat: 0.07319, married_hat: 0.58655, nodegree_hat: 0.43195, t_hat: 0.16540, age_bin_hat: 9.33344, education_bin_hat: 24.03975, re74_bin_hat: 3.22364, re75_bin_hat: 7.94118, y_bin_hat: 12.33928
