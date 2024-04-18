@@ -6,7 +6,7 @@ from torch.optim import AdamW
 import torch.optim as optim
 from src.models.DAG_aware_transformer import TabularBERT
 from src.models.utils import *
-from src.data.data_preprocess import DataProcessor
+from src.dataset.data_preprocess import DataProcessor
 from sklearn.model_selection import train_test_split
 from config import *
 from torch.utils.data import DataLoader, TensorDataset
