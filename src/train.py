@@ -16,7 +16,10 @@ from tqdm import tqdm
 import wandb
 
 
-def train(model: nn.Module, dataloader: DataLoader, config: Dict):
+def train(model: nn.Module,
+          dataloader: DataLoader,
+          config: Dict,
+          model_file: str):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Using device: {device}')
@@ -45,6 +48,8 @@ def train(model: nn.Module, dataloader: DataLoader, config: Dict):
             wandb.log({'loss': batch_loss.item()})
 
     wandb.finish()
+    print(f'Saving model to {model_file}')
+    torch.save(model.state_dict(), model_file)
 
 
 if __name__ == '__main__':
@@ -52,6 +57,7 @@ if __name__ == '__main__':
     parser.add_argument('--dag', type=str, required=True)
     parser.add_argument('--config', type=str, required=True)
     parser.add_argument('--data_file', type=str, required=True)
+    parser.add_argument('--model_file', type=str, required=True)
 
     args = parser.parse_args()
 
@@ -83,6 +89,6 @@ if __name__ == '__main__':
                             shuffle=True,
                             collate_fn=dataset.collate_fn)
 
-    train(model, dataloader, train_config)
+    train(model, dataloader, train_config, model_file=args.model_file)
     print('Done training.')
 
