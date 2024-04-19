@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch.optim import AdamW
 from src.models.DAG_aware_transformer import *
 from src.models.utils import *
-from src.data.data_preprocess import DataProcessor
+from src.dataset.data_preprocess import DataProcessor
 # TODO: Convert config to a json file
 from config import *
 import wandb

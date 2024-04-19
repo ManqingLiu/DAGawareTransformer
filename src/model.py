@@ -1,6 +1,5 @@
 import torch.nn as nn
 import torch
-
 from typing import Dict
 
 class DAGTransformer(nn.Module):
@@ -34,7 +33,6 @@ class DAGTransformer(nn.Module):
                 target_node_id = self.node_ids[target_node]
                 self.adj_matrix[source_node_id, target_node_id] = 1
 
-        self.adj_matrix = self.adj_matrix
 
         self.attn_mask = ~(self.adj_matrix.bool().T)
 
@@ -68,3 +66,20 @@ class DAGTransformer(nn.Module):
 
         return node_outputs
 
+
+def causal_loss_fun(outputs, labels, return_items=True):
+    loss = []
+    batch_items = {}
+    for output_name in outputs.keys():
+        output = outputs[output_name]
+        label = labels[output_name].squeeze()
+        batch_loss = nn.functional.cross_entropy(output, label)
+        if return_items:
+            batch_items[output_name] = batch_loss.item()
+        loss.append(batch_loss)
+
+    loss = sum(loss) / len(loss)
+    if return_items:
+        return loss, batch_items
+    else:
+        return loss

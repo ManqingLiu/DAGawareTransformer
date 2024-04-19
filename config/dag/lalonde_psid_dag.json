@@ -10,13 +10,12 @@
     "re74": {"num_categories":  5},
     "re75": {"num_categories":  5},
     "t": {"num_categories":  2},
-    "y": {"num_categories":  5}},
+    "y": {"num_categories":  10}},
 
   "output_nodes": {
     "t": {"num_categories":  2},
-    "y": {"num_categories":  5}
+    "y": {"num_categories":  10}
     },
-
   "edges": {
     "age": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75"],
     "education": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75"],

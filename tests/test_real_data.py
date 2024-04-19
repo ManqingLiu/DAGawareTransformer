@@ -5,8 +5,12 @@ import numpy as np
 import json
 
 import torch
+from torch.utils.data import DataLoader
 
-from src.model import DAGTransformer
+from src.model import DAGTransformer, causal_loss_fun
+from src.dataset import CausalDataset
+
+from tqdm import tqdm
 
 def bin_columns(df, config):
     for column, params in config.items():
@@ -19,7 +23,7 @@ def bin_columns(df, config):
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
-        self.config_file = '../config/lalonde_psid.json'
+        self.config_file = '../config/dag/lalonde_psid_dag.json'
         self.data_file = '../data/realcause_datasets/lalonde_psid_sample1.csv'
         with open(self.config_file) as f:
             self.dag = json.load(f)
@@ -47,9 +51,31 @@ class MyTestCase(unittest.TestCase):
             batch[node] = node_data
 
         model = DAGTransformer(self.dag)
-        model.to(self.device)
+        model = model.to(self.device)
         opt = torch.optim.Adam(model.parameters(), lr=0.001)
 
+        outputs = model(batch)
+
+        loss = causal_loss_fun(outputs, batch)
+        loss.backward()
+        initial_loss = loss.item()
+        opt.step()
+
+        outputs = model(batch)
+        final_loss = causal_loss_fun(outputs, batch).item()
+
+        self.assertTrue(final_loss < initial_loss)
+
+    def test_dataloader_onestep(self):
+
+        dataset = CausalDataset(self.data_file, self.config_file)
+        dataloader = DataLoader(dataset, batch_size=8, shuffle=True, collate_fn=dataset.collate_fn)
+
+        model = DAGTransformer(self.dag)
+        model = model.to(self.device)
+        opt = torch.optim.Adam(model.parameters(), lr=0.001)
+
+        batch = next(iter(dataloader))
         outputs = model(batch)
 
         loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
@@ -75,6 +101,76 @@ class MyTestCase(unittest.TestCase):
 
         self.assertTrue(total_loss.item() < initial_loss)
 
+    def test_dataloader_twoepochs(self):
+        batch_size = 64
+        data = pd.read_csv(self.data_file)
+        data = data[self.dag['nodes']]
+        dataset = CausalDataset(data, self.dag)
+        dataloader = DataLoader(dataset,
+                                batch_size=batch_size,
+                                num_workers=4,
+                                shuffle=True,
+                                collate_fn=dataset.collate_fn)
+
+        model = DAGTransformer(self.dag)
+        model = model.to(self.device)
+        opt = torch.optim.Adam(model.parameters(), lr=0.01)
+        loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
+
+        for batch in tqdm(dataloader):
+            outputs = model(batch)
+
+            batch_loss = []
+            for output_name in outputs.keys():
+                output = outputs[output_name]
+                labels = batch[output_name].squeeze()
+                batch_loss.append(loss_fn(output, labels))
+
+            batch_loss  = sum(batch_loss) / len(batch_loss)
+            batch_loss.backward()
+            opt.step()
+            opt.zero_grad()
+
+        # Calculate loss on the entire dataset
+        initial_loss = 0
+        for batch in dataloader:
+            outputs = model(batch)
+            batch_loss = 0
+            for output_name in outputs.keys():
+                output = outputs[output_name]
+                labels = batch[output_name].squeeze()
+                batch_loss += loss_fn(output, labels)
+
+            batch_loss /= len(outputs.keys())
+            initial_loss += batch_loss
+
+        initial_loss /= len(dataloader)
+
+        for batch in tqdm(dataloader):
+            outputs = model(batch)
+
+            batch_loss = causal_loss_fun(outputs, batch)
+            batch_loss.backward()
+            opt.step()
+            opt.zero_grad()
+
+        final_loss = 0
+        for batch in dataloader:
+            outputs = model(batch)
+            batch_loss = 0
+            for output_name in outputs.keys():
+                output = outputs[output_name]
+                labels = batch[output_name].squeeze()
+                batch_loss += loss_fn(output, labels)
+
+            batch_loss /= len(outputs.keys())
+            final_loss += batch_loss
+
+        final_loss /= len(dataloader)
+        print(f'Initial loss: {initial_loss.item()}')
+        print(f'Final loss: {final_loss.item()}')
+
+        self.assertTrue(final_loss.item() < initial_loss.item())
 
 if __name__ == '__main__':
     unittest.main()
