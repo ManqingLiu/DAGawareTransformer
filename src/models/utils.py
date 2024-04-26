@@ -90,18 +90,6 @@ def save_model(model, dataset_type, loader_name, n_sample, n_epochs,
     torch.save(model.state_dict(), model_path)
     print(f"Model saved to {model_path}")
 
-
-def save_model_stratified_std(model, treatment, dataset_type, loader_name, n_sample, n_epochs,
-               learning_rate, weight_decay, dropout_rate, batch_size, embedding_dim, nhead):
-    # write description of the model
-    model_path = (f"experiments/model/{dataset_type}/model_treatment{treatment}_{dataset_type}_{loader_name}_sample{n_sample}_"
-                  f"epoch{n_epochs}_lr{learning_rate:.4f}_wd{weight_decay:.4f}_dr{dropout_rate:.4f}_bs{batch_size}_ed{embedding_dim}_nh{nhead}.pth")
-    # Example path: "experiments/model/model_cps_train_fold1_sample100_epoch50.pth"
-
-    # Assuming you're using PyTorch to save the model. Adjust accordingly for other frameworks.
-    torch.save(model.state_dict(), model_path)
-    print(f"Model saved to {model_path}")
-
 '''
 def predict_and_create_df(model, model_path, device, trainer, loader, data, processor, feature_names):
     # Load the model

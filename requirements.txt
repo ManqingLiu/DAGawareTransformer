@@ -9,3 +9,5 @@ ray[tune]
 openpyxl
 matplotlib
 seaborn
+doubleml
+tqdm

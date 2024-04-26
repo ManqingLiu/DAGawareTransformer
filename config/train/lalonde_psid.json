@@ -1,6 +1,6 @@
 {
   "training": {
-    "num_epochs": 1000,
+    "num_epochs": 100,
     "batch_size": 512,
     "learning_rate": 0.001,
     "weight_decay": 0.0,
@@ -10,7 +10,6 @@
     "num_layers": 2,
     "dropout_rate": 0.1,
     "embedding_dim": 128,
-    "num_heads": 4,
-    "num_layers": 3
+    "num_heads": 32
   }
 }

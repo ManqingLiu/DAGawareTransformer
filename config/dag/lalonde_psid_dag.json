@@ -7,8 +7,8 @@
     "hispanic": {"num_categories":  2},
     "married": {"num_categories":  2},
     "nodegree": {"num_categories":  2},
-    "re74": {"num_categories":  5},
-    "re75": {"num_categories":  5},
+    "re74": {"num_categories":  10},
+    "re75": {"num_categories":  10},
     "t": {"num_categories":  2},
     "y": {"num_categories":  10}},
 

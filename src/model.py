@@ -36,8 +36,13 @@ class DAGTransformer(nn.Module):
 
         self.attn_mask = ~(self.adj_matrix.bool().T)
 
+        #self.embedding = nn.ModuleDict({
+        #    node: nn.Embedding(self.input_nodes[node]['num_categories'], self.embedding_dim)
+        #    for node in self.input_nodes.keys()
+        #})
+
         self.embedding = nn.ModuleDict({
-            node: nn.Embedding(self.input_nodes[node]['num_categories'], self.embedding_dim)
+            node.replace('.', '_'): nn.Embedding(self.input_nodes[node]['num_categories'], self.embedding_dim)
             for node in self.input_nodes.keys()
         })
 
@@ -51,20 +56,26 @@ class DAGTransformer(nn.Module):
             for node in self.output_nodes.keys()
         })
 
-    def forward(self, x):
-        embeddings = [self.embedding[node](x[node]) for node in self.node_ids.keys()]
+
+    def forward(self, x, mask=None):
+        #embeddings = [self.embedding[node](x[node]) for node in self.node_ids.keys()]
+        embeddings = [self.embedding[node.replace('.', '_')](x[node]) for node in self.node_ids.keys()]
         x = torch.stack(embeddings).squeeze(2)
         x = x.view(x.size(1), x.size(0), x.size(2))
 
-        attn_mask = self.attn_mask.repeat(x.size(0) * self.num_heads, 1, 1)
-        attn_mask = attn_mask.to(x.device)
-        x = self.encoder(x, mask=attn_mask)
+        if mask:
+            attn_mask = self.attn_mask.repeat(x.size(0) * self.num_heads, 1, 1)
+            attn_mask = attn_mask.to(x.device)
+            x = self.encoder(x, mask=attn_mask)
+        else:
+            x = self.encoder(x)
         node_outputs = {}
         for node_name in self.output_nodes.keys():
             node_id = self.node_ids[node_name]
             node_outputs[node_name] = self.output_head[node_name](x[:, node_id, :])
 
         return node_outputs
+
 
 
 def causal_loss_fun(outputs, labels, return_items=True):

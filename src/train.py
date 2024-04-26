@@ -12,6 +12,9 @@ from dataset import CausalDataset
 from typing import Dict
 
 from tqdm import tqdm
+import time
+
+from sklearn.model_selection import train_test_split
 
 import wandb
 
@@ -38,7 +41,9 @@ def train(model: nn.Module,
         for batch in dataloader:
             opt.zero_grad()
             batch = {k: v.to(device) for k, v in batch.items()}
-            outputs = model(batch)
+            outputs = model(batch, mask=False)
+            #for output_name in outputs.keys():
+            #    print(f"Shape of {output_name}: {outputs[output_name].shape}")
             batch_loss, batch_items = causal_loss_fun(outputs, batch, return_items=True)
             for item in batch_items.keys():
                 wandb.log({item: batch_items[item]})
@@ -56,8 +61,10 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--dag', type=str, required=True)
     parser.add_argument('--config', type=str, required=True)
-    parser.add_argument('--data_file', type=str, required=True)
-    parser.add_argument('--model_file', type=str, required=True)
+    parser.add_argument('--data_train_file', type=str, required=True)
+    parser.add_argument('--data_holdout_file', type=str, required=True)
+    parser.add_argument('--model_train_file', type=str, required=True)
+    parser.add_argument('--model_holdout_file', type=str, required=True)
 
     args = parser.parse_args()
 
@@ -79,7 +86,21 @@ if __name__ == '__main__':
     model = DAGTransformer(dag=dag,
                            **model_config)
 
-    data = pd.read_csv(args.data_file)
+    data = pd.read_csv(args.data_train_file)
+    data = data[dag['nodes']]
+    dataset = CausalDataset(data, dag)
+
+    batch_size = train_config['batch_size']
+    dataloader = DataLoader(dataset,
+                            batch_size=batch_size,
+                            shuffle=True,
+                            collate_fn=dataset.collate_fn)
+    # Before training for train file
+    start_time = time.time()
+    train(model, dataloader, train_config, model_file=args.model_train_file)
+    print('Done training.')
+
+    data = pd.read_csv(args.data_holdout_file)
     data = data[dag['nodes']]
     dataset = CausalDataset(data, dag)
 
@@ -89,6 +110,14 @@ if __name__ == '__main__':
                             shuffle=True,
                             collate_fn=dataset.collate_fn)
 
-    train(model, dataloader, train_config, model_file=args.model_file)
+    train(model, dataloader, train_config, model_file=args.model_holdout_file)
     print('Done training.')
+    # After training for holdout file
+    end_time = time.time()
+
+    # Calculate and print the total wall time
+    total_wall_time = end_time - start_time
+    # Convert the total wall time to minutes and seconds
+    minutes, seconds = divmod(total_wall_time, 60)
+    print(f"Total wall time used: {minutes} minutes and {seconds} seconds")
 
