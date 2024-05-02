@@ -12,7 +12,10 @@ N = 100
 Sigma = 0.5 * (0.3 * np.ones((5, 5)) + 0.7 * np.eye(5))
 
 # Generate unobserved confounders U
-U = np.random.multivariate_normal(np.zeros(5), Sigma, N)
+U_normal = np.random.multivariate_normal(np.zeros(5), Sigma, N)
+
+# Transform the normal variables to uniform variables using the CDF
+U = norm.cdf(U_normal)
 
 # Generate covariate matrix X
 X = np.zeros((N, 10))
@@ -48,7 +51,7 @@ print(df['A'].mean())
 print(df['Y'].mean())
 
 # save the data to a CSV file in data/unmeasured_confounding/data_U.csv
-df.to_csv('data/unmeasured_confounding/data_U_n100.csv', index=False)
+df.to_csv('data/unmeasured_confounding/data_U_uniform.csv', index=False)
 
 print(df.columns)
 

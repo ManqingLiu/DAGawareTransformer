@@ -6,7 +6,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch
 
-from model import DAGTransformer, causal_loss_fun
+from model import *
 from dataset import CausalDataset
 
 from typing import Dict
@@ -22,6 +22,7 @@ import wandb
 def train(model: nn.Module,
           dataloader: DataLoader,
           config: Dict,
+          mask: bool,
           model_file: str):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -41,7 +42,7 @@ def train(model: nn.Module,
         for batch in dataloader:
             opt.zero_grad()
             batch = {k: v.to(device) for k, v in batch.items()}
-            outputs = model(batch, mask=False)
+            outputs = model(batch, mask=mask)
             #for output_name in outputs.keys():
             #    print(f"Shape of {output_name}: {outputs[output_name].shape}")
             batch_loss, batch_items = causal_loss_fun(outputs, batch, return_items=True)
@@ -82,6 +83,7 @@ if __name__ == '__main__':
     # Move all of this to a utils function for load_dag and load_data
     num_nodes = len(dag['nodes'])
     dag['node_ids'] = dict(zip(dag['nodes'], range(num_nodes)))
+    print(dag)
 
     model = DAGTransformer(dag=dag,
                            **model_config)
@@ -97,7 +99,7 @@ if __name__ == '__main__':
                             collate_fn=dataset.collate_fn)
     # Before training for train file
     start_time = time.time()
-    train(model, dataloader, train_config, model_file=args.model_train_file)
+    train(model, dataloader, train_config, mask=True, model_file=args.model_train_file)
     print('Done training.')
 
     data = pd.read_csv(args.data_holdout_file)
@@ -110,7 +112,7 @@ if __name__ == '__main__':
                             shuffle=True,
                             collate_fn=dataset.collate_fn)
 
-    train(model, dataloader, train_config, model_file=args.model_holdout_file)
+    train(model, dataloader, train_config,  mask=True, model_file=args.model_holdout_file)
     print('Done training.')
     # After training for holdout file
     end_time = time.time()

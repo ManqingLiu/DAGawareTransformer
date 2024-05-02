@@ -5,41 +5,118 @@ import numpy as np
 # set print options to include all columns
 pd.set_option('display.max_columns', 100)
 
-'''
+
 # Load the dataset
 df = pd.read_csv('causal-predictive-analysis.csv')
 
 # Filter the dataframe where dataset equals 'twins'
-psid = df[df['dataset'] == 'twins']
+cps = df[df['dataset'] == 'lalonde_cps']
+# print column names
+print(cps.columns)
+# add a column of relative bias where it is ate_bias devided by -7028.2493
+cps['relative_bias'] = cps['ate_bias'] / -7028.2493
 # Group the filtered dataframe by 'meta-estimator' and summarize 'ate_rmse'
-ate_rmse_summary = psid.groupby('meta-estimator')['ate_rmse'].agg(['mean', 'std'])
+ate_bias_summary = cps.groupby('meta-estimator')['relative_bias'].agg(['mean', 'std'])
 
 # Display the summary
-print(ate_rmse_summary)
+print(ate_bias_summary)
 
 
 
-psid_outcome = psid[psid['meta-estimator'].isin(['standardization', 'stratified_standardization'])]
+cps_outcome =cps[cps['meta-estimator'].isin(['standardization', 'stratified_standardization'])]
 
 # adjust the code below to sort by min value of 'ate_rmse'
-ate_rmse_outcome = psid_outcome.groupby(['meta-estimator', 'outcome_model'])['ate_rmse'].agg(['min'])
-ate_rmse_outcome = ate_rmse_outcome.sort_values(by='min')
-print(ate_rmse_outcome)
+ate_bias_outcome = cps_outcome.groupby(['meta-estimator', 'outcome_model'])['relative_bias'].agg(['min'])
+ate_bias_outcome = ate_bias_outcome.sort_values(by='min')
+print(ate_bias_outcome)
+
+# get the smallest abosulte value of relative bias
+min_relative_bias = cps['relative_bias'].abs().min()
+print(min_relative_bias)
+
+# get the smallest absolute value and the corresponding outcome model of relative bias
+min_relative_bias_outcome = cps_outcome.loc[cps_outcome['relative_bias'].abs().idxmin(),
+['dataset', 'meta-estimator', 'outcome_model', 'params_outcome_model','relative_bias']]
+print(min_relative_bias_outcome)
+
+
+
+cps_treatment = cps[cps['meta-estimator'].isin(['ipw','ipw_stabilized'])]
+ate_bias_treatment = cps_treatment.groupby(['meta-estimator', 'prop_score_model'])['relative_bias'].agg(['min'])
+ate_bias_treatment = ate_bias_treatment.sort_values(by='min')
+print(ate_bias_treatment)
+
+# get the smallest absolute value and the corresponding treatment model of relative bias
+# show dataset, meta_estimator, treatment_model, params_treatment_model in the output
+
+min_relative_bias_treatment = cps_treatment.loc[cps_treatment['relative_bias'].abs().idxmin(),
+['dataset', 'meta-estimator', 'prop_score_model', 'params_prop_score_model','relative_bias']]
+print(min_relative_bias_treatment)
+
+
+
+
+# Filter the dataframe where dataset equals 'twins'
+cps = df[df['dataset'] == 'lalonde_cps']
+# print column names
+print(cps.columns)
+# add a column of relative bias where it is ate_bias devided by -7028.2493
+cps['relative_bias'] = cps['ate_bias'] / -7028.2493
+# Group the filtered dataframe by 'meta-estimator' and summarize 'ate_rmse'
+ate_bias_summary = cps.groupby('meta-estimator')['relative_bias'].agg(['mean', 'std'])
+
+# Display the summary
+print(ate_bias_summary)
+
+
+
+
+# Filter the dataframe where dataset equals 'twins'
+psid = df[df['dataset'] == 'lalonde_psid']
+
+# add a column of relative bias where it is ate_bias devided by -7028.2493
+psid['relative_bias'] = psid['ate_bias'] / -13346.9993
+
+psid_outcome =psid[psid['meta-estimator'].isin(['standardization'])]
+min_relative_bias_outcome = psid_outcome.loc[psid_outcome['relative_bias'].abs().idxmin(),
+['dataset', 'meta-estimator', 'outcome_model', 'params_outcome_model','relative_bias']]
+print(min_relative_bias_outcome)
+
 
 psid_treatment = psid[psid['meta-estimator'].isin(['ipw','ipw_stabilized'])]
-ate_rmse_treatment = psid_treatment.groupby(['meta-estimator', 'prop_score_model'])['ate_rmse'].agg(['min'])
-ate_rmse_treatment = ate_rmse_treatment.sort_values(by='min')
-print(ate_rmse_treatment)
+ate_bias_treatment = psid_treatment.groupby(['meta-estimator', 'prop_score_model'])['relative_bias'].agg(['min'])
+ate_bias_treatment = ate_bias_treatment.sort_values(by='min')
+print(ate_bias_treatment)
 
-# print unit value of first column which is categorical
-#print(analysis['dataset'].unique()) #['lalonde_psid' 'lalonde_cps' 'twins']
+# get the smallest absolute value and the corresponding treatment model of relative bias
+# show dataset, meta_estimator, treatment_model, params_treatment_model in the output
 
-## Dataset: lalonde_cps, laonde_psid, twins
-## outcome of laonde_cps and laonde_psid is continuous
-## outcome of twins is binary
+min_relative_bias_treatment = psid_treatment.loc[psid_treatment['relative_bias'].abs().idxmin(),
+['dataset', 'meta-estimator', 'prop_score_model', 'params_prop_score_model','relative_bias']]
+print(min_relative_bias_treatment)
+
+
+
+# Filter the dataframe where dataset equals 'twins'
+twins = df[df['dataset'] == 'twins']
+
+# add a column of relative bias where it is ate_bias devided by -7028.2493
+twins['relative_bias'] = twins['ate_bias'] / -0.06934245660881175
+
+
+twins_treatment = twins[twins['meta-estimator'].isin(['ipw','ipw_stabilized'])]
+
+# get the smallest absolute value and the corresponding treatment model of relative bias
+# show dataset, meta_estimator, treatment_model, params_treatment_model in the output
+
+min_relative_bias_treatment = twins_treatment.loc[twins_treatment['relative_bias'].abs().idxmin(),
+['dataset', 'meta-estimator', 'prop_score_model', 'params_prop_score_model','relative_bias']]
+print(min_relative_bias_treatment)
+
+
+
+
 '''
-
-
 # import the lalonde_cps_sample0 in csv as pandas dataframe
 twins = pd.read_csv('data/realcause_datasets/twins_sample0.csv')
 
@@ -70,7 +147,7 @@ df = df[columns]
 print(df.describe(include='all'))
 print(df.columns)
 
-'''
+
 ## summary of lalonde cps dataset
 # continuous: age, education, re74, re75
 # binary: black, hispanic, married, nodegree

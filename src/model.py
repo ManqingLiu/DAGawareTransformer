@@ -35,6 +35,7 @@ class DAGTransformer(nn.Module):
 
 
         self.attn_mask = ~(self.adj_matrix.bool().T)
+        #print(self.attn_mask)
 
         #self.embedding = nn.ModuleDict({
         #    node: nn.Embedding(self.input_nodes[node]['num_categories'], self.embedding_dim)
@@ -48,8 +49,9 @@ class DAGTransformer(nn.Module):
 
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=self.embedding_dim,
                                                         nhead=self.num_heads,
+                                                        dropout=self.dropout_rate,
                                                         batch_first=True)
-        self.encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=3)
+        self.encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_layers)
 
         self.output_head = nn.ModuleDict({
             node: nn.Linear(self.embedding_dim, self.output_nodes[node]['num_categories'])
@@ -77,8 +79,8 @@ class DAGTransformer(nn.Module):
         return node_outputs
 
 
-
 def causal_loss_fun(outputs, labels, return_items=True):
+
     loss = []
     batch_items = {}
     for output_name in outputs.keys():
