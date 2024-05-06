@@ -1,0 +1,19 @@
+{
+  "nodes": ["U1","A","Y","X"],
+  "input_nodes": {
+    "U1": {"num_categories":  2},
+    "A": {"num_categories":  2},
+    "Y": {"num_categories":  2},
+    "X": {"num_categories":  2}
+  },
+  "output_nodes": {
+    "X": {"num_categories": 2},
+    "A": {"num_categories":  2},
+    "Y": {"num_categories":  2}
+    },
+  "edges": {
+    "U1": ["A","Y","X","U1"],
+    "A": ["Y","A"],
+    "X": ["A","Y","X"]
+  }
+}

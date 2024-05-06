@@ -60,8 +60,8 @@ class DAGTransformer(nn.Module):
 
 
     def forward(self, x, mask=None):
-        #embeddings = [self.embedding[node](x[node]) for node in self.node_ids.keys()]
-        embeddings = [self.embedding[node.replace('.', '_')](x[node]) for node in self.node_ids.keys()]
+        #embeddings = [self.embedding[node.replace('.', '_')](x[node]) for node in self.node_ids.keys()]
+        embeddings = [self.embedding[node.replace('.', '_')](x[node].long()) for node in self.node_ids.keys()]
         x = torch.stack(embeddings).squeeze(2)
         x = x.view(x.size(1), x.size(0), x.size(2))
 

@@ -38,12 +38,12 @@ class CausalDataset(Dataset):
         for column, params in self.dag['input_nodes'].items():
             num_bins = params['num_categories']
             binner = KBinsDiscretizer(n_bins=num_bins, encode='ordinal', strategy='uniform')
-            if num_bins > 2:
-                self.data[column] = binner.fit_transform(self.data[column].values.reshape(-1, 1)).flatten()
-                self.data[column] = self.data[column].astype(int)
-                self.bin_edges[column] = binner.bin_edges_[0]
-            elif num_bins == 2:
-                self.data[column] = pd.cut(self.data[column], bins=2, labels=False)
+            #if num_bins > 2:
+            self.data[column] = binner.fit_transform(self.data[column].values.reshape(-1, 1)).flatten()
+            self.data[column] = self.data[column].astype(int)
+            self.bin_edges[column] = binner.bin_edges_[0]
+            #elif num_bins == 2:
+                #self.data[column] = pd.cut(self.data[column], bins=2, labels=False)
 
 
 class PredictionTransformer:
