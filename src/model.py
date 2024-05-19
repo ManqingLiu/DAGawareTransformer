@@ -2,6 +2,23 @@ import torch.nn as nn
 import torch
 from typing import Dict
 
+
+class CustomTransformerEncoderLayer(nn.TransformerEncoderLayer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def forward(self, src, src_mask=None, src_key_padding_mask=None, **kwargs):
+        # Copied and modified from PyTorch source to capture attention
+        src2, attn = self.self_attn(src, src, src, attn_mask=src_mask,
+                                    key_padding_mask=src_key_padding_mask)
+        src = src + self.dropout1(src2)
+        src = self.norm1(src)
+        src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))
+        src = src + self.dropout2(src2)
+        src = self.norm2(src)
+        return src, attn.detach()  # Make sure to detach to prevent memory leaks
+
+
 class DAGTransformer(nn.Module):
     '''
     This is a transformer module that takes in the adjacency matrix of the graph
@@ -35,6 +52,7 @@ class DAGTransformer(nn.Module):
 
 
         self.attn_mask = ~(self.adj_matrix.bool().T)
+
         #print(self.attn_mask)
 
         #self.embedding = nn.ModuleDict({
@@ -47,10 +65,20 @@ class DAGTransformer(nn.Module):
             for node in self.input_nodes.keys()
         })
 
+
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=self.embedding_dim,
                                                         nhead=self.num_heads,
                                                         dropout=self.dropout_rate,
                                                         batch_first=True)
+
+        '''
+        self.encoder_layer = CustomTransformerEncoderLayer(
+            d_model=embedding_dim,
+            nhead=num_heads,
+            dropout=dropout_rate,
+            batch_first=True
+        )
+        '''
         self.encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_layers)
 
         self.output_head = nn.ModuleDict({
@@ -65,6 +93,7 @@ class DAGTransformer(nn.Module):
         x = torch.stack(embeddings).squeeze(2)
         x = x.view(x.size(1), x.size(0), x.size(2))
 
+
         if mask:
             attn_mask = self.attn_mask.repeat(x.size(0) * self.num_heads, 1, 1)
             attn_mask = attn_mask.to(x.device)
@@ -77,6 +106,35 @@ class DAGTransformer(nn.Module):
             node_outputs[node_name] = self.output_head[node_name](x[:, node_id, :])
 
         return node_outputs
+
+        '''
+        if mask:
+            attn_mask = self.attn_mask.repeat(x.size(0) * self.num_heads, 1, 1)
+            attn_mask = attn_mask.to(x.device)
+
+            attn_weights = []
+
+            # Pass through each layer of the encoder
+            for layer in self.encoder.layers:
+                x, weights = layer(x, src_mask=attn_mask)  # Pass the correct arguments
+                attn_weights.append(weights)
+
+            # Process the output through the output heads
+            node_outputs = {}
+            for node_name in self.output_nodes.keys():
+                node_id = self.node_ids[node_name]
+                node_outputs[node_name] = self.output_head[node_name](x[:, node_id, :])
+
+            return node_outputs, attn_weights
+        else:
+            x = self.encoder(x)
+            node_outputs = {}
+            for node_name in self.output_nodes.keys():
+                node_id = self.node_ids[node_name]
+                node_outputs[node_name] = self.output_head[node_name](x[:, node_id, :])
+
+            return node_outputs
+        '''
 
 
 def causal_loss_fun(outputs, labels, return_items=True):

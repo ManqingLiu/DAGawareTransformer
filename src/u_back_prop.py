@@ -1,8 +1,9 @@
 import pandas as pd
-from dataset_u import *
+from dataset_u import CausalDataset
+from dataset import PredictionTransformer
 from train_u import train
 from predict_u import predict
-from model import DAGTransformer
+from model import DAGTransformer, causal_loss_fun
 from torch.utils.data import DataLoader
 import time
 import random
@@ -14,9 +15,10 @@ import json
 
 
 class Ubackprop:
-    def __init__(self, dag, config, data, model_file, new_model_file, mask, n_uniform_variables, seed=None):
+    def __init__(self, dag, config, data_train, data_holdout, model_file, new_model_file, mask, n_uniform_variables, seed=None):
         self.model = DAGTransformer(dag=dag, **config['model'])
-        self.data = pd.read_csv(data)
+        self.data_train = pd.read_csv(data_train)
+        self.data_holdout = pd.read_csv(data_holdout)
         self.dag = dag
         self.train_config = config['training']
         self.model_file = model_file
@@ -25,27 +27,33 @@ class Ubackprop:
         self.n_uniform_variables = n_uniform_variables
         self.seed = seed if seed is not None else random.randint(0, 10000)
 
-        self.dataset = CausalDataset(self.data, self.dag, add_u=True, n_uniform_variables=self.n_uniform_variables,
+        self.dataset_train = CausalDataset(self.data_train, self.dag, add_u=True, n_uniform_variables=self.n_uniform_variables,
                                 seed_value=self.seed)
-        # print distribution of U1
-        #print(self.data['U1'].describe())
 
-        self.dataloader = DataLoader(self.dataset,
+        self.dataloader_train = DataLoader(self.dataset_train,
                                      batch_size=self.train_config['batch_size'],
-                                     shuffle=True, collate_fn=self.dataset.collate_fn)
+                                     shuffle=True, collate_fn=self.dataset_train.collate_fn)
+
+        self.dataset_holdout = CausalDataset(self.data_holdout, self.dag, add_u=True,
+                                           n_uniform_variables=self.n_uniform_variables,
+                                           seed_value=self.seed)
+
+        self.dataloader_holdout = DataLoader(self.dataset_holdout,
+                                           batch_size=self.train_config['batch_size'],
+                                           shuffle=True, collate_fn=self.dataset_holdout.collate_fn)
 
         self.initial_train()
 
     def initial_train(self):
         train(model=self.model,
-              data=self.data,
-              dataloader=self.dataloader,
+              data=self.data_train,
+              dataloader=self.dataloader_train,
               config=self.train_config,
               mask=self.mask,
               model_file=self.model_file)
         print("Initial training complete.")
 
-    def back_propagate(self, lr=0.0001, n_iters=1000, reg_lambda=0.01, grad_clip=1.0):
+    def back_propagate(self, lr=0.001, n_iters=10, reg_lambda=0, grad_clip=0):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = self.model.to(device)
         self.model.load_state_dict(torch.load(self.model_file))
@@ -67,7 +75,7 @@ class Ubackprop:
         scheduler = torch.optim.lr_scheduler.ExponentialLR(opt, gamma=0.9)
 
         for i in range(n_iters):
-            for batch in self.dataloader:
+            for batch in self.dataloader_holdout:
                 batch = {k: v.to(device) for k, v in batch.items()}
                 outputs = self.model(batch, mask=True)
                 batch_loss, batch_items = causal_loss_fun(outputs, batch, return_items=True)
@@ -77,6 +85,7 @@ class Ubackprop:
                 for name, param in self.model.named_parameters():
                     if 'U' in name:
                         reg_loss += torch.norm(param, p=2)
+                        #print(f"{name}: {param.detach().cpu().numpy()}")
                 batch_loss += reg_lambda * reg_loss
 
                 batch_loss.backward()
@@ -123,7 +132,8 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--dag', type=str, required=True)
     parser.add_argument('--config', type=str, required=True)
-    parser.add_argument('--data_file', type=str, required=True)
+    parser.add_argument('--data_train_file', type=str, required=True)
+    parser.add_argument('--data_holdout_file', type=str, required=True)
     parser.add_argument('--model_file', type=str, required=True)
     parser.add_argument('--new_model_file', type=str, required=True)
     parser.add_argument('--mask', type=bool, required=True)
@@ -149,7 +159,8 @@ if __name__ == '__main__':
 
     model = Ubackprop(dag=dag,
                           config=config,
-                          data=args.data_file,
+                          data_train=args.data_train_file,
+                          data_holdout=args.data_holdout_file,
                           model_file=args.model_file,
                           new_model_file=args.new_model_file,
                           mask=args.mask,
@@ -159,7 +170,7 @@ if __name__ == '__main__':
 
 
     # Run the back-propagation to obtain the final U parameters
-    final_u_params = model.back_propagate(lr=0.0001, n_iters=100, reg_lambda=0.01, grad_clip=1.0)
+    final_u_params = model.back_propagate(lr=0.0001, n_iters=10, reg_lambda=0, grad_clip=1)
 
     new_model = model.get_new_model()
 
@@ -169,12 +180,13 @@ if __name__ == '__main__':
         if 'U' in name:
             u_values[name] = param
 
+    '''
     # Print the U values
     for name, value in u_values.items():
         # print shape of U variable
         print(f"U variable: {name}, shape: {value.shape}")
         print(f"U variable: {name}, value: {value}")
-
+    '''
 
 
 

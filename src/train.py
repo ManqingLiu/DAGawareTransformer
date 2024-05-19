@@ -6,8 +6,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch
 
-from model import *
-from dataset import CausalDataset
+from src.model import *
+from src.dataset import CausalDataset
 
 from typing import Dict
 
@@ -17,12 +17,14 @@ import time
 from sklearn.model_selection import train_test_split
 
 import wandb
+from matplotlib import pyplot as plt
 
 
 def train(model: nn.Module,
           dataloader: DataLoader,
           config: Dict,
           mask: bool,
+          save_model: bool,
           model_file: str):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,14 +56,16 @@ def train(model: nn.Module,
             wandb.log({'loss': batch_loss.item()})
 
     wandb.finish()
-    print(f'Saving model to {model_file}')
-    torch.save(model.state_dict(), model_file)
+    #print(f'Saving model to {model_file}')
+    if save_model==True:
+        torch.save(model.state_dict(), model_file)
 
 
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--dag', type=str, required=True)
     parser.add_argument('--config', type=str, required=True)
+    parser.add_argument('--mask', type=bool, default=True)
     parser.add_argument('--data_train_file', type=str, required=True)
     parser.add_argument('--data_holdout_file', type=str, required=True)
     parser.add_argument('--model_train_file', type=str, required=True)
@@ -99,8 +103,24 @@ if __name__ == '__main__':
                             collate_fn=dataset.collate_fn)
     # Before training for train file
     start_time = time.time()
-    train(model, dataloader, train_config, mask=True, model_file=args.model_train_file)
+    train(model, dataloader, train_config, mask=args.mask, save_model=True, model_file=args.model_train_file)
     print('Done training.')
+
+    # take a batch from dataloader
+    #inputs = next(iter(dataloader))
+
+    #outputs, attention_weights = model(inputs)
+
+    # Assuming `id2node` maps indices to node names
+    #node_names = dag['nodes']
+    #print(node_names)
+
+    # Now plot the attention weights for the first layer and first head
+    #plot_attention_heatmap(attention_weights, layer_idx=0, head_idx=0, node_names=node_names, transpose=False)
+
+    # save the plot as a png
+    #plt.savefig('attention_weights.png')
+
 
     data = pd.read_csv(args.data_holdout_file)
     data = data[dag['nodes']]
@@ -112,7 +132,7 @@ if __name__ == '__main__':
                             shuffle=True,
                             collate_fn=dataset.collate_fn)
 
-    train(model, dataloader, train_config,  mask=True, model_file=args.model_holdout_file)
+    train(model, dataloader, train_config,  mask=args.mask, save_model=True, model_file=args.model_holdout_file)
     print('Done training.')
     # After training for holdout file
     end_time = time.time()

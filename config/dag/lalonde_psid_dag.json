@@ -25,6 +25,7 @@
     "nodegree": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75"],
     "re74": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75"],
     "re75": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75"],
-    "t": ["y"]
+    "t": ["t","y"],
+    "y": ["y"]
   }
 }

@@ -5,10 +5,13 @@ from scipy.stats import bernoulli, norm
 # Set the seed for reproducibility
 np.random.seed(253)
 
-N = 100
+N = 2000
 
 # generate 1 u from uniform[0,1]
-U = np.random.uniform(0, 1, N)
+#U = np.random.uniform(0, 1, N)
+
+# draw U from a normal distribution
+U = np.random.normal(0, 1, N)
 
 # summarise distribution of U
 print(pd.Series(U).describe())

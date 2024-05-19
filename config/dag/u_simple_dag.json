@@ -1,7 +1,7 @@
 {
   "nodes": ["U1","A","Y","X"],
   "input_nodes": {
-    "U1": {"num_categories":  2},
+    "U1": {"num_categories":  10},
     "A": {"num_categories":  2},
     "Y": {"num_categories":  2},
     "X": {"num_categories":  2}

@@ -2,11 +2,11 @@
 #SBATCH --job-name=myjob
 #SBATCH --output=experiments/results/output_%j.txt
 #SBATCH --error=experiments/results/error_%j.txt
-#SBATCH -c 20
+#SBATCH -c 15
 #SBATCH -t 1:00:00
 #SBATCH -p gpu_beam
 #SBATCH --gres=gpu:1
-#SBATCH --mem=15G
+#SBATCH --mem=10G
 # You can change hostname to any command you would like to run
 hostname
 
@@ -33,8 +33,19 @@ module load python/3.10.11
 #pip3 install matplotlib seaborn
 #pip3 install doubleml
 #pip3 install pqdm
-#python3 src/data/DGP_unmeasured_confounding.py
-python3 main.py
+#pip3 install tensorboard
+
+
+#python3 src/models/NMMR/NMMR_experiments.py
+python3 experiments/experiment_proximal.py \
+        --dag \
+        config/dag/proximal_dag.json \
+        --config \
+        config/train/proximal/nmmr_u_transformer_n1000.json \
+        --results_dir \
+        experiments/results/proximal
+
+#python3 main.py
 #python3 summary_statistics_realcause.py
 #python3 experiments/experiment_g_formula_fullsample_AIPW.py
 #python3 experiments/train/train_cps_sample0.py
