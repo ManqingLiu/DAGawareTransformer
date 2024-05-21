@@ -1,0 +1,10 @@
+{
+    "n_repeat": 20,
+    "data": {
+        "name" : "demand",
+        "n_sample" : [1000, 5000, 10000, 50000]
+    },
+    "model": {
+        "name": "linear_regression_AWZY"
+    }
+}

@@ -87,7 +87,7 @@ class NMMR_Trainer_DemandExperiment(object):
                 outputs = model(batch, mask=self.mask)
                 labels = {'outcome': batch['outcome']}
                 # To Do: should return values to original scales before passing to compute_kernel (right now they are in bins)
-                #print(batch['treatment'].shape)  # torch.Size([1000, 1])
+                print(batch['treatment'].shape)  # torch.Size([1000, 1])
                 kernel_inputs_train =torch.cat((batch['treatment'], batch['treatment_proxy1'],
                                                 batch['treatment_proxy2']), dim=1)
                 kernel_matrix_train = self.compute_kernel(kernel_inputs_train)
