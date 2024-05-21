@@ -61,68 +61,45 @@ class NMMR_Trainer_DemandExperiment(object):
         return calculate_kernel_matrix(kernel_inputs)
 
     def train(self,
-              train_dataloader: Dataloader,
-              val_dataloader: Dataloader,
-              verbose: int = 0) -> DAGTransformer:
+          train_dataloader: Dataloader,
+          val_dataloader: Dataloader,
+          verbose: int = 0) -> DAGTransformer:
 
         model = DAGTransformer(dag=self.dag,
-                               **self.model_config)
+                            **self.model_config)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(f'Using device: {device}')
 
-        #if self.gpu_flg:
-        #    train_dataloader = train_dataloader.to_gpu()
-        #    val_dataloader = val_dataloader.to_gpu()
-        #model.cuda()
-
-        # weight_decay implements L2 penalty
         optimizer = optim.Adam(list(model.parameters()), lr=self.learning_rate, weight_decay=self.l2_penalty)
 
-        # train model
+        bin_left_edges = train_dataloader.dataset.get_bin_left_edges()
+
         for epoch in tqdm(range(self.n_epochs)):
-            for batch in train_dataloader:
+            for batch_raw, batch_binned in train_dataloader:
                 optimizer.zero_grad()
-                batch = {k: v.to(device) for k, v in batch.items()}
-                outputs = model(batch, mask=self.mask)
-                labels = {'outcome': batch['outcome']}
-                # To Do: should return values to original scales before passing to compute_kernel (right now they are in bins)
-                #print(batch['treatment'].shape)  # torch.Size([1000, 1])
-                kernel_inputs_train =torch.cat((batch['treatment'], batch['treatment_proxy1'],
-                                                batch['treatment_proxy2']), dim=1)
+                batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
+                outputs = model(batch_binned, mask=self.mask)
+
+                # Transform the model outputs back to the original scale
+                transformed_outputs = {}
+                for output_name, output in outputs.items():
+                    softmax_output = torch.softmax(output, dim=1)
+                    weighted_avg = torch.sum(softmax_output * bin_left_edges[output_name], dim=1, keepdim=True)
+                    transformed_outputs[output_name] = weighted_avg
+
+                labels = {'outcome': batch_raw['outcome']}
+                kernel_inputs_train = torch.cat((batch_raw['treatment'], batch_raw['treatment_proxy1'],
+                                                batch_raw['treatment_proxy2']), dim=1)
                 kernel_matrix_train = self.compute_kernel(kernel_inputs_train)
-                #print(kernel_matrix_train.shape)  # torch.Size([1000, 1000])
-                # To Do: should unbin the model output to original scale before passing it to NMMR_loss_transformer
-                model_output = outputs['outcome']  # of shape [1000, 10]
-                print(model_output)
-                #print(model_output.shape)
+
+                model_output = transformed_outputs['outcome']
                 target = labels['outcome']
-                print(target)
-                #print(target.shape)  # of shape [1000, 1]
 
                 loss, batch_items = NMMR_loss_transformer(model_output, target, kernel_matrix_train,
-                                                                loss_name=self.loss_name, return_items=True)
+                                                        loss_name=self.loss_name, return_items=True)
                 loss.backward()
                 optimizer.step()
-
-
-        '''
-        # at the end of each epoch, log metrics
-        with torch.no_grad():
-            for batch in val_dataloader:
-                batch = {k: v.to(device) for k, v in batch.items()}
-                outputs = model(batch, mask=self.mask)
-                #print(outputs['outcome'].shape)  torch.Size([100, 10]) -> [batch_size, num_bins]
-                labels = {'outcome': batch['outcome']}
-                kernel_inputs_val = torch.cat((batch['treatment'], batch['treatment_proxy1'],
-                                               batch['treatment_proxy2']), dim=1)
-                kernel_matrix_val = self.compute_kernel(kernel_inputs_val)
-                model_output = outputs['outcome']
-                target = labels['outcome']
-                val_loss, batch_items = NMMR_loss_transformer(model_output, target, kernel_matrix_val,
-                                                loss_name=self.loss_name, return_items=True)
-                print(f"Validation Loss: {val_loss}")
-        '''
 
         return model
 

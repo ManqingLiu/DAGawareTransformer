@@ -14,6 +14,12 @@ import json
 class CausalDataset(Dataset):
     def __init__(self, data, dag):
         self.data = data
+        
+        if isinstance(self.data, pd.DataFrame):
+            self.data_binned = self.data.copy()
+        elif isinstance(self.data, dict):
+            self.data_binned = {k: None for k, _ in self.data.items()}
+        
         self.dag = dag
         self.bin_edges = {}
 
@@ -34,9 +40,10 @@ class CausalDataset(Dataset):
 
     def __getitem__(self, idx):
         if isinstance(self.data, pd.DataFrame):
-            return self.data.iloc[idx]
+            return self.data.iloc[idx], self.data_binned.iloc[idx]
         elif isinstance(self.data, dict):
-            return {key: self.data[key][idx] for key in self.data}
+            return {key: self.data[key][idx] for key in self.data}, 
+        {key: self.data_binned[key][idx] for key in self.data_binned}
 
     def collate_fn(self, batch_list):
         batch = {}
@@ -50,22 +57,22 @@ class CausalDataset(Dataset):
             num_bins = params['num_categories']
             binner = KBinsDiscretizer(n_bins=num_bins, encode='ordinal', strategy='uniform')
             if num_bins > 2:
-                self.data[column] = binner.fit_transform(self.data[column].values.reshape(-1, 1)).flatten()
-                self.data[column] = self.data[column].astype(int)
+                self.data_binned[column] = binner.fit_transform(self.data[column].values.reshape(-1, 1)).flatten()
+                self.data_binned[column] = self.data_binned[column].astype(int)
                 self.bin_edges[column] = binner.bin_edges_[0]
             elif num_bins == 2:
-                self.data[column] = pd.cut(self.data[column], bins=2, labels=False)
+                self.data_binned[column] = pd.cut(self.data[column], bins=2, labels=False)
 
     def bin_columns_for_ndarray(self):
         for column, params in self.dag['input_nodes'].items():
             num_bins = params['num_categories']
             binner = KBinsDiscretizer(n_bins=num_bins, encode='ordinal', strategy='uniform')
             if num_bins > 2:
-                self.data[column] = binner.fit_transform(self.data[column].reshape(-1, 1)).flatten()
-                self.data[column] = self.data[column].astype(int)
+                self.data_binned[column] = binner.fit_transform(self.data[column].reshape(-1, 1)).flatten()
+                self.data_binned[column] = self.data_binned[column].astype(int)
                 self.bin_edges[column] = binner.bin_edges_[0]
             elif num_bins == 2:
-                self.data[column] = pd.cut(self.data[column], bins=2, labels=False).to_numpy()
+                self.data_binned[column] = pd.cut(self.data[column], bins=2, labels=False).to_numpy()
 
     def to_pvtraindataset(self):
         treatment = self.data['treatment'] if 'treatment' in self.data else None
@@ -81,6 +88,9 @@ class CausalDataset(Dataset):
             outcome=outcome,
             backdoor=backdoor
         )
+    
+    def get_bin_left_edges(self):
+        return {k: v[:-1] for k, v in self.bin_edges.items()}
 
 class PredictionTransformer:
     def __init__(self, bin_edges):
