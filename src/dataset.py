@@ -32,6 +32,7 @@ class CausalDataset(Dataset):
             first_key = next(iter(self.data))
             return len(self.data[first_key])
 
+
     def __getitem__(self, idx):
         if isinstance(self.data, pd.DataFrame):
             return self.data.iloc[idx]
@@ -66,6 +67,9 @@ class CausalDataset(Dataset):
                 self.bin_edges[column] = binner.bin_edges_[0]
             elif num_bins == 2:
                 self.data[column] = pd.cut(self.data[column], bins=2, labels=False).to_numpy()
+
+    def get_bin_left_edges(self):
+        return {k: v[:-1] for k, v in self.bin_edges.items()}
 
     def to_pvtraindataset(self):
         treatment = self.data['treatment'] if 'treatment' in self.data else None

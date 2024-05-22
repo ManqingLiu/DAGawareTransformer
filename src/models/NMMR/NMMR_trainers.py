@@ -79,6 +79,9 @@ class NMMR_Trainer_DemandExperiment(object):
         # weight_decay implements L2 penalty
         optimizer = optim.Adam(list(model.parameters()), lr=self.learning_rate, weight_decay=self.l2_penalty)
 
+        bin_left_edges = train_dataloader.dataset.get_bin_left_edges()
+
+
         # train model
         for epoch in tqdm(range(self.n_epochs)):
             for batch in train_dataloader:

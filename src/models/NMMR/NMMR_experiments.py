@@ -58,6 +58,7 @@ def NMMR_experiment(data_config: Dict[str, Any],
                                      treatment_proxy2.T,
                                      outcome_proxy.T,
                                      outcome.T), dim=-1)
+    print(model_inputs_test.shape)
 
 
     train_data_dict = {
