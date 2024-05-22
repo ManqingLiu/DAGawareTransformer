@@ -1,0 +1,22 @@
+{
+  "n_repeat": 10,
+  "data": {
+    "name": "demand",
+    "n_sample": 10000
+  },
+  "training": {
+    "n_epochs": 100,
+    "batch_size": 1000,
+    "log_metrics": "False",
+    "learning_rate": 0.001,
+    "l2_penalty": 3e-06,
+    "loss_name": "U_statistic"
+  },
+  "model": {
+    "name": "nmmr",
+    "num_layers": 1,
+    "dropout_rate": 0,
+    "embedding_dim": 128,
+    "num_heads": 1
+  }
+}
