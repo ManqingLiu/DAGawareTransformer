@@ -62,8 +62,7 @@ class DAGTransformer(nn.Module):
     def forward(self, x, mask=None):
         embeddings = [self.embedding[node.replace('.', '_')](x[node].long()) for node in self.node_ids.keys()]
         x = torch.stack(embeddings).squeeze(2)
-        x = x.view(x.size(1), x.size(0), x.size(2))
-
+        x = x.permute(1, 0, 2)
 
         if mask:
             attn_mask = self.attn_mask.repeat(x.size(0) * self.num_heads, 1, 1)
