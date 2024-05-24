@@ -1,2 +1,0 @@
-
-Train Loader, Epoch 0, Training Losses: black_hat: 0.59026, hispanic_hat: 0.50156, married_hat: 0.72403, nodegree_hat: 0.67857, t_hat: 0.59215, age_bin_hat: 38.29458, education_bin_hat: 100.31284, re74_bin_hat: 41.54947, re75_bin_hat: 66.75809, y_bin_hat: 76.85408

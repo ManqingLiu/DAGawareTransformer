@@ -61,79 +61,54 @@ class NMMR_Trainer_DemandExperiment(object):
         return calculate_kernel_matrix(kernel_inputs)
 
     def train(self,
-              train_dataloader: Dataloader,
-              val_dataloader: Dataloader,
-              verbose: int = 0) -> DAGTransformer:
+          train_dataloader: Dataloader,
+          val_dataloader: Dataloader,
+          verbose: int = 0) -> DAGTransformer:
 
         model = DAGTransformer(dag=self.dag,
-                               **self.model_config)
+                            **self.model_config)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(f'Using device: {device}')
 
-        #if self.gpu_flg:
-        #    train_dataloader = train_dataloader.to_gpu()
-        #    val_dataloader = val_dataloader.to_gpu()
-        #model.cuda()
-
-        # weight_decay implements L2 penalty
         optimizer = optim.Adam(list(model.parameters()), lr=self.learning_rate, weight_decay=self.l2_penalty)
 
-        bin_left_edges = train_dataloader.dataset.get_bin_left_edges()
+        bin_left_edges = {k: torch.tensor(v[:-1], dtype=torch.float32).to(device) for k, v in train_dataloader.dataset.bin_edges.items()}
 
-
-        # train model
-        for epoch in tqdm(range(self.n_epochs)):
-            for batch in train_dataloader:
+        for _ in tqdm(range(self.n_epochs)):
+            for batch_raw, batch_binned in train_dataloader:
                 optimizer.zero_grad()
-                batch = {k: v.to(device) for k, v in batch.items()}
-                outputs = model(batch, mask=self.mask)
-                labels = {'outcome': batch['outcome']}
-                # To Do: should return values to original scales before passing to compute_kernel (right now they are in bins)
-                print(batch['treatment'].shape)  # torch.Size([1000, 1])
-                kernel_inputs_train =torch.cat((batch['treatment'], batch['treatment_proxy1'],
-                                                batch['treatment_proxy2']), dim=1)
-                kernel_matrix_train = self.compute_kernel(kernel_inputs_train)
-                #print(kernel_matrix_train.shape)  # torch.Size([1000, 1000])
-                # To Do: should unbin the model output to original scale before passing it to NMMR_loss_transformer
-                model_output = outputs['outcome']  # of shape [1000, 10]
-                print(model_output)
-                #print(model_output.shape)
-                target = labels['outcome']
-                print(target)
-                #print(target.shape)  # of shape [1000, 1]
+                batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
+                outputs = model(batch_binned, mask=self.mask)
 
-                loss, batch_items = NMMR_loss_transformer(model_output, target, kernel_matrix_train,
-                                                                loss_name=self.loss_name, return_items=True)
+                # Transform the model outputs back to the original scale
+                transformed_outputs = {}
+                for output_name, output in outputs.items():
+                    softmax_output = torch.softmax(output, dim=1)
+                    weighted_avg = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
+                    transformed_outputs[output_name] = weighted_avg
+
+                labels = {'outcome': batch_raw['outcome']}
+                kernel_inputs_train = torch.cat((batch_raw['treatment'], batch_raw['treatment_proxy1'],
+                                                batch_raw['treatment_proxy2']), dim=1)
+                kernel_matrix_train = self.compute_kernel(kernel_inputs_train)
+
+                model_output = transformed_outputs['outcome']
+                target = labels['outcome']
+
+                loss, _ = NMMR_loss_transformer(model_output, target, kernel_matrix_train,
+                                                        loss_name=self.loss_name, return_items=True)
+                print(f"Loss: {loss.item()}")
                 loss.backward()
                 optimizer.step()
-
-
-        '''
-        # at the end of each epoch, log metrics
-        with torch.no_grad():
-            for batch in val_dataloader:
-                batch = {k: v.to(device) for k, v in batch.items()}
-                outputs = model(batch, mask=self.mask)
-                #print(outputs['outcome'].shape)  torch.Size([100, 10]) -> [batch_size, num_bins]
-                labels = {'outcome': batch['outcome']}
-                kernel_inputs_val = torch.cat((batch['treatment'], batch['treatment_proxy1'],
-                                               batch['treatment_proxy2']), dim=1)
-                kernel_matrix_val = self.compute_kernel(kernel_inputs_val)
-                model_output = outputs['outcome']
-                target = labels['outcome']
-                val_loss, batch_items = NMMR_loss_transformer(model_output, target, kernel_matrix_val,
-                                                loss_name=self.loss_name, return_items=True)
-                print(f"Validation Loss: {val_loss}")
-        '''
 
         return model
 
     @staticmethod
     def predict(model,
                 n_sample,
-                model_intput_test_data,
-                model_input_test_dataloader):
+                bin_edges,
+                test_dataloader):
         # Create a 3-dim array with shape [intervention_array_len, n_samples, 2]
         # This will contain the test values for do(A) chosen by Xu et al. as well as {n_samples} random draws for W
         # Compute model's predicted E[Y | do(A)] = E_w[h(a, w)]
@@ -146,12 +121,12 @@ class NMMR_Trainer_DemandExperiment(object):
         print(f'Using device: {device}')
         model = model.to(device)
 
-
-        predictions = []
+        bin_left_edges = {k: np.array(v[:-1], dtype=np.float32) for k, v in test_dataloader.dataset.bin_edges.items()}
+        softmaxes = []
         with torch.no_grad():
-            for batch in model_input_test_dataloader:
-                batch = {k: v.to(device) for k, v in batch.items()}
-                outputs = model(batch, mask=True)
+            for _, batch_binned in test_dataloader:
+                batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
+                outputs = model(batch_binned, mask=True)
                 batch_predictions = []
                 for output_name in outputs.keys():
                     # Detach the outputs and move them to cpu
@@ -161,16 +136,12 @@ class NMMR_Trainer_DemandExperiment(object):
                     batch_predictions.append(output)
                 # concatenate the batch predictions along the second axis
                 batch_predictions = np.concatenate(batch_predictions, axis=1)
-                predictions.append(batch_predictions)
+                softmaxes.append(batch_predictions)
 
         # assign column names to the predictions_df
-        predictions = np.concatenate(predictions, axis=0)
-        prediction_transformer = PredictionTransformer(model_intput_test_data.bin_edges)
-        transformed_predictions = prediction_transformer.transform_proximal(predictions, n_sample)
-        #print(transformed_predictions.shape)  #[10, 1000, 1]
+        softmaxes = np.concatenate(softmaxes, axis=0)
+        predictions = np.sum(softmaxes * bin_left_edges[output_name], axis=1)
+        
+        E_w_haw = np.mean(predictions.reshape(10, n_sample, 1), axis=1)  # should return 10 expected values
 
-        E_w_haw = torch.mean(transformed_predictions, dim=1)  # should return 10 expected values
-
-        return E_w_haw.cpu()
-
-
+        return E_w_haw

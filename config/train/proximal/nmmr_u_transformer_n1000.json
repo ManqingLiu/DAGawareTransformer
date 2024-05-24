@@ -5,7 +5,7 @@
     "n_sample": 1000
   },
   "training": {
-    "n_epochs": 10,
+    "n_epochs": 100,
     "batch_size": 1000,
     "log_metrics": "False",
     "learning_rate": 0.003,
