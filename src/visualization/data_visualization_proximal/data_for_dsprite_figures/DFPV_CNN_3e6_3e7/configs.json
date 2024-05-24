@@ -1,0 +1,23 @@
+{
+    "n_repeat": 20,
+    "data": {
+        "name": "dsprite",
+        "n_sample": [
+            1000
+        ]
+    },
+    "model": {
+        "name": "dfpv_cnn",
+        "lam1": 0.1,
+        "lam2": 0.1,
+        "stage1_iter": 20,
+        "stage2_iter": 1,
+        "n_epoch": 500,
+        "split_ratio": 0.5,
+        "learning_rate": 3e-06,
+        "treatment_weight_decay": 3e-07,
+        "treatment_proxy_weight_decay": 0.1,
+        "outcome_proxy_weight_decay": 0,
+        "backdoor_weight_decay": 0.0
+    }
+}

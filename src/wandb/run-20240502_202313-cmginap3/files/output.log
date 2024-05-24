@@ -1,0 +1,13 @@
+
+ 50%|█████     | 5/10 [00:01<00:01,  3.91it/s]
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])
+
+100%|██████████| 10/10 [00:02<00:00,  3.90it/s]
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])
+Batch keys: dict_keys(['U1', 'A', 'Y', 'X'])

@@ -1,0 +1,35 @@
+  0%|          | 0/10 [00:00<?, ?it/s]/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/dataset_u.py:38: SettingWithCopyWarning:
+A value is trying to be set on a copy of a slice from a DataFrame
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  sample[node] = torch.tensor(sample[node], dtype=torch.float32, requires_grad=True)
+  0%|          | 0/10 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 113, in <module>
+    ubackprop = Ubackprop(dag=dag,
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 35, in __init__
+    self.initial_train()
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 38, in initial_train
+    train(model=self.model,
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train_u.py", line 43, in train
+    for batch in dataloader:
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 631, in __next__
+    data = self._next_data()
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 675, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 51, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 51, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/dataset_u.py", line 38, in __getitem__
+    sample[node] = torch.tensor(sample[node], dtype=torch.float32, requires_grad=True)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/core/series.py", line 1289, in __setitem__
+    self._set_with_engine(key, value, warn=warn)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/core/series.py", line 1364, in _set_with_engine
+    self._mgr.setitem_inplace(loc, value, warn=warn)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/core/internals/managers.py", line 2042, in setitem_inplace
+    super().setitem_inplace(indexer, value)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/core/internals/base.py", line 357, in setitem_inplace
+    value = np_can_hold_element(arr.dtype, value)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/pandas/core/dtypes/cast.py", line 1798, in np_can_hold_element
+    if tipo.kind not in "iu":
+AttributeError: 'torch.dtype' object has no attribute 'kind'

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 123, in <module>
+    model = ubackprop.back_propagate()
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 69, in back_propagate
+    outputs = self.model(batch, mask=True)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/model.py", line 64, in forward
+    embeddings = [self.embedding[node.replace('.', '_')](x[node]) for node in self.node_ids.keys()]
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/model.py", line 64, in <listcomp>
+    embeddings = [self.embedding[node.replace('.', '_')](x[node]) for node in self.node_ids.keys()]
+KeyError: 'U1'

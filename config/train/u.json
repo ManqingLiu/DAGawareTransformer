@@ -1,0 +1,15 @@
+{
+  "training": {
+    "num_epochs": 10,
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "project_tag": "unmeasured_confounding_binary"
+  },
+  "model": {
+    "num_layers": 3,
+    "dropout_rate": 0,
+    "embedding_dim": 512,
+    "num_heads": 32
+  }
+}

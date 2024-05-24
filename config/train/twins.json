@@ -1,0 +1,16 @@
+{
+  "training": {
+    "num_epochs": 30,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "weight_decay": 0.01,
+    "project_tag": "twins"
+  },
+  "model": {
+    "num_layers": 2,
+    "dropout_rate": 0.1,
+    "embedding_dim": 512,
+    "num_heads": 16
+  }
+}
+

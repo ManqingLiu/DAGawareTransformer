@@ -1,0 +1,11 @@
+U variable: embedding.U1.weight, shape: (2, 512)
+U variable: embedding.U1.weight, value: [[ 1.6087787   0.1824733   0.48131594 ... -3.2112823  -0.9995508
+  -1.4792298 ]
+ [ 0.49216485  0.318727   -0.3767131  ...  1.0786514  -0.8252142
+  -0.73770666]]
+Traceback (most recent call last):
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 174, in <module>
+    original_u_values = model.map_u_to_original_scale(u_values)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 116, in map_u_to_original_scale
+    original_value = self.u_mapping[binary_category]
+KeyError: 181

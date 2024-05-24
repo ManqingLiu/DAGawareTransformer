@@ -1,0 +1,1 @@
+{"results": {"ATE_true": 0.065, "ATE_frontdoor": 0.030669922684483986, "RMSE_frontdoor": 0.03433007731551602}, "hyperparameters": {"training": {"num_epochs": 100, "batch_size": 512, "learning_rate": 0.001, "weight_decay": 0, "project_tag": "front-door"}, "model": {"num_layers": 2, "dropout_rate": 0.1, "embedding_dim": 128, "num_heads": 32}}}

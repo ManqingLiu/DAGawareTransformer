@@ -1,0 +1,55 @@
+{
+  "nodes": ["U1","U2","U3","U4","U5","A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+  "input_nodes": {
+    "U1": {"num_categories":  2},
+    "U2": {"num_categories":  2},
+    "U3": {"num_categories":  2},
+    "U4": {"num_categories":  2},
+    "U5": {"num_categories":  2},
+    "A": {"num_categories":  2},
+    "Y": {"num_categories":  2},
+    "X1": {"num_categories":  2},
+    "X2": {"num_categories":  2},
+    "X3": {"num_categories":  2},
+    "X4": {"num_categories":  2},
+    "X5": {"num_categories":  2},
+    "X6": {"num_categories":  2},
+    "X7": {"num_categories":  2},
+    "X8": {"num_categories":  2},
+    "X9": {"num_categories":  2},
+    "X10": {"num_categories":  2}},
+
+  "output_nodes": {
+    "X1": {"num_categories":  2},
+    "X2": {"num_categories":  2},
+    "X3": {"num_categories":  2},
+    "X4": {"num_categories":  2},
+    "X5": {"num_categories":  2},
+    "X6": {"num_categories":  2},
+    "X7": {"num_categories":  2},
+    "X8": {"num_categories":  2},
+    "X9": {"num_categories":  2},
+    "X10": {"num_categories": 2},
+    "A": {"num_categories":  2},
+    "Y": {"num_categories":  2}
+    },
+  "edges": {
+    "U1": ["U1","U2","U3","U4","U5","A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "U2": ["U1","U2","U3","U4","U5","A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "U3": ["U1","U2","U3","U4","U5","A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "U4": ["U1","U2","U3","U4","U5","A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "U5": ["U1","U2","U3","U4","U5","A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "A": ["Y"],
+    "X1": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X2": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X3": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X4": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X5": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X6": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X7": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X8": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X9": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"],
+    "X10": ["A","Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10"]
+
+  }
+}
