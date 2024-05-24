@@ -1,1 +1,8 @@
 /data/
+myenv/
+.idea/
+__pycache__/
+wandb/
+*.egg-info
+*/results/proximal.DS_Store
+__pycache__/
