@@ -15,7 +15,7 @@ from src.data.ate.data_class import PVTrainDataSetTorch, PVTestDataSetTorch, RHC
 from src.models.NMMR.NMMR_loss import NMMR_loss, NMMR_loss_batched, NMMR_loss_transformer
 from src.models.NMMR.NMMR_model import MLP_for_NMMR, cnn_for_dsprite
 from src.models.NMMR.kernel_utils import calculate_kernel_matrix, calculate_kernel_matrix_batched, rbf_kernel
-from src.models.NMMR.transformer_model import DAGTransformer, causal_loss_fun
+from src.models.transformer_model import DAGTransformer, causal_loss_fun
 
 
 class NMMR_Trainer_DemandExperiment(object):
