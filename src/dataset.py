@@ -107,28 +107,6 @@ class CausalDataset(Dataset):
     def get_bin_left_edges(self):
         return {k: v[:-1] for k, v in self.bin_edges.items()}
 
-    def to_pvtraindataset(self):
-        treatment = self.data["treatment"] if "treatment" in self.data else None
-        treatment_proxy = (
-            self.data["treatment_proxy"] if "treatment_proxy" in self.data else None
-        )
-        outcome_proxy = (
-            self.data["outcome_proxy"] if "outcome_proxy" in self.data else None
-        )
-        outcome = self.data["outcome"] if "outcome" in self.data else None
-        backdoor = self.data["backdoor"] if "backdoor" in self.data else None
-
-        return PVTrainDataSet(
-            treatment=treatment,
-            treatment_proxy=treatment_proxy,
-            outcome_proxy=outcome_proxy,
-            outcome=outcome,
-            backdoor=backdoor,
-        )
-
-    def get_bin_left_edges(self):
-        return {k: v[:-1] for k, v in self.bin_edges.items()}
-
 
 def make_train_data(
     data_config: Dict[str, Any], dag: Dict[str, Any], random_seed: int

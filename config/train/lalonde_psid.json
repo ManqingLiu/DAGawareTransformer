@@ -1,15 +1,15 @@
 {
   "training": {
     "num_epochs": 10,
-    "batch_size": 32,
+    "batch_size": 100,
     "learning_rate": 0.0001,
-    "weight_decay": 0.0,
-    "project_tag": "lalonde_psid"
+    "weight_decay": 0.001,
+    "project_tag": "lalonde_cps"
   },
   "model": {
-    "num_layers": 3,
+    "num_layers": 4,
     "dropout_rate": 0.1,
-    "embedding_dim": 128,
-    "num_heads": 16
+    "embedding_dim": 32,
+    "num_heads": 8
   }
 }

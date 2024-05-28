@@ -14,14 +14,15 @@ def aggregate_data(data_name):
         directory = f'experiments/results/{data_name}/sample{i}'
         json_file_path = os.path.join(directory, f'{data_name}.json')
         nomask_json_file_path = os.path.join(directory, f'{data_name}_nomask.json')
+        baseline_json_file_path = os.path.join(directory, f'{data_name}_baseline.json')
 
         # Open and load the regular JSON file
         with open(json_file_path, 'r') as file:
             data = json.load(file)
-            ATE_AIPW_baseline = data[0]['results'].get('ATE_AIPW_baseline', None)
-            results_dict = data[1]['results']
+            results_dict = data[0]['results']
             ATE_true = results_dict.get('ATE_true', None)
             ATE_IPTW = results_dict.get('ATE_IPTW', None)
+            ATE_std = results_dict.get('ATE_std', None)
             ATE_AIPW = results_dict.get('ATE_AIPW', None)
 
         # Open and load the nomask JSON file
@@ -30,15 +31,25 @@ def aggregate_data(data_name):
             nomask_data = json.load(file)
             nomask_results_dict = nomask_data[0]['results']
             ATE_IPTW_nomask = nomask_results_dict.get('ATE_IPTW', None)
+            ATE_std_nomask = nomask_results_dict.get('ATE_std', None)
             ATE_AIPW_nomask = nomask_results_dict.get('ATE_AIPW', None)
+
+        # Open and load the baseline JSON file
+        with open(baseline_json_file_path, 'r') as file:
+            baseline_data = json.load(file)
+            baseline_results_dict = baseline_data[0]['results']
+            ATE_AIPW_baseline = baseline_results_dict.get('ATE_AIPW_baseline', None)
+
 
         # Append the extracted data to the list with new labels for nomask values
         data_list.append({
             'ATE_true': ATE_true,
             'ATE_AIPW_baseline': ATE_AIPW_baseline,
             'ATE_IPTW': ATE_IPTW,
+            'ATE_std': ATE_std,
             'ATE_AIPW': ATE_AIPW,
             'ATE_IPTW_nomask': ATE_IPTW_nomask,
+            'ATE_std_nomask': ATE_std_nomask,
             'ATE_AIPW_nomask': ATE_AIPW_nomask
         })
 
@@ -74,6 +85,12 @@ if __name__ == '__main__':
     rmse_IPTW = rmse(ATE_IPTW_mean, ATE_true_mean)
     print(f"RMSE for ATE_IPTW: {rmse_IPTW:.4f}")
 
+    # calculate RMSE for ATE_std using rmse function from utils.py
+    # use mean of ATE_true and mean of ATE_std as inputs
+    ATE_std_mean = df['ATE_std'].mean()
+    rmse_std = rmse(ATE_std_mean, ATE_true_mean)
+    print(f"RMSE for ATE_std: {rmse_std:.4f}")
+
     # calculate RMSE for ATE_AIPW using rmse function from utils.py
     # use mean of ATE_true and mean of ATE_AIPW as inputs
     ATE_AIPW_mean = df['ATE_AIPW'].mean()
@@ -83,6 +100,8 @@ if __name__ == '__main__':
 
     ATE_IPTW_nomask_mean = df['ATE_IPTW_nomask'].mean()
     rmse_IPTW_nomask = rmse(ATE_IPTW_nomask_mean, ATE_true_mean)
+    ATE_std_nomask_mean = df['ATE_std_nomask'].mean()
+    rmse_std_nomask = rmse(ATE_std_nomask_mean, ATE_true_mean)
     ATE_AIPW_nomask_mean = df['ATE_AIPW_nomask'].mean()
     rmse_AIPW_nomask = rmse(ATE_AIPW_nomask_mean, ATE_true_mean)
 
@@ -91,14 +110,18 @@ if __name__ == '__main__':
     results = {
         'ATE_true_mean': ATE_true_mean,
         'ATE_IPTW_mean': ATE_IPTW_mean,
+        'ATE_std_mean': ATE_std_mean,
         'ATE_AIPW_mean': ATE_AIPW_mean,
         'ATE_AIPW_baseline_mean': ATE_AIPW_baseline_mean,
         'ATE_IPTW_nomask_mean': ATE_IPTW_nomask_mean,
+        'ATE_std_nomask_mean': ATE_std_nomask_mean,
         'ATE_AIPW_nomask_mean': ATE_AIPW_nomask_mean,
         'RMSE_IPTW': rmse_IPTW,
+        'RMSE_std': rmse_std,
         'RMSE_AIPW': rmse_AIPW,
         'RMSE_AIPW_baseline': rmse_AIPW_baseline,
         'RMSE_IPTW_nomask': rmse_IPTW_nomask,
+        'RMSE_std_nomask': rmse_std_nomask,
         'RMSE_AIPW_nomask': rmse_AIPW_nomask
     }
 

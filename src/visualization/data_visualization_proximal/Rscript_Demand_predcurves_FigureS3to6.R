@@ -4,14 +4,13 @@ library(dplyr)
 library(latex2exp)
 
 # Set the working directory to results/
-setwd("~/")
-df = read.csv("aggregated_results_for_figures/demand_predcurve_data.csv")
+#setwd("~/")
+df = read.csv("../../../experiments/results/proximal/aggregated_results_for_figures/demand_predcurve_data.csv")
 
 # subset methods for the plot
-methods = c('linear_reg_awy', 'cevae', 'kpv', 'pmmr', 'twosls', 
-            'linear_reg_aw2y', 'naivenet_awy', 'dfpv', 'nmmr_u', 'nmmr_v')
+methods = c('nmmr_u')
 
-for (n in c(1000, 5000, 10000, 50000)) {
+for (n in c(1000, 5000, 10000)) {
   
   df_subset = df[which(df$method %in% methods & df$sample_size==n),]
   
@@ -33,7 +32,7 @@ for (n in c(1000, 5000, 10000, 50000)) {
   
   p <- ggplot(df_subset) + 
     geom_line(aes(x=A, y=pred_EY_doA, group=rep), color="#438BC4", linetype="dotted", alpha=1) + 
-    geom_smooth(method='loess', formula=y ~ x, aes(x=A, y=true_EY_doA), color='black', size=0.65) +
+    geom_smooth(method='loess', formula=y ~ x, aes(x=A, y=true_EY_doA), color='black', linewidth=0.65) +
     coord_cartesian(ylim = c(0, 100), xlim = c(8, 32)) +
     xlab("Ticket price (A)") +
     ylab(TeX(r'(Ticket sales: $E \[ Y^a \] $)')) +
