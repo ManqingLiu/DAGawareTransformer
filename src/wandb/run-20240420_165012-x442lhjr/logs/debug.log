@@ -1,0 +1,34 @@
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_setup.py:_flush():76] Current SDK version is 0.16.6
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_setup.py:_flush():76] Configure stats pid to 68744
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_setup.py:_flush():76] Loading settings from /Users/manqingliu/.config/wandb/settings
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_setup.py:_flush():76] Loading settings from /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/settings
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'src/train.py', 'program_abspath': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py', 'program': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py'}
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_setup.py:_flush():76] Applying login settings: {}
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_init.py:_log_setup():521] Logging user logs to /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240420_165012-x442lhjr/logs/debug.log
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_init.py:_log_setup():522] Logging internal logs to /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240420_165012-x442lhjr/logs/debug-internal.log
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_init.py:init():561] calling init triggers
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_init.py:init():568] wandb.init called with sweep_config: {}
+config: {'num_epochs': 100, 'batch_size': 512, 'learning_rate': 0.001, 'weight_decay': 0.0, 'project_tag': 'lalonde_psid'}
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_init.py:init():611] starting backend
+2024-04-20 16:50:12,281 INFO    MainThread:68744 [wandb_init.py:init():615] setting up manager
+2024-04-20 16:50:12,282 INFO    MainThread:68744 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2024-04-20 16:50:12,282 INFO    MainThread:68744 [wandb_init.py:init():623] backend started and connected
+2024-04-20 16:50:12,288 INFO    MainThread:68744 [wandb_init.py:init():715] updated telemetry
+2024-04-20 16:50:12,327 INFO    MainThread:68744 [wandb_init.py:init():748] communicating run to backend with 90.0 second timeout
+2024-04-20 16:50:13,499 INFO    MainThread:68744 [wandb_run.py:_on_init():2357] communicating current version
+2024-04-20 16:50:13,702 INFO    MainThread:68744 [wandb_run.py:_on_init():2366] got version response 
+2024-04-20 16:50:13,703 INFO    MainThread:68744 [wandb_init.py:init():799] starting run threads in backend
+2024-04-20 16:50:17,662 INFO    MainThread:68744 [wandb_run.py:_console_start():2335] atexit reg
+2024-04-20 16:50:17,663 INFO    MainThread:68744 [wandb_run.py:_redirect():2190] redirect: wrap_raw
+2024-04-20 16:50:17,663 INFO    MainThread:68744 [wandb_run.py:_redirect():2255] Wrapping output streams.
+2024-04-20 16:50:17,663 INFO    MainThread:68744 [wandb_run.py:_redirect():2280] Redirects installed.
+2024-04-20 16:50:17,664 INFO    MainThread:68744 [wandb_init.py:init():842] run started, returning control to user process
+2024-04-20 16:53:15,518 INFO    MainThread:68744 [wandb_run.py:_finish():2064] finishing run mliu7/DAG transformer/x442lhjr
+2024-04-20 16:53:15,519 INFO    MainThread:68744 [wandb_run.py:_atexit_cleanup():2304] got exitcode: 0
+2024-04-20 16:53:15,520 INFO    MainThread:68744 [wandb_run.py:_restore():2287] restore
+2024-04-20 16:53:15,520 INFO    MainThread:68744 [wandb_run.py:_restore():2293] restore done
+2024-04-20 16:53:20,420 INFO    MainThread:68744 [wandb_run.py:_footer_history_summary_info():3936] rendering history
+2024-04-20 16:53:20,422 INFO    MainThread:68744 [wandb_run.py:_footer_history_summary_info():3968] rendering summary
+2024-04-20 16:53:20,441 INFO    MainThread:68744 [wandb_run.py:_footer_sync_info():3895] logging synced files

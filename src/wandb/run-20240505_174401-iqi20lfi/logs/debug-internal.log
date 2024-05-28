@@ -1,0 +1,59 @@
+2024-05-05 17:44:01,279 INFO    StreamThr :91738 [internal.py:wandb_internal():86] W&B internal server running at pid: 91738, started at: 2024-05-05 17:44:01.277993
+2024-05-05 17:44:01,280 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status
+2024-05-05 17:44:01,285 INFO    WriterThread:91738 [datastore.py:open_for_write():87] open: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240505_174401-iqi20lfi/run-iqi20lfi.wandb
+2024-05-05 17:44:01,285 DEBUG   SenderThread:91738 [sender.py:send():379] send: header
+2024-05-05 17:44:01,317 DEBUG   SenderThread:91738 [sender.py:send():379] send: run
+2024-05-05 17:44:01,899 INFO    SenderThread:91738 [dir_watcher.py:__init__():211] watching files in: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240505_174401-iqi20lfi/files
+2024-05-05 17:44:01,899 INFO    SenderThread:91738 [sender.py:_start_run_threads():1124] run started: iqi20lfi with start time 1714945441.278532
+2024-05-05 17:44:01,918 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: check_version
+2024-05-05 17:44:01,918 DEBUG   SenderThread:91738 [sender.py:send_request():406] send_request: check_version
+2024-05-05 17:44:02,080 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: run_start
+2024-05-05 17:44:02,098 DEBUG   HandlerThread:91738 [system_info.py:__init__():26] System info init
+2024-05-05 17:44:02,098 DEBUG   HandlerThread:91738 [system_info.py:__init__():41] System info init done
+2024-05-05 17:44:02,098 INFO    HandlerThread:91738 [system_monitor.py:start():194] Starting system monitor
+2024-05-05 17:44:02,098 INFO    SystemMonitor:91738 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-05-05 17:44:02,099 INFO    HandlerThread:91738 [system_monitor.py:probe():214] Collecting system info
+2024-05-05 17:44:02,099 INFO    SystemMonitor:91738 [interfaces.py:start():190] Started cpu monitoring
+2024-05-05 17:44:02,100 INFO    SystemMonitor:91738 [interfaces.py:start():190] Started disk monitoring
+2024-05-05 17:44:02,100 DEBUG   HandlerThread:91738 [system_info.py:probe():150] Probing system
+2024-05-05 17:44:02,100 INFO    SystemMonitor:91738 [interfaces.py:start():190] Started memory monitoring
+2024-05-05 17:44:02,103 INFO    SystemMonitor:91738 [interfaces.py:start():190] Started network monitoring
+2024-05-05 17:44:02,111 DEBUG   HandlerThread:91738 [system_info.py:_probe_git():135] Probing git
+2024-05-05 17:44:02,132 DEBUG   HandlerThread:91738 [system_info.py:_probe_git():143] Probing git done
+2024-05-05 17:44:02,132 DEBUG   HandlerThread:91738 [system_info.py:probe():198] Probing system done
+2024-05-05 17:44:02,132 DEBUG   HandlerThread:91738 [system_monitor.py:probe():223] {'os': 'macOS-10.16-x86_64-i386-64bit', 'python': '3.10.14', 'heartbeatAt': '2024-05-05T21:44:02.100538', 'startedAt': '2024-05-05T21:44:01.268991', 'docker': None, 'cuda': None, 'args': ('--dag', '../config/dag/u_simple_dag.json', '--config', '../config/train/u.json', '--data_file', '../data/unmeasured_confounding/data_U_uniform_simple.csv', '--model_file', '../experiments/model/unmeasured_confounding/model_U_train_simple.pth', '--mask', 'True', '--n_uniform_variables', '1', '--seed', '4248'), 'state': 'running', 'program': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py', 'codePathLocal': 'u_back_prop.py', 'codePath': 'src/u_back_prop.py', 'git': {'remote': 'https://github.com/ManqingLiu/DAGawareTransformer_NeurIPS.git', 'commit': '7d2378b4dc4f2f0289a8deda25d3e5cdddf82a15'}, 'email': 'manqingliu@g.harvard.edu', 'root': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS', 'host': 'Manqings-MacBook-Pro.local', 'username': 'manqingliu', 'executable': '/Users/manqingliu/opt/anaconda3/envs/Myenv/bin/python', 'cpu_count': 8, 'cpu_count_logical': 8, 'cpu_freq': {'current': 2400, 'min': 2400, 'max': 2400}, 'cpu_freq_per_core': [{'current': 2400, 'min': 2400, 'max': 2400}], 'disk': {'/': {'total': 228.27386474609375, 'used': 9.539291381835938}}, 'memory': {'total': 8.0}}
+2024-05-05 17:44:02,132 INFO    HandlerThread:91738 [system_monitor.py:probe():224] Finished collecting system info
+2024-05-05 17:44:02,132 INFO    HandlerThread:91738 [system_monitor.py:probe():227] Publishing system info
+2024-05-05 17:44:02,132 DEBUG   HandlerThread:91738 [system_info.py:_save_conda():207] Saving list of conda packages installed into the current environment
+2024-05-05 17:44:02,905 INFO    Thread-12 :91738 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240505_174401-iqi20lfi/files/conda-environment.yaml
+2024-05-05 17:44:06,729 DEBUG   HandlerThread:91738 [system_info.py:_save_conda():222] Saving conda packages done
+2024-05-05 17:44:06,730 INFO    HandlerThread:91738 [system_monitor.py:probe():229] Finished publishing system info
+2024-05-05 17:44:06,733 DEBUG   SenderThread:91738 [sender.py:send():379] send: files
+2024-05-05 17:44:06,733 INFO    SenderThread:91738 [sender.py:_save_file():1390] saving file wandb-metadata.json with policy now
+2024-05-05 17:44:06,734 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:06,922 INFO    Thread-12 :91738 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240505_174401-iqi20lfi/files/wandb-metadata.json
+2024-05-05 17:44:11,752 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:16,766 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:21,782 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:26,798 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:31,810 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:36,834 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:41,851 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:46,873 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:51,889 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:44:56,907 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:01,925 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:02,107 DEBUG   SystemMonitor:91738 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-05-05 17:45:02,111 DEBUG   SenderThread:91738 [sender.py:send():379] send: stats
+2024-05-05 17:45:07,127 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:12,145 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:17,161 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:22,178 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:27,197 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:32,115 DEBUG   SenderThread:91738 [sender.py:send():379] send: stats
+2024-05-05 17:45:33,123 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:38,140 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:43,158 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:48,174 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:53,198 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report
+2024-05-05 17:45:58,216 DEBUG   HandlerThread:91738 [handler.py:handle_request():146] handle_request: status_report

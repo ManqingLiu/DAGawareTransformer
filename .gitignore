@@ -4,4 +4,5 @@ myenv/
 __pycache__/
 wandb/
 *.egg-info
-*/results/proximal
+*/results/proximal.DS_Store
+__pycache__/

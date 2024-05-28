@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 120, in <module>
+    model = ubackprop.back_propagate()
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 79, in back_propagate
+    param.copy_(param - lr * param.grad)
+RuntimeError: a leaf Variable that requires grad is being used in an in-place operation.

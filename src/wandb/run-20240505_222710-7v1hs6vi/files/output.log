@@ -1,0 +1,6 @@
+<All keys matched successfully>
+U variable: embedding.U1.weight, shape: (2, 512)
+U variable: embedding.U1.weight, value: [[ 1.0086913   0.9669719  -0.16077973 ... -0.6397608   0.14492922
+   0.3721247 ]
+ [-0.09980567 -0.24977016  2.247553   ...  2.1799958   1.7225304
+  -0.7387287 ]]

@@ -1,0 +1,114 @@
+2024-04-19 18:29:20,824 INFO    StreamThr :48099 [internal.py:wandb_internal():86] W&B internal server running at pid: 48099, started at: 2024-04-19 18:29:20.821810
+2024-04-19 18:29:20,827 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status
+2024-04-19 18:29:20,847 INFO    WriterThread:48099 [datastore.py:open_for_write():87] open: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/run-vr83x9en.wandb
+2024-04-19 18:29:20,848 DEBUG   SenderThread:48099 [sender.py:send():379] send: header
+2024-04-19 18:29:20,872 DEBUG   SenderThread:48099 [sender.py:send():379] send: run
+2024-04-19 18:29:21,194 INFO    SenderThread:48099 [dir_watcher.py:__init__():211] watching files in: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/files
+2024-04-19 18:29:21,194 INFO    SenderThread:48099 [sender.py:_start_run_threads():1124] run started: vr83x9en with start time 1713565760.827182
+2024-04-19 18:29:21,232 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: check_version
+2024-04-19 18:29:21,232 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: check_version
+2024-04-19 18:29:21,360 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: run_start
+2024-04-19 18:29:21,378 DEBUG   HandlerThread:48099 [system_info.py:__init__():26] System info init
+2024-04-19 18:29:21,378 DEBUG   HandlerThread:48099 [system_info.py:__init__():41] System info init done
+2024-04-19 18:29:21,378 INFO    HandlerThread:48099 [system_monitor.py:start():194] Starting system monitor
+2024-04-19 18:29:21,379 INFO    SystemMonitor:48099 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-04-19 18:29:21,379 INFO    HandlerThread:48099 [system_monitor.py:probe():214] Collecting system info
+2024-04-19 18:29:21,380 INFO    SystemMonitor:48099 [interfaces.py:start():190] Started cpu monitoring
+2024-04-19 18:29:21,381 DEBUG   HandlerThread:48099 [system_info.py:probe():150] Probing system
+2024-04-19 18:29:21,381 INFO    SystemMonitor:48099 [interfaces.py:start():190] Started disk monitoring
+2024-04-19 18:29:21,383 INFO    SystemMonitor:48099 [interfaces.py:start():190] Started memory monitoring
+2024-04-19 18:29:21,384 INFO    SystemMonitor:48099 [interfaces.py:start():190] Started network monitoring
+2024-04-19 18:29:21,393 DEBUG   HandlerThread:48099 [system_info.py:_probe_git():135] Probing git
+2024-04-19 18:29:21,419 DEBUG   HandlerThread:48099 [system_info.py:_probe_git():143] Probing git done
+2024-04-19 18:29:21,419 DEBUG   HandlerThread:48099 [system_info.py:probe():198] Probing system done
+2024-04-19 18:29:21,419 DEBUG   HandlerThread:48099 [system_monitor.py:probe():223] {'os': 'macOS-10.16-x86_64-i386-64bit', 'python': '3.10.14', 'heartbeatAt': '2024-04-19T22:29:21.381471', 'startedAt': '2024-04-19T22:29:20.801701', 'docker': None, 'cuda': None, 'args': ('--dag', '../config/dag/lalonde_psid_dag.json', '--config', '../config/train/lalonde_psid.json', '--data_file', '../data/realcause_datasets/lalonde_psid_sample1.csv', '--model_file', '../experiments/model/lalonde_psid/model_psid_sample1.pth'), 'state': 'running', 'program': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py', 'codePathLocal': 'train.py', 'codePath': 'src/train.py', 'git': {'remote': 'https://github.com/ManqingLiu/DAGawareTransformer_NeurIPS.git', 'commit': 'db32f67b0e58264d81b7b0740156e8d10eaa96e3'}, 'email': 'manqingliu@g.harvard.edu', 'root': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS', 'host': 'Manqings-MacBook-Pro.local', 'username': 'manqingliu', 'executable': '/Users/manqingliu/opt/anaconda3/envs/Myenv/bin/python', 'cpu_count': 8, 'cpu_count_logical': 8, 'cpu_freq': {'current': 2400, 'min': 2400, 'max': 2400}, 'cpu_freq_per_core': [{'current': 2400, 'min': 2400, 'max': 2400}], 'disk': {'/': {'total': 228.27386474609375, 'used': 9.539291381835938}}, 'memory': {'total': 8.0}}
+2024-04-19 18:29:21,419 INFO    HandlerThread:48099 [system_monitor.py:probe():224] Finished collecting system info
+2024-04-19 18:29:21,419 INFO    HandlerThread:48099 [system_monitor.py:probe():227] Publishing system info
+2024-04-19 18:29:21,419 DEBUG   HandlerThread:48099 [system_info.py:_save_conda():207] Saving list of conda packages installed into the current environment
+2024-04-19 18:29:22,204 INFO    Thread-16 :48099 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/files/conda-environment.yaml
+2024-04-19 18:29:25,084 DEBUG   HandlerThread:48099 [system_info.py:_save_conda():222] Saving conda packages done
+2024-04-19 18:29:25,085 INFO    HandlerThread:48099 [system_monitor.py:probe():229] Finished publishing system info
+2024-04-19 18:29:25,091 DEBUG   SenderThread:48099 [sender.py:send():379] send: files
+2024-04-19 18:29:25,091 INFO    SenderThread:48099 [sender.py:_save_file():1390] saving file wandb-metadata.json with policy now
+2024-04-19 18:29:25,215 INFO    Thread-16 :48099 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/files/conda-environment.yaml
+2024-04-19 18:29:25,215 INFO    Thread-16 :48099 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/files/wandb-metadata.json
+2024-04-19 18:29:25,225 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: python_packages
+2024-04-19 18:29:25,225 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: python_packages
+2024-04-19 18:29:25,228 DEBUG   SenderThread:48099 [sender.py:send():379] send: telemetry
+2024-04-19 18:29:25,230 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:29:25,230 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:29:25,233 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:29:26,220 INFO    Thread-16 :48099 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/files/requirements.txt
+2024-04-19 18:29:27,518 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:29:28,224 INFO    Thread-16 :48099 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/files/output.log
+2024-04-19 18:29:28,587 INFO    wandb-upload_0:48099 [upload_job.py:push():131] Uploaded file /var/folders/ym/bl9nj6l913x_5qq1258xk6lc0000gn/T/tmpsw_07q5qwandb/581rwbl4-wandb-metadata.json
+2024-04-19 18:29:30,231 INFO    Thread-16 :48099 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/files/output.log
+2024-04-19 18:29:32,836 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:29:37,845 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:29:40,242 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:29:40,244 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:29:40,245 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:29:43,455 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:29:48,470 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:29:53,489 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:29:54,352 INFO    Thread-16 :48099 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240419_182920-vr83x9en/files/config.yaml
+2024-04-19 18:29:55,243 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:29:55,244 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:29:55,246 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:29:59,373 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:04,395 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:09,412 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:10,250 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:30:10,251 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:30:10,253 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:30:15,386 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:20,402 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:21,391 DEBUG   SystemMonitor:48099 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-04-19 18:30:21,398 DEBUG   SenderThread:48099 [sender.py:send():379] send: stats
+2024-04-19 18:30:25,254 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:30:25,256 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:30:25,257 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:30:25,445 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:30,463 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:35,478 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:40,256 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:30:40,258 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:30:40,260 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:30:41,446 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:46,462 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:51,406 DEBUG   SenderThread:48099 [sender.py:send():379] send: stats
+2024-04-19 18:30:52,412 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:30:55,266 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:30:55,267 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:30:55,269 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:30:57,463 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:02,478 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:07,497 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:10,270 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:31:10,271 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:31:10,272 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:31:13,447 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:18,466 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:21,411 DEBUG   SenderThread:48099 [sender.py:send():379] send: stats
+2024-04-19 18:31:24,419 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:25,276 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:31:25,277 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:31:25,279 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:31:29,438 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:34,463 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:39,477 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:40,278 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-19 18:31:40,279 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-19 18:31:40,280 DEBUG   SenderThread:48099 [sender.py:send_request():406] send_request: stop_status
+2024-04-19 18:31:45,439 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:50,459 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:31:51,420 DEBUG   SenderThread:48099 [sender.py:send():379] send: stats
+2024-04-19 18:31:56,446 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:32:01,468 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:32:06,481 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:32:11,505 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:32:16,520 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:32:21,430 DEBUG   SenderThread:48099 [sender.py:send():379] send: stats
+2024-04-19 18:32:22,432 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:32:27,457 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report
+2024-04-19 18:32:32,477 DEBUG   HandlerThread:48099 [handler.py:handle_request():146] handle_request: status_report

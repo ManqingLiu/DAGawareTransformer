@@ -112,6 +112,21 @@ def ate_plot(dataset):
     plt.savefig(plot_path)
     plt.close()
 
+    # take a batch from dataloader
+    #inputs = next(iter(dataloader))
+
+    #outputs, attention_weights = model(inputs)
+
+    # Assuming `id2node` maps indices to node names
+    #node_names = dag['nodes']
+    #print(node_names)
+
+    # Now plot the attention weights for the first layer and first head
+    #plot_attention_heatmap(attention_weights, layer_idx=0, head_idx=0, node_names=node_names, transpose=False)
+
+    # save the plot as a png
+    #plt.savefig('attention_weights.png')
+
 
 if __name__ == '__main__':
     parser = ArgumentParser()

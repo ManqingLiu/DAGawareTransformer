@@ -1,0 +1,454 @@
+
+  0%|          | 0/100 [00:00<?, ?it/s]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+  1%|          | 1/100 [00:02<04:16,  2.59s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+  2%|▏         | 2/100 [00:04<03:17,  2.01s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+  3%|▎         | 3/100 [00:05<03:03,  1.89s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+  5%|▌         | 5/100 [00:09<02:47,  1.77s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+  6%|▌         | 6/100 [00:10<02:41,  1.72s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+  7%|▋         | 7/100 [00:12<02:37,  1.69s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+  8%|▊         | 8/100 [00:14<02:38,  1.72s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+  9%|▉         | 9/100 [00:16<02:34,  1.70s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 11%|█         | 11/100 [00:19<02:29,  1.68s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 12%|█▏        | 12/100 [00:20<02:26,  1.67s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 13%|█▎        | 13/100 [00:22<02:25,  1.68s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 14%|█▍        | 14/100 [00:24<02:23,  1.67s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 15%|█▌        | 15/100 [00:26<02:24,  1.70s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 17%|█▋        | 17/100 [00:29<02:20,  1.69s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 18%|█▊        | 18/100 [00:31<02:20,  1.71s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 19%|█▉        | 19/100 [00:32<02:15,  1.68s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 20%|██        | 20/100 [00:34<02:12,  1.66s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 21%|██        | 21/100 [00:36<02:12,  1.68s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 23%|██▎       | 23/100 [00:39<02:11,  1.70s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 24%|██▍       | 24/100 [00:41<02:07,  1.68s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 25%|██▌       | 25/100 [00:42<02:05,  1.67s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 26%|██▌       | 26/100 [00:44<02:02,  1.65s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 27%|██▋       | 27/100 [00:46<01:59,  1.63s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 29%|██▉       | 29/100 [00:49<01:58,  1.67s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 30%|███       | 30/100 [00:51<01:57,  1.68s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 31%|███       | 31/100 [00:52<01:54,  1.66s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 32%|███▏      | 32/100 [00:54<01:51,  1.64s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 34%|███▍      | 34/100 [00:57<01:48,  1.64s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 35%|███▌      | 35/100 [00:59<01:49,  1.68s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 36%|███▌      | 36/100 [01:01<01:47,  1.68s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 37%|███▋      | 37/100 [01:02<01:47,  1.70s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 38%|███▊      | 38/100 [01:04<01:47,  1.73s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 39%|███▉      | 39/100 [01:06<01:47,  1.76s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 40%|████      | 40/100 [01:08<01:51,  1.85s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 41%|████      | 41/100 [01:10<01:53,  1.93s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 42%|████▏     | 42/100 [01:12<01:52,  1.95s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 43%|████▎     | 43/100 [01:14<01:51,  1.95s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 45%|████▌     | 45/100 [01:17<01:38,  1.79s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 46%|████▌     | 46/100 [01:19<01:33,  1.74s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 47%|████▋     | 47/100 [01:21<01:30,  1.71s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 48%|████▊     | 48/100 [01:22<01:28,  1.70s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 49%|████▉     | 49/100 [01:24<01:27,  1.71s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 50%|█████     | 50/100 [01:26<01:27,  1.76s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 51%|█████     | 51/100 [01:28<01:24,  1.72s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 53%|█████▎    | 53/100 [01:31<01:19,  1.69s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 54%|█████▍    | 54/100 [01:33<01:16,  1.66s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 55%|█████▌    | 55/100 [01:34<01:14,  1.66s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 56%|█████▌    | 56/100 [01:36<01:14,  1.70s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 57%|█████▋    | 57/100 [01:38<01:14,  1.72s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 58%|█████▊    | 58/100 [01:40<01:15,  1.79s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 60%|██████    | 60/100 [01:43<01:12,  1.81s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+
+ 61%|██████    | 61/100 [01:45<01:08,  1.75s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+
+ 62%|██████▏   | 62/100 [01:47<01:12,  1.92s/it]
+Shape of t: torch.Size([313, 2])
+Shape of y: torch.Size([313, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 63%|██████▎   | 63/100 [01:50<01:24,  2.28s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([313, 2])
+
+ 64%|██████▍   | 64/100 [01:52<01:16,  2.14s/it]
+Shape of t: torch.Size([512, 2])
+Shape of y: torch.Size([512, 10])
+Shape of t: torch.Size([512, 2])
+ 64%|██████▍   | 64/100 [01:54<01:04,  1.78s/it]
+Traceback (most recent call last):
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py", line 100, in <module>
+    train(model, dataloader, train_config, model_file=args.model_file)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py", line 50, in train
+    batch_loss.backward()
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/_tensor.py", line 522, in backward
+    torch.autograd.backward(
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/autograd/__init__.py", line 266, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass

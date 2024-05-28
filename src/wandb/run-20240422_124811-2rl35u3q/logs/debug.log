@@ -1,0 +1,27 @@
+2024-04-22 12:48:11,612 INFO    MainThread:9998 [wandb_setup.py:_flush():76] Current SDK version is 0.16.6
+2024-04-22 12:48:11,612 INFO    MainThread:9998 [wandb_setup.py:_flush():76] Configure stats pid to 9998
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_setup.py:_flush():76] Loading settings from /Users/manqingliu/.config/wandb/settings
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_setup.py:_flush():76] Loading settings from /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/settings
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'src/train_u.py', 'program_abspath': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train_u.py', 'program': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train_u.py'}
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_setup.py:_flush():76] Applying login settings: {}
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_init.py:_log_setup():521] Logging user logs to /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240422_124811-2rl35u3q/logs/debug.log
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_init.py:_log_setup():522] Logging internal logs to /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240422_124811-2rl35u3q/logs/debug-internal.log
+2024-04-22 12:48:11,613 INFO    MainThread:9998 [wandb_init.py:init():561] calling init triggers
+2024-04-22 12:48:11,614 INFO    MainThread:9998 [wandb_init.py:init():568] wandb.init called with sweep_config: {}
+config: {'num_epochs': 100, 'batch_size': 128, 'learning_rate': 0.001, 'weight_decay': 0.0, 'project_tag': 'unmeasured_confounding_binary'}
+2024-04-22 12:48:11,614 INFO    MainThread:9998 [wandb_init.py:init():611] starting backend
+2024-04-22 12:48:11,614 INFO    MainThread:9998 [wandb_init.py:init():615] setting up manager
+2024-04-22 12:48:11,617 INFO    MainThread:9998 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2024-04-22 12:48:11,622 INFO    MainThread:9998 [wandb_init.py:init():623] backend started and connected
+2024-04-22 12:48:11,649 INFO    MainThread:9998 [wandb_init.py:init():715] updated telemetry
+2024-04-22 12:48:11,688 INFO    MainThread:9998 [wandb_init.py:init():748] communicating run to backend with 90.0 second timeout
+2024-04-22 12:48:12,092 INFO    MainThread:9998 [wandb_run.py:_on_init():2357] communicating current version
+2024-04-22 12:48:12,228 INFO    MainThread:9998 [wandb_run.py:_on_init():2366] got version response 
+2024-04-22 12:48:12,229 INFO    MainThread:9998 [wandb_init.py:init():799] starting run threads in backend
+2024-04-22 12:48:21,261 INFO    MainThread:9998 [wandb_run.py:_console_start():2335] atexit reg
+2024-04-22 12:48:21,261 INFO    MainThread:9998 [wandb_run.py:_redirect():2190] redirect: wrap_raw
+2024-04-22 12:48:21,261 INFO    MainThread:9998 [wandb_run.py:_redirect():2255] Wrapping output streams.
+2024-04-22 12:48:21,261 INFO    MainThread:9998 [wandb_run.py:_redirect():2280] Redirects installed.
+2024-04-22 12:48:21,262 INFO    MainThread:9998 [wandb_init.py:init():842] run started, returning control to user process

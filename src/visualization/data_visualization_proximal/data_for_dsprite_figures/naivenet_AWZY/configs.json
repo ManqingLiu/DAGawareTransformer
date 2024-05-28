@@ -1,0 +1,21 @@
+{
+    "n_repeat": 20,
+    "data": {
+        "name": "dsprite",
+        "n_sample": [
+            1000,
+            5000
+        ],
+        "val_sample": 1000
+    },
+    "model": {
+        "name": "naive_neural_net_AWZY",
+        "n_epochs": 500,
+        "batch_size": 256,
+        "val_batch_size": 200,
+        "kernel_batch_size": 10,
+        "log_metrics": "True",
+        "learning_rate": 3e-05,
+        "l2_penalty": 3e-06
+    }
+}

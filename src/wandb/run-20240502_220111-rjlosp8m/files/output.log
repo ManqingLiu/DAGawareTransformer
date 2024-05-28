@@ -1,0 +1,5 @@
+embedding.U1.weight: torch.Size([2, 512])
+embedding.U1.weight: Parameter containing:
+tensor([[-0.0880, -0.1657, -0.2314,  ..., -0.6449, -0.0699,  0.1078],
+        [ 0.8243,  1.4841, -2.1677,  ...,  0.0197,  2.8524,  1.0436]],
+       requires_grad=True)

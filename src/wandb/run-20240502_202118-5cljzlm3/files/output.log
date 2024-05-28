@@ -1,0 +1,13 @@
+
+ 50%|█████     | 5/10 [00:01<00:01,  3.97it/s]
+dict_keys(['U1', 'A', 'Y', 'X'])
+dict_keys(['U1', 'A', 'Y', 'X'])
+dict_keys(['U1', 'A', 'Y', 'X'])
+dict_keys(['U1', 'A', 'Y', 'X'])
+dict_keys(['U1', 'A', 'Y', 'X'])
+
+100%|██████████| 10/10 [00:02<00:00,  3.89it/s]
+dict_keys(['U1', 'A', 'Y', 'X'])
+dict_keys(['U1', 'A', 'Y', 'X'])
+dict_keys(['U1', 'A', 'Y', 'X'])
+dict_keys(['U1', 'A', 'Y', 'X'])

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 167, in <module>
+    new_model = model.get_new_model()
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 121, in get_new_model
+    new_model = DAGTransformer(dag=self.dag, **self.train_config['model'])
+KeyError: 'model'

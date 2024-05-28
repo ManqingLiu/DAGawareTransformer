@@ -1,0 +1,191 @@
+2024-05-08 19:32:21,036 INFO    StreamThr :59262 [internal.py:wandb_internal():86] W&B internal server running at pid: 59262, started at: 2024-05-08 19:32:21.035356
+2024-05-08 19:32:21,037 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: status
+2024-05-08 19:32:21,042 INFO    WriterThread:59262 [datastore.py:open_for_write():87] open: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/run-onhv4xet.wandb
+2024-05-08 19:32:21,042 DEBUG   SenderThread:59262 [sender.py:send():379] send: header
+2024-05-08 19:32:21,077 DEBUG   SenderThread:59262 [sender.py:send():379] send: run
+2024-05-08 19:32:21,838 INFO    SenderThread:59262 [dir_watcher.py:__init__():211] watching files in: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files
+2024-05-08 19:32:21,838 INFO    SenderThread:59262 [sender.py:_start_run_threads():1124] run started: onhv4xet with start time 1715211141.036076
+2024-05-08 19:32:21,858 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: check_version
+2024-05-08 19:32:21,858 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: check_version
+2024-05-08 19:32:22,049 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: run_start
+2024-05-08 19:32:22,072 DEBUG   HandlerThread:59262 [system_info.py:__init__():26] System info init
+2024-05-08 19:32:22,072 DEBUG   HandlerThread:59262 [system_info.py:__init__():41] System info init done
+2024-05-08 19:32:22,072 INFO    HandlerThread:59262 [system_monitor.py:start():194] Starting system monitor
+2024-05-08 19:32:22,073 INFO    SystemMonitor:59262 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-05-08 19:32:22,073 INFO    HandlerThread:59262 [system_monitor.py:probe():214] Collecting system info
+2024-05-08 19:32:22,073 INFO    SystemMonitor:59262 [interfaces.py:start():190] Started cpu monitoring
+2024-05-08 19:32:22,074 DEBUG   HandlerThread:59262 [system_info.py:probe():150] Probing system
+2024-05-08 19:32:22,074 INFO    SystemMonitor:59262 [interfaces.py:start():190] Started disk monitoring
+2024-05-08 19:32:22,079 INFO    SystemMonitor:59262 [interfaces.py:start():190] Started memory monitoring
+2024-05-08 19:32:22,080 INFO    SystemMonitor:59262 [interfaces.py:start():190] Started network monitoring
+2024-05-08 19:32:22,089 DEBUG   HandlerThread:59262 [system_info.py:_probe_git():135] Probing git
+2024-05-08 19:32:22,111 DEBUG   HandlerThread:59262 [system_info.py:_probe_git():143] Probing git done
+2024-05-08 19:32:22,111 DEBUG   HandlerThread:59262 [system_info.py:probe():198] Probing system done
+2024-05-08 19:32:22,111 DEBUG   HandlerThread:59262 [system_monitor.py:probe():223] {'os': 'macOS-10.16-x86_64-i386-64bit', 'python': '3.10.14', 'heartbeatAt': '2024-05-08T23:32:22.074223', 'startedAt': '2024-05-08T23:32:21.026876', 'docker': None, 'cuda': None, 'args': ('--dag', '../config/dag/lalonde_psid_dag.json', '--config', '../config/train/lalonde_psid.json', '--data_train_file', '../data/realcause_datasets/lalonde_psid/sample1/train/lalonde_psid_train.csv', '--data_holdout_file', '../data/realcause_datasets/lalonde_psid/sample1/train/lalonde_psid_holdout.csv', '--model_train_file', '../experiments/model/lalonde_psid/sample1/model_psid_train.pth', '--model_holdout_file', '../experiments/model/lalonde_psid/sample1/model_psid_holdout.pth'), 'state': 'running', 'program': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py', 'codePathLocal': 'train.py', 'codePath': 'src/train.py', 'git': {'remote': 'https://github.com/ManqingLiu/DAGawareTransformer_NeurIPS.git', 'commit': '9255007047a009b3373da2e5e7f38f4ca9a011ed'}, 'email': 'manqingliu@g.harvard.edu', 'root': '/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS', 'host': 'Manqings-MacBook-Pro.local', 'username': 'manqingliu', 'executable': '/Users/manqingliu/opt/anaconda3/envs/Myenv/bin/python', 'cpu_count': 8, 'cpu_count_logical': 8, 'cpu_freq': {'current': 2400, 'min': 2400, 'max': 2400}, 'cpu_freq_per_core': [{'current': 2400, 'min': 2400, 'max': 2400}], 'disk': {'/': {'total': 228.27386474609375, 'used': 9.539291381835938}}, 'memory': {'total': 8.0}}
+2024-05-08 19:32:22,111 INFO    HandlerThread:59262 [system_monitor.py:probe():224] Finished collecting system info
+2024-05-08 19:32:22,111 INFO    HandlerThread:59262 [system_monitor.py:probe():227] Publishing system info
+2024-05-08 19:32:22,111 DEBUG   HandlerThread:59262 [system_info.py:_save_conda():207] Saving list of conda packages installed into the current environment
+2024-05-08 19:32:22,851 INFO    Thread-12 :59262 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/conda-environment.yaml
+2024-05-08 19:32:33,823 DEBUG   HandlerThread:59262 [system_info.py:_save_conda():222] Saving conda packages done
+2024-05-08 19:32:33,825 INFO    HandlerThread:59262 [system_monitor.py:probe():229] Finished publishing system info
+2024-05-08 19:32:33,828 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: status_report
+2024-05-08 19:32:33,828 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: keepalive
+2024-05-08 19:32:33,829 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: status_report
+2024-05-08 19:32:33,829 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: keepalive
+2024-05-08 19:32:33,829 DEBUG   SenderThread:59262 [sender.py:send():379] send: files
+2024-05-08 19:32:33,829 INFO    SenderThread:59262 [sender.py:_save_file():1390] saving file wandb-metadata.json with policy now
+2024-05-08 19:32:33,884 INFO    Thread-12 :59262 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/conda-environment.yaml
+2024-05-08 19:32:33,885 INFO    Thread-12 :59262 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/wandb-metadata.json
+2024-05-08 19:32:33,886 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: python_packages
+2024-05-08 19:32:33,886 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: python_packages
+2024-05-08 19:32:33,887 DEBUG   SenderThread:59262 [sender.py:send():379] send: telemetry
+2024-05-08 19:32:33,889 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: stop_status
+2024-05-08 19:32:33,889 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-08 19:32:33,890 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: stop_status
+2024-05-08 19:32:34,251 INFO    wandb-upload_0:59262 [upload_job.py:push():131] Uploaded file /var/folders/ym/bl9nj6l913x_5qq1258xk6lc0000gn/T/tmptql7q04zwandb/03hswmrw-wandb-metadata.json
+2024-05-08 19:32:34,739 DEBUG   SenderThread:59262 [sender.py:send():379] send: exit
+2024-05-08 19:32:34,739 INFO    SenderThread:59262 [sender.py:send_exit():586] handling exit code: 1
+2024-05-08 19:32:34,739 INFO    SenderThread:59262 [sender.py:send_exit():588] handling runtime: 12
+2024-05-08 19:32:34,740 INFO    SenderThread:59262 [sender.py:_save_file():1390] saving file wandb-summary.json with policy end
+2024-05-08 19:32:34,740 INFO    SenderThread:59262 [sender.py:send_exit():594] send defer
+2024-05-08 19:32:34,741 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:34,741 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 0
+2024-05-08 19:32:34,741 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:34,741 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 0
+2024-05-08 19:32:34,741 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 1
+2024-05-08 19:32:34,741 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:34,741 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 1
+2024-05-08 19:32:34,741 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:34,741 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 1
+2024-05-08 19:32:34,741 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 2
+2024-05-08 19:32:34,741 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:34,741 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 2
+2024-05-08 19:32:34,741 INFO    HandlerThread:59262 [system_monitor.py:finish():203] Stopping system monitor
+2024-05-08 19:32:34,742 INFO    HandlerThread:59262 [interfaces.py:finish():202] Joined cpu monitor
+2024-05-08 19:32:34,742 DEBUG   SystemMonitor:59262 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-05-08 19:32:34,742 INFO    HandlerThread:59262 [interfaces.py:finish():202] Joined disk monitor
+2024-05-08 19:32:34,742 DEBUG   SystemMonitor:59262 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-05-08 19:32:34,742 INFO    HandlerThread:59262 [interfaces.py:finish():202] Joined memory monitor
+2024-05-08 19:32:34,742 DEBUG   SystemMonitor:59262 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-05-08 19:32:34,742 INFO    HandlerThread:59262 [interfaces.py:finish():202] Joined network monitor
+2024-05-08 19:32:34,743 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:34,743 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 2
+2024-05-08 19:32:34,743 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 3
+2024-05-08 19:32:34,743 DEBUG   SenderThread:59262 [sender.py:send():379] send: stats
+2024-05-08 19:32:34,743 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:34,743 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 3
+2024-05-08 19:32:34,743 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:34,743 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 3
+2024-05-08 19:32:34,743 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 4
+2024-05-08 19:32:34,743 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:34,743 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 4
+2024-05-08 19:32:34,744 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:34,744 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 4
+2024-05-08 19:32:34,744 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 5
+2024-05-08 19:32:34,744 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:34,744 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 5
+2024-05-08 19:32:34,744 DEBUG   SenderThread:59262 [sender.py:send():379] send: summary
+2024-05-08 19:32:34,744 INFO    SenderThread:59262 [sender.py:_save_file():1390] saving file wandb-summary.json with policy end
+2024-05-08 19:32:34,744 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:34,744 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 5
+2024-05-08 19:32:34,744 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 6
+2024-05-08 19:32:34,744 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:34,744 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 6
+2024-05-08 19:32:34,744 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:34,744 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 6
+2024-05-08 19:32:34,747 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: status_report
+2024-05-08 19:32:34,832 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 7
+2024-05-08 19:32:34,833 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:34,833 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 7
+2024-05-08 19:32:34,833 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:34,833 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 7
+2024-05-08 19:32:34,890 INFO    Thread-12 :59262 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/config.yaml
+2024-05-08 19:32:34,890 INFO    Thread-12 :59262 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/wandb-summary.json
+2024-05-08 19:32:34,890 INFO    Thread-12 :59262 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/output.log
+2024-05-08 19:32:34,890 INFO    Thread-12 :59262 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/requirements.txt
+2024-05-08 19:32:35,741 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-08 19:32:36,624 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 8
+2024-05-08 19:32:36,625 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: poll_exit
+2024-05-08 19:32:36,625 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:36,625 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 8
+2024-05-08 19:32:36,626 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:36,626 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 8
+2024-05-08 19:32:36,626 INFO    SenderThread:59262 [job_builder.py:build():318] Attempting to build job artifact
+2024-05-08 19:32:36,627 INFO    SenderThread:59262 [job_builder.py:_get_source_type():455] is repo sourced job
+2024-05-08 19:32:36,744 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-08 19:32:36,860 INFO    SenderThread:59262 [job_builder.py:build():431] adding wandb-job metadata file
+2024-05-08 19:32:36,862 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 9
+2024-05-08 19:32:36,862 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: poll_exit
+2024-05-08 19:32:36,862 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:36,863 DEBUG   SenderThread:59262 [sender.py:send():379] send: artifact
+2024-05-08 19:32:36,863 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 9
+2024-05-08 19:32:36,901 INFO    Thread-12 :59262 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/output.log
+2024-05-08 19:32:37,445 INFO    wandb-upload_1:59262 [upload_job.py:push():86] Skipped uploading /Users/manqingliu/Library/Application Support/wandb/artifacts/staging/tmpyfzj9etq
+2024-05-08 19:32:37,631 INFO    wandb-upload_0:59262 [upload_job.py:push():89] Uploaded file /var/folders/ym/bl9nj6l913x_5qq1258xk6lc0000gn/T/tmpc7tkg7_9/wandb-job.json
+2024-05-08 19:32:37,751 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-08 19:32:38,389 INFO    SenderThread:59262 [sender.py:send_artifact():1468] sent artifact job-https___github.com_ManqingLiu_DAGawareTransformer_NeurIPS.git_src_train.py - {'id': 'QXJ0aWZhY3Q6ODI4MTEzNDg4', 'state': 'PENDING', 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjE2NDUwMzY2NQ==', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6ODI3ODA2MjI4', 'versionIndex': 6}}}
+2024-05-08 19:32:38,389 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:38,389 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 9
+2024-05-08 19:32:38,390 INFO    SenderThread:59262 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-05-08 19:32:38,912 INFO    SenderThread:59262 [dir_watcher.py:finish():388] scan: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files
+2024-05-08 19:32:38,913 INFO    SenderThread:59262 [dir_watcher.py:finish():402] scan save: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/requirements.txt requirements.txt
+2024-05-08 19:32:38,913 INFO    SenderThread:59262 [dir_watcher.py:finish():402] scan save: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/output.log output.log
+2024-05-08 19:32:38,913 INFO    SenderThread:59262 [dir_watcher.py:finish():402] scan save: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/config.yaml config.yaml
+2024-05-08 19:32:38,915 INFO    SenderThread:59262 [dir_watcher.py:finish():402] scan save: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/wandb-summary.json wandb-summary.json
+2024-05-08 19:32:38,917 INFO    SenderThread:59262 [dir_watcher.py:finish():402] scan save: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/conda-environment.yaml conda-environment.yaml
+2024-05-08 19:32:38,951 INFO    SenderThread:59262 [dir_watcher.py:finish():402] scan save: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/wandb-metadata.json wandb-metadata.json
+2024-05-08 19:32:38,951 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 10
+2024-05-08 19:32:38,951 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: poll_exit
+2024-05-08 19:32:38,952 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:38,952 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 10
+2024-05-08 19:32:38,953 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:38,953 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 10
+2024-05-08 19:32:38,953 INFO    SenderThread:59262 [file_pusher.py:finish():172] shutting down file pusher
+2024-05-08 19:32:39,178 INFO    wandb-upload_2:59262 [upload_job.py:push():131] Uploaded file /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/config.yaml
+2024-05-08 19:32:39,258 INFO    wandb-upload_1:59262 [upload_job.py:push():131] Uploaded file /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/requirements.txt
+2024-05-08 19:32:39,362 INFO    wandb-upload_0:59262 [upload_job.py:push():131] Uploaded file /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/output.log
+2024-05-08 19:32:39,363 INFO    wandb-upload_3:59262 [upload_job.py:push():131] Uploaded file /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/wandb-summary.json
+2024-05-08 19:32:39,364 INFO    wandb-upload_4:59262 [upload_job.py:push():131] Uploaded file /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/files/conda-environment.yaml
+2024-05-08 19:32:39,565 INFO    Thread-11 (_thread_body):59262 [sender.py:transition_state():614] send defer: 11
+2024-05-08 19:32:39,565 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:39,565 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 11
+2024-05-08 19:32:39,566 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:39,566 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 11
+2024-05-08 19:32:39,566 INFO    SenderThread:59262 [file_pusher.py:join():178] waiting for file pusher
+2024-05-08 19:32:39,566 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 12
+2024-05-08 19:32:39,566 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:39,566 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 12
+2024-05-08 19:32:39,566 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:39,566 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 12
+2024-05-08 19:32:39,566 INFO    SenderThread:59262 [file_stream.py:finish():614] file stream finish called
+2024-05-08 19:32:39,651 INFO    SenderThread:59262 [file_stream.py:finish():618] file stream finish is done
+2024-05-08 19:32:39,652 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 13
+2024-05-08 19:32:39,652 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:39,652 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 13
+2024-05-08 19:32:39,653 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:39,653 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 13
+2024-05-08 19:32:39,653 INFO    SenderThread:59262 [sender.py:transition_state():614] send defer: 14
+2024-05-08 19:32:39,653 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: defer
+2024-05-08 19:32:39,653 DEBUG   SenderThread:59262 [sender.py:send():379] send: final
+2024-05-08 19:32:39,653 INFO    HandlerThread:59262 [handler.py:handle_request_defer():172] handle defer: 14
+2024-05-08 19:32:39,653 DEBUG   SenderThread:59262 [sender.py:send():379] send: footer
+2024-05-08 19:32:39,654 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: defer
+2024-05-08 19:32:39,654 INFO    SenderThread:59262 [sender.py:send_request_defer():610] handle sender defer: 14
+2024-05-08 19:32:39,654 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-08 19:32:39,655 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: poll_exit
+2024-05-08 19:32:39,655 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: poll_exit
+2024-05-08 19:32:39,655 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: poll_exit
+2024-05-08 19:32:39,656 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: server_info
+2024-05-08 19:32:39,656 DEBUG   SenderThread:59262 [sender.py:send_request():406] send_request: server_info
+2024-05-08 19:32:39,658 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: get_summary
+2024-05-08 19:32:39,659 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: sampled_history
+2024-05-08 19:32:39,659 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: internal_messages
+2024-05-08 19:32:39,737 INFO    MainThread:59262 [wandb_run.py:_footer_history_summary_info():3936] rendering history
+2024-05-08 19:32:39,738 INFO    MainThread:59262 [wandb_run.py:_footer_history_summary_info():3968] rendering summary
+2024-05-08 19:32:39,738 INFO    MainThread:59262 [wandb_run.py:_footer_sync_info():3895] logging synced files
+2024-05-08 19:32:39,739 DEBUG   HandlerThread:59262 [handler.py:handle_request():146] handle_request: shutdown
+2024-05-08 19:32:39,739 INFO    HandlerThread:59262 [handler.py:finish():866] shutting down handler
+2024-05-08 19:32:40,660 INFO    WriterThread:59262 [datastore.py:close():296] close: /Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/wandb/run-20240508_193221-onhv4xet/run-onhv4xet.wandb
+2024-05-08 19:32:40,741 INFO    SenderThread:59262 [sender.py:finish():1546] shutting down sender
+2024-05-08 19:32:40,741 INFO    SenderThread:59262 [file_pusher.py:finish():172] shutting down file pusher
+2024-05-08 19:32:40,742 INFO    SenderThread:59262 [file_pusher.py:join():178] waiting for file pusher

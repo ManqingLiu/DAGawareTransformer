@@ -38,7 +38,7 @@ def predict(model: nn.Module,
     predictions = []
     attention_weights = []
     with torch.no_grad():
-        for batch in dataloader:
+        for _, batch in dataloader:
             batch = {k: v.to(device) for k, v in batch.items()}
             outputs = model(batch, mask=mask)
             batch_predictions = []
@@ -54,6 +54,7 @@ def predict(model: nn.Module,
 
     # assign column names to the predictions_df
     predictions = np.concatenate(predictions, axis=0)
+    print(predictions.shape)
     print('Done predicting.')
     prediction_transformer = PredictionTransformer(dataset.bin_edges)
     transformed_predictions = prediction_transformer.transform(predictions)

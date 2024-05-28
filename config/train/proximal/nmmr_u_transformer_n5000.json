@@ -1,5 +1,5 @@
 {
-  "n_repeat": 10,
+  "n_repeat": 20,
   "data": {
     "name": "demand",
     "n_sample": 5000
@@ -15,8 +15,8 @@
   "model": {
     "name": "nmmr",
     "num_layers": 1,
-    "dropout_rate": 0.1,
-    "embedding_dim": 128,
+    "dropout_rate": 0,
+    "embedding_dim": 40,
     "num_heads": 1
   }
 }

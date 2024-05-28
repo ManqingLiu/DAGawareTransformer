@@ -1,0 +1,31 @@
+  0%|          | 0/100 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py", line 102, in <module>
+    train(model, dataloader, train_config, mask=True, model_file=args.model_train_file)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py", line 45, in train
+    outputs = model(batch, mask=mask)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/model.py", line 97, in forward
+    x = self.encoder(x, mask=attn_mask)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/transformer.py", line 391, in forward
+    output = mod(output, src_mask=mask, is_causal=is_causal, src_key_padding_mask=src_key_padding_mask_for_layers)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/model.py", line 12, in forward
+    src2, attn = self.self_attn(src, src, src, attn_mask=src_mask,
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/nn/modules/activation.py", line 1116, in forward
+    is_batched = query.dim() == 3
+AttributeError: 'tuple' object has no attribute 'dim'

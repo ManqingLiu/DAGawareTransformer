@@ -1,0 +1,62 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.10.14",
+    "heartbeatAt": "2024-05-07T01:41:27.322735",
+    "startedAt": "2024-05-07T01:41:26.120376",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--dag",
+        "../config/dag/u_simple_dag.json",
+        "--config",
+        "../config/train/u.json",
+        "--data_file",
+        "../data/unmeasured_confounding/data_U_uniform_simple.csv",
+        "--model_file",
+        "../experiments/model/unmeasured_confounding/model_U_train_simple.pth",
+        "--new_model_file",
+        "../experiments/model/unmeasured_confounding/model_U_train_simple_new.pth",
+        "--mask",
+        "True",
+        "--n_uniform_variables",
+        "1",
+        "--seed",
+        "42"
+    ],
+    "state": "running",
+    "program": "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py",
+    "codePathLocal": "u_back_prop.py",
+    "codePath": "src/u_back_prop.py",
+    "git": {
+        "remote": "https://github.com/ManqingLiu/DAGawareTransformer_NeurIPS.git",
+        "commit": "9255007047a009b3373da2e5e7f38f4ca9a011ed"
+    },
+    "email": "manqingliu@g.harvard.edu",
+    "root": "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS",
+    "host": "Manqings-MacBook-Pro.local",
+    "username": "manqingliu",
+    "executable": "/Users/manqingliu/opt/anaconda3/envs/Myenv/bin/python",
+    "cpu_count": 8,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2400,
+        "min": 2400,
+        "max": 2400
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2400,
+            "min": 2400,
+            "max": 2400
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 228.27386474609375,
+            "used": 9.539291381835938
+        }
+    },
+    "memory": {
+        "total": 8.0
+    }
+}

@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader as Dataloader
 import torch.optim as optim
 import torch.nn as nn
 from tqdm import tqdm
+import wandb
 
 from src.data.ate.data_class import PVTrainDataSetTorch, PVTestDataSetTorch, RHCTestDataSet
 from src.models.NMMR.NMMR_loss import NMMR_loss, NMMR_loss_batched, NMMR_loss_transformer
@@ -20,6 +21,7 @@ from src.models.transformer_model import DAGTransformer, causal_loss_fun
 
 class NMMR_Trainer_DemandExperiment(object):
     def __init__(self,
+                 configs: Dict[str, Any],
                  data_configs: Dict[str, Any],
                  dag: Dict[str, Any],
                  train_config: Dict[str, Any],
@@ -28,7 +30,7 @@ class NMMR_Trainer_DemandExperiment(object):
                  random_seed: int,
                  dump_folder: Optional[Path] = None):
 
-
+        self.configs = configs
         self.data_config = data_configs
         self.dag = dag
         self.mask = mask
@@ -60,6 +62,8 @@ class NMMR_Trainer_DemandExperiment(object):
 
         return calculate_kernel_matrix(kernel_inputs)
 
+
+
     def train(self,
           train_dataloader: Dataloader,
           val_dataloader: Dataloader,
@@ -71,9 +75,14 @@ class NMMR_Trainer_DemandExperiment(object):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(f'Using device: {device}')
 
+        wandb.init(project="DAG transformer",
+                   config=self.configs,
+                   tags='proximal_demand')
+
         optimizer = optim.Adam(list(model.parameters()), lr=self.learning_rate, weight_decay=self.l2_penalty)
 
         bin_left_edges = {k: torch.tensor(v[:-1], dtype=torch.float32).to(device) for k, v in train_dataloader.dataset.bin_edges.items()}
+        bin_midpoints = {k: torch.tensor((v[1:] + v[:-1]) / 2, dtype=torch.float32).to(device) for k, v in train_dataloader.dataset.bin_edges.items()}
 
         for _ in tqdm(range(self.n_epochs)):
             for batch_raw, batch_binned in train_dataloader:
@@ -96,25 +105,56 @@ class NMMR_Trainer_DemandExperiment(object):
                 model_output = transformed_outputs['outcome']
                 target = labels['outcome']
 
-                loss, _ = NMMR_loss_transformer(model_output, target, kernel_matrix_train,
+                batch_loss, batch_items = NMMR_loss_transformer(model_output, target, kernel_matrix_train,
                                                         loss_name=self.loss_name, return_items=True)
-                print(f"Loss: {loss.item()}")
-                loss.backward()
+                print(f"Traing Loss: {batch_loss}")
+                for item in batch_items.keys():
+                    wandb.log({item: batch_items[item]})
+                batch_loss.backward()
                 optimizer.step()
+                wandb.log({'Training loss': batch_loss})
+
+            model.eval()
+            with torch.no_grad():
+                for batch_raw, batch_binned in val_dataloader:
+                    batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
+                    outputs = model(batch_binned, mask=self.mask)
+
+                    # Transform the model outputs back to the original scale
+                    transformed_outputs = {}
+                    for output_name, output in outputs.items():
+                        softmax_output = torch.softmax(output, dim=1)
+                        weighted_avg = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
+                        transformed_outputs[output_name] = weighted_avg
+
+                    labels = {'outcome': batch_raw['outcome']}
+                    kernel_inputs_val = torch.cat((batch_raw['treatment'], batch_raw['treatment_proxy1'],
+                                                    batch_raw['treatment_proxy2']), dim=1)
+                    kernel_matrix_val = self.compute_kernel(kernel_inputs_val)
+
+                    model_output = transformed_outputs['outcome']
+                    target = labels['outcome']
+
+                    batch_loss, batch_items = NMMR_loss_transformer(model_output, target, kernel_matrix_val,
+                                                            loss_name=self.loss_name, return_items=True)
+                    print(f"Validation Loss: {batch_loss}")
+                    for item in batch_items.keys():
+                        wandb.log({item: batch_items[item]})
+                    wandb.log({'Validation loss': batch_loss})
+
+        wandb.finish()
 
         return model
 
-    @staticmethod
-    def predict(model,
+    def predict(self,
                 n_sample,
-                bin_edges,
                 test_dataloader):
         # Create a 3-dim array with shape [intervention_array_len, n_samples, 2]
         # This will contain the test values for do(A) chosen by Xu et al. as well as {n_samples} random draws for W
         # Compute model's predicted E[Y | do(A)] = E_w[h(a, w)]
         # Note: the mean is taken over the n_sample axis, so we obtain {intervention_array_len} number of expected values
-        #model = DAGTransformer(dag=self.dag,
-        #                       **self.model_config)
+        model = DAGTransformer(dag=self.dag,
+                               **self.model_config)
 
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -122,6 +162,8 @@ class NMMR_Trainer_DemandExperiment(object):
         model = model.to(device)
 
         bin_left_edges = {k: np.array(v[:-1], dtype=np.float32) for k, v in test_dataloader.dataset.bin_edges.items()}
+
+
         softmaxes = []
         with torch.no_grad():
             for _, batch_binned in test_dataloader:
@@ -138,7 +180,7 @@ class NMMR_Trainer_DemandExperiment(object):
                 batch_predictions = np.concatenate(batch_predictions, axis=1)
                 softmaxes.append(batch_predictions)
 
-        # assign column names to the predictions_df
+        # concatenate and unbin the predictions
         softmaxes = np.concatenate(softmaxes, axis=0)
         predictions = np.sum(softmaxes * bin_left_edges[output_name], axis=1)
         

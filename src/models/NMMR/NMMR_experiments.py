@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import pandas as pd
 import torch
+import os
 
 from src.dataset import (
     make_train_data,
@@ -20,6 +21,7 @@ from src.models.NMMR.NMMR_trainers import NMMR_Trainer_DemandExperiment
 
 
 def NMMR_experiment(
+    config: Dict[str, Any],
     data_config: Dict[str, Any],
     model_config: Dict[str, Any],
     train_config: Dict[str, Any],
@@ -59,6 +61,7 @@ def NMMR_experiment(
     )
 
     trainer = NMMR_Trainer_DemandExperiment(
+        config,
         data_config,
         dag,
         train_config,
@@ -68,16 +71,15 @@ def NMMR_experiment(
         one_mdl_dump_dir,
     )
 
-    model = trainer.train(train_dataloader, val_dataloader, verbose)
+    trainer.train(train_dataloader, val_dataloader, verbose)
 
     if trainer.gpu_flg:
         torch.cuda.empty_cache()
         test_data = test_data.to_gpu()
 
     n_sample = data_config.get("n_sample", None)
-
     E_wx_hawx = trainer.predict(
-        model, n_sample, test_data.bin_edges, test_dataloader
+        n_sample, test_dataloader
     )
 
     pred = E_wx_hawx
@@ -92,9 +94,12 @@ def NMMR_experiment(
 
 
 if __name__ == "__main__":
+
+    # Change the working directory to the project root
+    os.chdir(Path(__file__).resolve().parent.parent.parent.parent)
     parser = ArgumentParser()
     # Load the configurations from the JSON file
-    with open(Path("config/train/proximal/nmmr_u_transformer_n1000.json"), "r") as f:
+    with open(Path("config/train/proximal/nmmr_u_transformer_n5000.json"), "r") as f:
         config = json.load(f)
 
     # Extract the data and model configurations
@@ -117,7 +122,7 @@ if __name__ == "__main__":
 
     # Run the experiment
     oos_loss = NMMR_experiment(
-        data_config, model_config, train_config, dag, mask, one_mdl_dump_dir
+        config, data_config, model_config, train_config, dag, mask, one_mdl_dump_dir
     )
     # Print the oos_loss
     print(f"Out of sample loss: {oos_loss}")

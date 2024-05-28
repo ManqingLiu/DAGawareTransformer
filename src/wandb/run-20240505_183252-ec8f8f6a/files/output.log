@@ -1,0 +1,10 @@
+
+dict_keys(['U1', 'X', 'A', 'Y'])
+Traceback (most recent call last):
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 179, in <module>
+    recovered_u = model.recover_u(final_u_params)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 136, in recover_u
+    recovered_u = prediction_transformer.transform(recovered_u)
+  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/dataset_u.py", line 174, in transform
+    column_prob = column_predictions[:, 1]  # Probability of column=1
+IndexError: index 1 is out of bounds for axis 1 with size 0

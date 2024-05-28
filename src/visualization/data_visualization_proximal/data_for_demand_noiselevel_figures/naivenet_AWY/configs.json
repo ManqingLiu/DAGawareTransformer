@@ -1,0 +1,19 @@
+{
+    "n_repeat": 20,
+    "data": {
+        "name": "demand",
+        "n_sample": 5000,
+        "Z_noise": [0, 0.01, 0.1, 0.5, 1, 2, 4, 8, 16],
+        "W_noise": [0, 0.01, 0.1, 0.5, 1, 16, 64, 150]
+    },
+    "model": {
+        "name": "naive_neural_net_AWY",
+        "n_epochs": 3000,
+        "batch_size": 1000,
+        "log_metrics": "False",
+        "learning_rate": 0.003,
+        "l2_penalty": 3e-06,
+        "network_depth": 2,
+        "network_width": 80
+    }
+}
