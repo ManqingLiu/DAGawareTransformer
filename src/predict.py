@@ -106,8 +106,6 @@ if __name__ == '__main__':
     start_time = time.time()
     predictions_train = predict(model, data, dag, dataloader, mask=args.mask, model_file=args.model_train_file)
 
-
-
     data_A1 = replace_column_values(data, 't', 1)
     dataset_A1 = CausalDataset(data_A1, dag)
     dataloader_A1 = DataLoader(dataset_A1,

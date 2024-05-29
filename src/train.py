@@ -1,23 +1,17 @@
 from argparse import ArgumentParser
 import json
-import pandas as pd
-
-import torch.nn as nn
-from torch.utils.data import DataLoader
-import torch
-
-from src.models.transformer_model import DAGTransformer, causal_loss_fun
-from src.dataset import CausalDataset
-
+import time
 from typing import Dict
 
+import pandas as pd
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
 from tqdm import tqdm
-import time
-
-from sklearn.model_selection import train_test_split
-
 import wandb
-from matplotlib import pyplot as plt
+
+from src.dataset import CausalDataset
+from src.models.transformer_model import DAGTransformer, causal_loss_fun
 
 
 def train(model: nn.Module,
@@ -33,6 +27,7 @@ def train(model: nn.Module,
     model = model.to(device)
 
     wandb.init(project="DAG transformer",
+               entity="mliu7",
                config=config,
                tags=[config['project_tag']])
 
@@ -50,7 +45,7 @@ def train(model: nn.Module,
             #    print(f"Shape of {output_name}: {outputs[output_name].shape}")
             batch_loss, batch_items = causal_loss_fun(outputs, batch, return_items=True)
             for item in batch_items.keys():
-                wandb.log({item: batch_items[item]})
+                wandb.log({f"train_{item}": batch_items[item]})
 
             batch_loss.backward()
             opt.step()
@@ -62,12 +57,14 @@ def train(model: nn.Module,
             for _, batch in val_dataloader:
                 batch = {k: v.to(device) for k, v in batch.items()}
                 outputs = model(batch, mask=mask)
-                batch_loss, _ = causal_loss_fun(outputs, batch)
+                batch_loss, batch_items = causal_loss_fun(outputs, batch)
                 for item in batch_items.keys():
-                    wandb.log({item: batch_items[item]})
+                    wandb.log({f"val_{item}": batch_items[item]})
                 val_loss += batch_loss.item()
             avg_val_loss = val_loss / len(val_dataloader)
             wandb.log({'validation loss': avg_val_loss})
+
+        model.train()
 
     wandb.finish()
     #print(f'Saving model to {model_file}')
@@ -103,8 +100,10 @@ if __name__ == '__main__':
     dag['node_ids'] = dict(zip(dag['nodes'], range(num_nodes)))
     print(dag)
 
-    model = DAGTransformer(dag=dag,
-                           **model_config)
+    # The Augmented IP weighted split-sample and cross-fit estimator 
+    # From Technical Point 18.1 in What If (https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/)
+    crossfit_model1 = DAGTransformer(dag=dag, **model_config)
+    crossfit_model2 = DAGTransformer(dag=dag, **model_config)
 
     train_data = pd.read_csv(args.data_train_file)
     train_data = train_data[dag['nodes']]
@@ -123,9 +122,10 @@ if __name__ == '__main__':
                             batch_size=batch_size,
                             shuffle=True,
                             collate_fn=holdout_dataset.collate_fn)
+    
     # Before training for train file
     start_time = time.time()
-    train(model,
+    train(crossfit_model1,
           train_dataloader,
           holdout_dataloader,
           train_config,
@@ -134,17 +134,7 @@ if __name__ == '__main__':
           model_file=args.model_train_file)
     print('Done training.')
 
-    data = pd.read_csv(args.data_holdout_file)
-    data = data[dag['nodes']]
-    dataset = CausalDataset(data, dag)
-
-    batch_size = train_config['batch_size']
-    dataloader = DataLoader(dataset,
-                            batch_size=batch_size,
-                            shuffle=True,
-                            collate_fn=dataset.collate_fn)
-
-    train(model,
+    train(crossfit_model2,
           holdout_dataloader,
           train_dataloader,
           train_config,
@@ -152,6 +142,7 @@ if __name__ == '__main__':
           save_model=True,
           model_file=args.model_holdout_file)
     print('Done training.')
+
     # After training for holdout file
     end_time = time.time()
 

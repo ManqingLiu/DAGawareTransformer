@@ -1,3 +1,4 @@
+.gitignore
 /data/
 myenv/
 .idea/
@@ -6,3 +7,6 @@ wandb/
 *.egg-info
 */results/proximal.DS_Store
 __pycache__/
+.vscode
+experiments/predict/*
+experiments/model/*
