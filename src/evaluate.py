@@ -93,8 +93,6 @@ if __name__ == '__main__':
     Y0_AIPW = AIPW_Y0(predictions_final['t'], predictions_final['t_prob'], predictions_final['y'], predictions_final['pred_y_A0'])
     ATE_AIPW = Y1_AIPW - Y0_AIPW
     print(f"Estimated ATE from AIPW (DR): {ATE_AIPW:.4f}")
-    #rb_AIPW = relative_bias(ATE_AIPW, ATE_true)
-    #print(f"Relative bias from AIPW (DR): {rb_AIPW:.4f}")
     rmse_AIPW = rmse(ATE_AIPW, ATE_true)
     print(f"RMSE from AIPW (DR): {rmse_AIPW:.4f}")
 
@@ -111,4 +109,4 @@ if __name__ == '__main__':
 
 
     # Log the results
-    #log_results_evaluate(results, config, args.results)
+    log_results_evaluate(results, config, args.results)
