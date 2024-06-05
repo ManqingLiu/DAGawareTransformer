@@ -1,7 +1,10 @@
 import numpy as np
 import math
 import pandas as pd
+import matplotlib
+import warnings
 import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
 
 from argparse import ArgumentParser
 import pandas as pd
@@ -237,3 +240,252 @@ def log_results_evaluate(results, config, results_file):
     # Write everything back to the file
     with open(results_file, 'w') as f:
         json.dump(existing_data, f, indent=4)
+
+# from causallib library:https://github.com/BiomedSciAI/causallib/blob/master/causallib/utils/stat_utils.py#L181
+def calc_weighted_standardized_mean_differences(x, y, wx, wy, weighted_var=False):
+    r"""
+    Standardized mean difference: frac{\mu_1 - \mu_2 }{\sqrt{\sigma_1^2 + \sigma_2^2}}
+
+    References:
+        [1]https://cran.r-project.org/web/packages/cobalt/vignettes/cobalt_A0_basic_use.html#details-on-calculations
+        [2]https://en.wikipedia.org/wiki/Strictly_standardized_mean_difference#Concept
+
+    Note on variance:
+    - The variance is calculated on unadjusted to avoid paradoxical situation when adjustment decreases both the
+      mean difference and the spread of the sample, yielding a larger smd than that prior to adjustment,
+      even though the adjusted groups are now more similar [1].
+    - The denominator is as depicted in the "statistical estimation" section:
+      https://en.wikipedia.org/wiki/Strictly_standardized_mean_difference#Statistical_estimation,
+      namely, disregarding the covariance term [2], and is unweighted as suggested above in [1].
+    """
+    numerator = np.average(x, weights=wx) - np.average(y, weights=wy)
+    if weighted_var:
+        var = lambda vec, weights: np.average((vec - np.average(vec, weights=weights)) ** 2, weights=weights)
+        denominator = np.sqrt(var(x, wx) + var(y, wy))
+    else:
+        denominator = np.sqrt(np.nanvar(x) + np.nanvar(y))
+    if np.isfinite(denominator) and np.isfinite(numerator) and denominator != 0:
+        bias = numerator / denominator
+    else:
+        bias = np.nan
+    return bias
+
+
+
+# from causallib library: https://github.com/BiomedSciAI/causallib/blob/master/causallib/metrics/weight_metrics.py
+
+DISTRIBUTION_DISTANCE_METRICS = {
+    "smd": lambda x, y, wx, wy: calc_weighted_standardized_mean_differences(
+        x, y, wx, wy
+    ),
+    "abs_smd": lambda x, y, wx, wy: abs(
+        calc_weighted_standardized_mean_differences(x, y, wx, wy)
+    ),
+}
+def calculate_distribution_distance_for_single_feature(
+    x, w, a, group_level, metric="abs_smd"
+):
+    """
+
+    Args:
+        x (pd.Series): A single feature to check balancing.
+        a (pd.Series): Group assignment of each sample.
+        w (pd.Series): sample weights for balancing between groups in `a`.
+        group_level: Value from `a` in order to divide the sample into one vs. rest.
+        metric (str | callable): Either a key from DISTRIBUTION_DISTANCE_METRICS or a metric with
+            the signature weighted_distance(x, y, wx, wy) calculating distance between the weighted
+            sample x and weighted sample y (weights by wx and wy respectively).
+
+    Returns:
+        float: weighted distance between the samples assigned to `group_level`
+            and the rest of the samples.
+    """
+    if not callable(metric):
+        metric = DISTRIBUTION_DISTANCE_METRICS[metric]
+    cur_treated_mask = a == group_level
+    x_treated = x.loc[cur_treated_mask]
+    w_treated = w.loc[cur_treated_mask]
+    x_untreated = x.loc[~cur_treated_mask]
+    w_untreated = w.loc[~cur_treated_mask]
+    distribution_distance = metric(x_treated, x_untreated, w_treated, w_untreated)
+    return distribution_distance
+
+
+# from causallib library: https://github.com/BiomedSciAI/causallib/blob/master/causallib/metrics/weight_metrics.py
+def calculate_covariate_balance(X, a, w, metric="abs_smd"):
+    """Calculate covariate balance table ("table 1")
+
+    Args:
+        X (pd.DataFrame): Covariates.
+        a (pd.Series): Group assignment of each sample.
+        w (pd.Series): sample weights for balancing between groups in `a`.
+        metric (str | callable): Either a key from DISTRIBUTION_DISTANCE_METRICS or a metric with
+            the signature weighted_distance(x, y, wx, wy) calculating distance between the weighted
+            sample x and weighted sample y (weights by wx and wy respectively).
+
+    Returns:
+        pd.DataFrame: index are covariate names (columns) from X, and columns are
+            "weighted" / "unweighted" results of applying `metric` on each covariate
+            to compare the two groups.
+    """
+    treatment_values = np.sort(np.unique(a))
+    results = {}
+    for treatment_value in treatment_values:
+        distribution_distance_of_cur_treatment = pd.DataFrame(
+            index=X.columns, columns=["weighted", "unweighted"], dtype=float
+        )
+        for col_name, col_data in X.items():
+            weighted_distance = calculate_distribution_distance_for_single_feature(
+                col_data, w, a, treatment_value, metric
+            )
+            unweighted_distance = calculate_distribution_distance_for_single_feature(
+                col_data, pd.Series(1, index=w.index), a, treatment_value, metric
+            )
+            distribution_distance_of_cur_treatment.loc[
+                col_name, ["weighted", "unweighted"]
+            ] = [weighted_distance, unweighted_distance]
+        results[treatment_value] = distribution_distance_of_cur_treatment
+    results = pd.concat(
+        results, axis="columns", names=[a.name or "a", metric]
+    )  # type: pd.DataFrame
+    results.index.name = "covariate"
+    if len(treatment_values) == 2:
+        # If there are only two treatments, the results for both are identical.
+        # Therefore, we can get rid of one of them.
+        # We keep the results for the higher valued treatment group (assumed treated, typically 1):
+        results = results.xs(treatment_values.max(), axis="columns", level=0)
+    return results
+
+
+def smd_plot(df, ax=None):
+    """
+    Plot the absolute standardized mean difference for weighted and unweighted data.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing the 'weighted' and 'unweighted' columns.
+        ax (plt.Axes | None): Matplotlib Axes to plot on. If None, use the current Axes.
+
+    Returns:
+        ax (plt.Axes): The Axes with the plot.
+    """
+    ax = ax or plt.gca()
+
+    # Plot weighted and unweighted points
+    ax.scatter(df['weighted'], df.index, label='weighted', color='blue')
+    ax.scatter(df['unweighted'], df.index, label='unweighted', color='orange')
+
+    # Connect weighted and unweighted points with lines
+    for covariate in df.index:
+        ax.plot([df.loc[covariate, 'weighted'], df.loc[covariate, 'unweighted']], [covariate, covariate], 'k--')
+
+    # Adding labels and title
+    ax.set_xlabel('Absolute Standardized Mean Difference')
+    ax.set_ylabel('Covariates')
+    ax.set_title('Evaluation on test data')
+    ax.legend()
+
+    return ax
+
+# from causallib: https://causallib.readthedocs.io/en/latest/_modules/causallib/evaluation/plots/plots.html#plot_propensity_score_distribution
+def plot_propensity_score_distribution(
+    propensity,
+    treatment,
+    reflect=True,
+    kde=False,
+    cumulative=False,
+    norm_hist=True,
+    ax=None,
+):
+    """
+    Plot the distribution of propensity score
+
+    Args:
+        propensity (pd.Series):
+        treatment (pd.Series):
+        reflect (bool): Whether to plot second treatment group on the opposite sides of the x-axis.
+                        This can only work if there are exactly two groups.
+        kde (bool): Whether to plot kernel density estimation
+        cumulative (bool): Whether to plot cumulative distribution.
+        norm_hist (bool): If False - use raw counts on the y-axis.
+                          If kde=True, then norm_hist should be True as well.
+        ax (plt.Axes | None):
+
+    Returns:
+
+    """
+    # assert propensity.index.symmetric_difference(a.index).size == 0
+    ax = ax or plt.gca()
+    if kde and not norm_hist:
+        warnings.warn(
+            "kde=True and norm_hist=False is not supported. Forcing norm_hist from False to True."
+        )
+        norm_hist = True
+    bins = np.histogram(propensity, bins="auto")[1]
+    plot_params = dict(bins=bins, density=norm_hist, alpha=0.5, cumulative=cumulative)
+
+    unique_treatments = np.sort(np.unique(treatment))
+    for treatment_number, treatment_value in enumerate(unique_treatments):
+        cur_propensity = propensity.loc[treatment == treatment_value]
+        cur_color = f"C{treatment_number}"
+        ax.hist(
+            cur_propensity,
+            label=f"treatment = {treatment_value}",
+            color=[cur_color],
+            **plot_params,
+        )
+        if kde:
+            cur_kde = gaussian_kde(cur_propensity)
+            min_support = max(0, cur_propensity.values.min() - cur_kde.factor)
+            max_support = min(1, cur_propensity.values.max() + cur_kde.factor)
+            X_plot = np.linspace(min_support, max_support, 200)
+            if cumulative:
+                density = np.array(
+                    [cur_kde.integrate_box_1d(X_plot[0], x_i) for x_i in X_plot]
+                )
+                ax.plot(
+                    X_plot,
+                    density,
+                    color=cur_color,
+                )
+            else:
+                ax.plot(
+                    X_plot,
+                    cur_kde.pdf(X_plot),
+                    color=cur_color,
+                )
+    if reflect:
+        if len(unique_treatments) != 2:
+            raise ValueError(
+                "Reflecting density across X axis can only be done for two groups. "
+                "This one has {}".format(len(unique_treatments))
+            )
+        # Update line:
+        if kde:
+            last_line = ax.get_lines()[-1]
+            last_line.set_ydata(-1 * last_line.get_ydata())
+        # Update histogram bars:
+        idx_of_first_hist_rect = [patch.get_label() for patch in ax.patches].index(
+            f"treatment = {unique_treatments[-1]}"
+        )
+        for patch in ax.patches[idx_of_first_hist_rect:]:
+            patch.set_height(-1 * patch.get_height())
+
+        # Re-set the view of axes:
+        ax.relim()
+        ax.autoscale()
+        # Remove negation sign from lower y-axis:
+        ax.yaxis.set_major_formatter(
+            matplotlib.ticker.FuncFormatter(
+                lambda x, pos: str(x) if x >= 0 else str(-x)
+            )
+        )
+
+    ax.legend(loc="best")
+    x_type = (
+        "Propensity" if propensity.between(0, 1, inclusive="both").all() else "Weights"
+    )
+    ax.set_xlabel(x_type)
+    y_type = "Probability density" if norm_hist else "Counts"
+    ax.set_ylabel(y_type)
+    ax.set_title(f"{x_type} Distribution")
+    return ax
