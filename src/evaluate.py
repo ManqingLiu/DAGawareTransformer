@@ -28,28 +28,37 @@ if __name__ == '__main__':
     predictions = pd.read_csv(args.predictions_file)
     predictions_final = pd.concat([data, predictions], axis=1)
 
-    # Separate the dataframe by the binary column 't'
-    group_0 = predictions_final[predictions_final['t'] == 0]['t_prob']
-    group_1 = predictions_final[predictions_final['t'] == 1]['t_prob']
+    predictions_final['weight'] = np.where(predictions_final['t'] == 1,
+                                           1 / predictions_final['t_prob'],
+                                           1 / (1 - predictions_final['t_prob']))
 
-    # Plot the histograms
-    plt.figure(figsize=(12, 6))
+    X = predictions_final[['age', 'education', 'black', 'hispanic', 'married', 'nodegree', 're74', 're75']]
 
-    # Histogram for group t=0
-    plt.hist(group_0, bins=30, alpha=0.5, label='t=0')
+    abs_smd = calculate_covariate_balance(X,
+                                          predictions_final['t'],
+                                          predictions_final['weight'])
 
-    # Histogram for group t=1
-    plt.hist(group_1, bins=30, alpha=0.5, label='t=1')
+    print(abs_smd)
 
-    # Adding titles and labels
-    plt.title('Histogram of t_prob by group of t')
-    plt.xlabel('t_prob')
-    plt.ylabel('Frequency')
-    plt.legend(loc='upper right')
+    # plot absolute standardized mean difference
+    fig, ax = plt.subplots(figsize=(8, 6))
+    smd_plot(abs_smd, ax)
 
-    # Show the plot
     plt.show()
+    # save the plot as png
+    fig.savefig('experiments/results/figures/abs_smd.png')
 
+    # plot PS by treatment group
+    fig, ax = plt.subplots(figsize=(10, 8))
+    plot_propensity_score_distribution(
+        predictions_final['t_prob'],
+        predictions_final['t'],
+        reflect=True,
+        kde=False
+    )
+
+    plt.show()
+    fig.savefig('experiments/results/figures/propensity_score_distribution.png')
 
 
     # get true ATE: mean of y1 - mean of y0
@@ -93,8 +102,6 @@ if __name__ == '__main__':
     Y0_AIPW = AIPW_Y0(predictions_final['t'], predictions_final['t_prob'], predictions_final['y'], predictions_final['pred_y_A0'])
     ATE_AIPW = Y1_AIPW - Y0_AIPW
     print(f"Estimated ATE from AIPW (DR): {ATE_AIPW:.4f}")
-    #rb_AIPW = relative_bias(ATE_AIPW, ATE_true)
-    #print(f"Relative bias from AIPW (DR): {rb_AIPW:.4f}")
     rmse_AIPW = rmse(ATE_AIPW, ATE_true)
     print(f"RMSE from AIPW (DR): {rmse_AIPW:.4f}")
 
@@ -110,5 +117,7 @@ if __name__ == '__main__':
     }
 
 
+
+
     # Log the results
-    #log_results_evaluate(results, config, args.results)
+    log_results_evaluate(results, config, args.results)
