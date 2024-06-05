@@ -50,7 +50,6 @@ def predict(model,
 
     # assign column names to the predictions_df
     predictions = np.concatenate(predictions, axis=0)
-    print('Done predicting.')
     prediction_transformer = PredictionTransformer(dataset.bin_edges)
     transformed_predictions = prediction_transformer.transform(predictions)
 

@@ -79,7 +79,6 @@ if __name__ == '__main__':
     start_time = time.time()
     model = train(model,
                   val_data,
-                  test_data,
                   dag,
                   train_dataloader,
                   val_dataloader,
@@ -122,9 +121,6 @@ if __name__ == '__main__':
 
     # Save the predictions to a CSV file
     final_predictions.to_csv(args.output_file, index=False)
-
-    # Save the predictions to a CSV file
-    # predictions_test.to_csv(args.output_file, index=False)
 
     # After training for holdout file
     end_time = time.time()
