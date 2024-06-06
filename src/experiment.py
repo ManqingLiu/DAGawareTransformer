@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import json
+import os
 import time
 from typing import Dict
 
@@ -14,8 +15,9 @@ import wandb
 from src.dataset import CausalDataset, PredictionTransformer
 from src.models.transformer_model import DAGTransformer, causal_loss_fun
 from src.predict import predict
-from src.train import train
+from src.train.lalonde_psid.train import train
 from utils import IPTW_unstabilized, rmse, replace_column_values
+
 
 
 
@@ -79,6 +81,7 @@ if __name__ == '__main__':
     start_time = time.time()
     model = train(model,
                   val_data,
+                  train_data,
                   dag,
                   train_dataloader,
                   val_dataloader,
@@ -118,6 +121,10 @@ if __name__ == '__main__':
     final_predictions = pd.concat([predictions['t_prob'],
                                    predictions_A1['pred_y_A1'],
                                    predictions_A0['pred_y_A0']], axis=1)
+
+    output_dir = os.path.dirname(args.output_file)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     # Save the predictions to a CSV file
     final_predictions.to_csv(args.output_file, index=False)

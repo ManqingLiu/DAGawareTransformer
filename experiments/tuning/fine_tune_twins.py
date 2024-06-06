@@ -3,7 +3,7 @@ from ray import train, tune
 from ray.train import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
 import json
-from src.train import train as train_function
+from src.train.lalonde_psid.train import train as train_function
 from src.model import *
 import pandas as pd
 from src.dataset import CausalDataset

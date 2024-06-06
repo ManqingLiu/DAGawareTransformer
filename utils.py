@@ -388,8 +388,9 @@ def smd_plot(df, ax=None):
 
 # from causallib: https://causallib.readthedocs.io/en/latest/_modules/causallib/evaluation/plots/plots.html#plot_propensity_score_distribution
 def plot_propensity_score_distribution(
-    propensity,
+    propensity,  
     treatment,
+    num_bins: int,
     reflect=True,
     kde=False,
     cumulative=False,
@@ -420,8 +421,7 @@ def plot_propensity_score_distribution(
             "kde=True and norm_hist=False is not supported. Forcing norm_hist from False to True."
         )
         norm_hist = True
-    bins = np.histogram(propensity, bins="auto")[1]
-    plot_params = dict(bins=bins, density=norm_hist, alpha=0.5, cumulative=cumulative)
+    plot_params = dict(bins=num_bins, density=norm_hist, alpha=0.5, cumulative=cumulative, range=(0, 1))
 
     unique_treatments = np.sort(np.unique(treatment))
     for treatment_number, treatment_value in enumerate(unique_treatments):
@@ -433,6 +433,9 @@ def plot_propensity_score_distribution(
             color=[cur_color],
             **plot_params,
         )
+        
+        ax.set_ylim([-100, 100])
+
         if kde:
             cur_kde = gaussian_kde(cur_propensity)
             min_support = max(0, cur_propensity.values.min() - cur_kde.factor)
@@ -470,9 +473,7 @@ def plot_propensity_score_distribution(
         for patch in ax.patches[idx_of_first_hist_rect:]:
             patch.set_height(-1 * patch.get_height())
 
-        # Re-set the view of axes:
-        ax.relim()
-        ax.autoscale()
+        ax.autoscale(enable=False, axis="both")
         # Remove negation sign from lower y-axis:
         ax.yaxis.set_major_formatter(
             matplotlib.ticker.FuncFormatter(
