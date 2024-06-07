@@ -233,10 +233,17 @@ if __name__ == "__main__":
     parser.add_argument("--dag", type=str, required=True)
     parser.add_argument("--data_file", type=str, required=True)
     parser.add_argument("--train_output_file", type=str, required=True)
-    parser.add_argument("--holdout_output_file", type=str, required=True)
+    parser.add_argument("--val_output_file", type=str, required=True)
+    parser.add_argument("--test_output_file", type=str, required=True)
 
     args = parser.parse_args()
     data = pd.read_csv(args.data_file)
+
+    # cleaning
+    # rename re78 as y
+    data = data.rename(columns={"re78": "y"})
+    # rename treatment as t
+    data = data.rename(columns={"treat": "t"})
 
     with open(args.dag) as f:
         print(f"Loading dag file from {args.dag}")
@@ -244,7 +251,14 @@ if __name__ == "__main__":
 
     data = data[dag["nodes"]]
     # split to train and holdout set
-    train_data, holdout_data = train_test_split(data, test_size=0.5, random_state=42)
+    train_data, temp_data = train_test_split(data, test_size=0.7, random_state=42)
+    val_data, test_data = train_test_split(temp_data, test_size=0.5, random_state=42)
 
     train_data.to_csv(args.train_output_file, index=False)
-    holdout_data.to_csv(args.holdout_output_file, index=False)
+    val_data.to_csv(args.val_output_file, index=False)
+    test_data.to_csv(args.test_output_file, index=False)
+
+    # print average t in train_data
+    print(f"Average t in train data: {train_data['t'].mean()}")
+    # print average t in val_data
+    print(f"Average t in val data: {val_data['t'].mean()}")

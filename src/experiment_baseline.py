@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
 from matplotlib import pyplot as plt
 
-from src.dataset import DataObject
+#from src.dataset import DataObject
 from utils import rmse
 
 if __name__ == '__main__':
@@ -28,14 +28,16 @@ if __name__ == '__main__':
     print(data_train.columns)
 
     # Select the relevant columns for X, a, and y
-    X = data_train[['age', 'education', 'black', 'hispanic', 'married', 'nodegree', 're74', 're75']]
+    X = data_train[['age', 'education', 'black', 'hispanic', 'married', 'nodegree', 're74', 're75', "u74", "u75"]]
     a = data_train['t']
     y = data_train['y']
 
     # Create an instance of DataObject
-    data = DataObject(X, a, y)
+    #data = DataObject(X, a, y)
 
-    learner = LogisticRegression(solver="liblinear")
+    learner = LogisticRegression(penalty='none',  # No regularization, new in scikit-learn 0.21.*
+                             solver='lbfgs', class_weight="balanced", # The classes are very imbalanced
+                             max_iter=500)
 
     ipw = IPW(learner)
 
@@ -46,25 +48,25 @@ if __name__ == '__main__':
 
     # evaluate on test data
     ipw = IPW(learner)
-    X_test = data_test[['age', 'education', 'black', 'hispanic', 'married', 'nodegree', 're74', 're75']]
-    a_test = data_test['t']
-    y_test = data_test['y']
+    X_val = data_val[['age', 'education', 'black', 'hispanic', 'married', 'nodegree', 're74', 're75', "u74", "u75"]]
+    a_val = data_val['t']
+    y_val = data_val['y']
     plots = ["covariate_balance_love", "weight_distribution"]
-    evaluation_results = evaluate(ipw, X_test, a_test, y_test)
-    outcomes_test = ipw.estimate_population_outcome(X_test, a_test, y_test)
+    evaluation_results = evaluate(ipw, X_val, a_val, y_val)
+    outcomes_test = ipw.estimate_population_outcome(X_val, a_val, y_val)
     effect_test = ipw.estimate_effect(outcomes_test[1], outcomes_test[0], effect_types=["diff"])
     print(effect_test)
     f, [a0, a1] = plt.subplots(2, 1, figsize=(10, 12))
     evaluation_results.plot_covariate_balance(kind="love", ax=a0)
     evaluation_results.plot_weight_distribution(ax=a1)
-    plt.suptitle("Evaluation on test data")
+    plt.suptitle("Evaluation on val data")
     # show plot
     plt.show()
 
     # save plot as png
-    f.savefig('evaluation_test.png')
+    f.savefig('evaluation_val.png')
 
-    ATE_true = data_test['y1'].mean() - data_test['y0'].mean()
+    ATE_true = 1794.34
     print(f"True ATE: {ATE_true}")
     rmse_test = rmse(effect_test, ATE_true)
     print(f"RMSE on test data: {rmse_test}")

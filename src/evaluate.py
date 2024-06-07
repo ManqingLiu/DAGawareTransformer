@@ -53,6 +53,7 @@ if __name__ == '__main__':
     plot_propensity_score_distribution(
         predictions_final['t_prob'],
         predictions_final['t'],
+        num_bins=100,
         reflect=True,
         kde=False
     )
@@ -62,7 +63,7 @@ if __name__ == '__main__':
 
 
     # get true ATE: mean of y1 - mean of y0
-    ATE_true = data['y1'].mean() - data['y0'].mean()
+    ATE_true = 1794.34
     print("true ATE:", ATE_true)
 
     # calculate naive ATE which is the difference of mean of y for t=1 and t=0
@@ -115,8 +116,6 @@ if __name__ == '__main__':
         'ATE_AIPW': ATE_AIPW,
         'RMSE_AIPW': rmse_AIPW
     }
-
-
 
 
     # Log the results

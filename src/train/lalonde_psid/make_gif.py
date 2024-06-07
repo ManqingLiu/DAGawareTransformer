@@ -37,4 +37,4 @@ def main(wandb_run_path: str, duration: int) -> None:
 
 
 if __name__ == "__main__":
-    main('mliu7/DAG transformer/09semqwp', 500)
+    main('mliu7/DAG transformer/br7cq9s5', 500)

@@ -7,7 +7,8 @@ from PIL import Image
 from scipy.stats import ks_2samp
 
 from src.dataset import CausalDataset, PredictionTransformer
-from utils import IPTW_unstabilized, rmse, calculate_covariate_balance, smd_plot, plot_propensity_score_distribution
+from utils import (IPTW_unstabilized, rmse, calculate_covariate_balance,
+                   smd_plot, plot_propensity_score_distribution, extract_number)
 
 
 def calculate_metrics(
@@ -43,7 +44,7 @@ def calculate_metrics(
         predictions_final[predictions_final["t"] == 0]["t_prob"],
     )
 
-    ATE_true = dataset["y1"].mean() - dataset["y0"].mean()
+    ATE_true = 1794.34
     ATE_IPTW = IPTW_unstabilized(
         predictions_final["t"], predictions_final["y"], predictions_final["t_prob"]
     )
@@ -69,21 +70,22 @@ def create_metric_plots(dataset: pd.DataFrame, dag: Dict, predictions: np.array,
         1 / predictions_final["t_prob"],
         1 / (1 - predictions_final["t_prob"]),
     )
+
+    predictions_final["logodds_ps"] = np.log(predictions_final['t_prob'] / (1 - predictions_final['t_prob']))
     
     X = predictions_final[
-        ["age", "education", "black", "hispanic", "married", "nodegree", "re74", "re75"]
+        ["age", "education", "black", "hispanic", "married", "nodegree", "re74", "re75", "u74", "u75"]
     ]
     abs_smd = calculate_covariate_balance(
         X, predictions_final["t"], predictions_final["weight"]
     )
 
-    # TODO: make gif for SMD
-    # # plot absolute standardized mean difference
-    # fig, ax = plt.subplots(figsize=(8, 6))
-    # smd_plot(abs_smd, ax)
+    #plot absolute standardized mean difference
+    fig, ax = plt.subplots(figsize=(8, 6))
+    smd_plot(abs_smd, ax, epoch=suffix)
 
-    # smd_imagepath = 'experiments/results/figures/abs_smd.png'
-    # fig.savefig(smd_imagepath)
+    smd_imagepath = 'experiments/results/figures/abs_smd.png'
+    fig.savefig(smd_imagepath)
 
     # plot PS by treatment group
     fig, ax = plt.subplots(figsize=(10, 8))
@@ -93,18 +95,19 @@ def create_metric_plots(dataset: pd.DataFrame, dag: Dict, predictions: np.array,
         num_bins=100,
         reflect=True,
         kde=False,
-        ax = ax
+        ax=ax,
+        epoch=suffix
     )
 
     ps_imagepath = f'experiments/results/figures/propensity_score_distribution.png'
     fig.savefig(ps_imagepath)
 
-    return {#f"{prefix}: SMD": smd_imagepath, 
+    return {f"{prefix}: SMD_{suffix}": smd_imagepath,
             f"{prefix}: propensity score_{suffix}": ps_imagepath}
 
 
 def images_to_gif(image_fnames: List[str], gif_outpath: str, duration: int = 5):
-    image_fnames.sort(key=lambda x: int(x.split('_')[3])) #sort by step
+    image_fnames.sort(key=extract_number) #sort by step
     frames = [Image.open(image) for image in image_fnames]
     frame_one = frames[0]
     frame_one.save(gif_outpath, format="GIF", append_images=frames,

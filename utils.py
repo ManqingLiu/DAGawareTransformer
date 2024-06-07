@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import re
 import pandas as pd
 import matplotlib
 import warnings
@@ -21,6 +22,12 @@ import os
 from src.model import DAGTransformer, causal_loss_fun
 from src.dataset import *
 from src.predict import *
+
+def extract_number(filepath):
+    match = re.search(r'_(\d+)_', filepath)
+    if match:
+        return int(match.group(1))
+    return float('inf')  # Return a large number if no match found
 
 def IPTW_stabilized(t, y, pred_t):
     """
@@ -357,7 +364,7 @@ def calculate_covariate_balance(X, a, w, metric="abs_smd"):
     return results
 
 
-def smd_plot(df, ax=None):
+def smd_plot(df, ax=None, epoch=None):
     """
     Plot the absolute standardized mean difference for weighted and unweighted data.
 
@@ -379,9 +386,10 @@ def smd_plot(df, ax=None):
         ax.plot([df.loc[covariate, 'weighted'], df.loc[covariate, 'unweighted']], [covariate, covariate], 'k--')
 
     # Adding labels and title
+    ax.set_xlim([0, 2])
     ax.set_xlabel('Absolute Standardized Mean Difference')
     ax.set_ylabel('Covariates')
-    ax.set_title('Evaluation on test data')
+    ax.set_title(f'Number of epochs:{epoch}')
     ax.legend()
 
     return ax
@@ -396,6 +404,7 @@ def plot_propensity_score_distribution(
     cumulative=False,
     norm_hist=True,
     ax=None,
+    epoch=None
 ):
     """
     Plot the distribution of propensity score
@@ -488,5 +497,5 @@ def plot_propensity_score_distribution(
     ax.set_xlabel(x_type)
     y_type = "Probability density" if norm_hist else "Counts"
     ax.set_ylabel(y_type)
-    ax.set_title(f"{x_type} Distribution")
+    ax.set_title(f"{x_type} Distribution, epoch:{epoch}")
     return ax

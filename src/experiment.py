@@ -91,26 +91,26 @@ if __name__ == '__main__':
     print('Done training.')
 
 
-    predictions = predict(model, test_data, dag, test_dataloader, mask=args.mask)
+    predictions = predict(model,val_data, dag, val_dataloader, mask=args.mask)
 
-    data_A1 = replace_column_values(test_data, 't', 1)
+    data_A1 = replace_column_values(val_data, 't', 1)
     dataset_A1 = CausalDataset(data_A1, dag)
     dataloader_A1 = DataLoader(dataset_A1,
                                batch_size=batch_size,
                                shuffle=True,
-                               collate_fn=test_dataset.collate_fn)
+                               collate_fn=val_dataset.collate_fn)
 
     predictions_A1 = predict(model, data_A1, dag, dataloader_A1, mask=args.mask)
 
     # rename pred_y to pred_y_A1
     predictions_A1 = predictions_A1.rename(columns={'pred_y': 'pred_y_A1'})
 
-    data_A0 = replace_column_values(test_data, 't', 0)
+    data_A0 = replace_column_values(val_data, 't', 0)
     dataset_A0 = CausalDataset(data_A0, dag)
     dataloader_A0 = DataLoader(dataset_A0,
                                batch_size=batch_size,
                                shuffle=True,
-                               collate_fn=test_dataset.collate_fn)
+                               collate_fn=val_dataset.collate_fn)
     predictions_A0 = predict(model, data_A0, dag, dataloader_A0, mask=args.mask)
 
     # rename pred_y to pred_y_A0
