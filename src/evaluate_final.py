@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 import os
-from utils import rmse, log_results_evaluate
+from src.utils import rmse, log_results_evaluate
 from argparse import ArgumentParser
 
 

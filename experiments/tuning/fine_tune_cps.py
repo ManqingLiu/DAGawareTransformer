@@ -11,13 +11,13 @@ from torch.utils.data import DataLoader
 from config import *
 import torch
 from argparse import ArgumentParser
-from utils import log_results
+from src.utils import log_results
 import os
 
 
 def fine_tune(config, dag, train_data, holdout_data):
     train_data = train_data[dag['nodes']]
-    train_dataset = CausalDataset(train_data, dag)
+    train_dataset = CausalDataset(train_data, dag, random_seed=config['random_seed'])
     train_dataloader = DataLoader(train_dataset, batch_size=config['training']['batch_size'], shuffle=True, collate_fn=train_dataset.collate_fn)
 
     # Create the model
@@ -28,7 +28,7 @@ def fine_tune(config, dag, train_data, holdout_data):
 
     # Evaluate the model on the holdout set and report the loss
     holdout_data = holdout_data[dag['nodes']]
-    holdout_dataset = CausalDataset(holdout_data, dag)
+    holdout_dataset = CausalDataset(holdout_data, dag, random_seed=config['random_seed'])
     holdout_dataloader = DataLoader(holdout_dataset, batch_size=config['training']['batch_size'], shuffle=False, collate_fn=holdout_dataset.collate_fn)
 
     model.eval()

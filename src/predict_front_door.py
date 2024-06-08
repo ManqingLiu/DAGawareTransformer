@@ -13,7 +13,7 @@ from dataset import *
 from typing import Dict
 import time
 
-from utils import *
+from src.utils import *
 
 from tqdm import tqdm
 

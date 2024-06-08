@@ -2,7 +2,7 @@ import numpy as np
 from doubleml import DoubleMLData
 import pandas as pd
 import time
-from utils import rmse, log_results_evaluate
+from src.utils import rmse, log_results_evaluate
 from sklearn.base import clone
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVR, LinearSVR

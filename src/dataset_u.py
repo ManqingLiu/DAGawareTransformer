@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import KBinsDiscretizer
 from argparse import ArgumentParser
-from utils import *
+from src.utils import *
 from sklearn.model_selection import train_test_split
 from numpy.random import rand, seed, multivariate_normal
 from scipy.stats import norm
@@ -13,7 +13,7 @@ from scipy.linalg import cholesky
 
 import json
 
-class CausalDataset(Dataset):
+class CausalDataset_u(Dataset):
     def __init__(self, data, dag, n_uniform_variables=0, add_u=False, seed_value=0):
         self.data = data
         self.dag = dag

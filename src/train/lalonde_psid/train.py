@@ -1,25 +1,14 @@
-from argparse import ArgumentParser
-import json
-import os
-import time
 from typing import Dict
 
-from scipy.stats import ks_2samp
 import pandas as pd
 import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 import wandb
 
-from src.models.transformer_model import DAGTransformer, causal_loss_fun
-from src.predict import predict
-from src.train.lalonde_psid.train_metrics import (
-    calculate_metrics,
-    create_metric_plots,
-    images_to_gif,
-)
+from src.models.transformer_model import causal_loss_fun
+from src.train.lalonde_psid.train_metrics import calculate_metrics, create_metric_plots
 
 
 def train(
@@ -30,15 +19,13 @@ def train(
     train_dataloader: DataLoader,
     val_dataloader: DataLoader,
     test_dataloader: DataLoader,
-    config: Dict,
-    mask: bool,
+    train_config: Dict,
+    random_seed: int,
 ) -> nn.Module:
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     model = model.to(device)
-
-    train_config = config["training"]
 
     opt = torch.optim.AdamW(
         model.parameters(),
@@ -46,15 +33,13 @@ def train(
         lr=train_config["learning_rate"],
     )
 
-    run = wandb.init(project="DAG transformer", entity="mliu7", config=config)
-
-    #for epoch in tqdm(range(train_config["num_epochs"])):
+    # for epoch in tqdm(range(train_config["num_epochs"])):
     for epoch in range(train_config["num_epochs"]):
         predictions = []
         for _, batch in train_dataloader:
             opt.zero_grad()
             batch = {k: v.to(device) for k, v in batch.items()}
-            outputs = model(batch, mask=mask)
+            outputs = model(batch, mask=train_config["dag_attention_mask"])
 
             batch_predictions = []
             for output_name in outputs.keys():
@@ -77,7 +62,11 @@ def train(
 
         wandb.log(
             calculate_metrics(
-                train_data, dag, np.concatenate(predictions, axis=0), prefix="Train"
+                train_data,
+                dag,
+                np.concatenate(predictions, axis=0),
+                prefix="Train",
+                random_seed=random_seed,
             )
         )
         plot_dict = create_metric_plots(
@@ -86,6 +75,7 @@ def train(
             np.concatenate(predictions, axis=0),
             prefix="Train",
             suffix=epoch,
+            random_seed=random_seed,
         )
         wandb.log(
             {
@@ -100,7 +90,7 @@ def train(
             val_loss = 0
             for _, batch in val_dataloader:
                 batch = {k: v.to(device) for k, v in batch.items()}
-                outputs = model(batch, mask=mask)
+                outputs = model(batch, mask=train_config["dag_attention_mask"])
 
                 batch_predictions = []
                 for output_name in outputs.keys():
@@ -124,7 +114,11 @@ def train(
 
         wandb.log(
             calculate_metrics(
-                val_data, dag, np.concatenate(predictions, axis=0), prefix="Val"
+                val_data,
+                dag,
+                np.concatenate(predictions, axis=0),
+                prefix="Val",
+                random_seed=random_seed,
             )
         )
         plot_dict = create_metric_plots(
@@ -133,6 +127,7 @@ def train(
             np.concatenate(predictions, axis=0),
             prefix="Val",
             suffix=epoch,
+            random_seed=random_seed,
         )
         wandb.log(
             {
@@ -141,62 +136,5 @@ def train(
             }
         )
         model.train()
-
-    wandb.finish()
-
-    api = wandb.Api()
-    run = api.run(run.path)
-    for file in run.files():
-        if file.name.endswith(".png") and "Train" in file.name and "propensity" in file.name:
-            file.download(root="train_gif_images_ps", replace=True, exist_ok=True)
-        if file.name.endswith(".png") and "Val" in file.name and "propensity" in file.name:
-            file.download(root="val_gif_images_ps", replace=True, exist_ok=True)
-        if file.name.endswith(".png") and "Train" in file.name and "SMD" in file.name:
-            file.download(root="train_gif_images_smd", replace=True, exist_ok=True)
-        if file.name.endswith(".png") and "Val" in file.name and "SMD" in file.name:
-            file.download(root="val_gif_images_smd", replace=True, exist_ok=True)
-
-    for split, filepath in {
-        "train": "train_gif_images_ps",
-        "val": "val_gif_images_ps",
-    }.items():
-        image_filepaths_ps = []
-        image_directory_ps = os.path.join(filepath, "media/images")
-        for root, dirs, files in os.walk(image_directory_ps):
-            for file in files:
-                if file.endswith(".png"):
-                    image_filepaths_ps.append(os.path.join(root, file))
-
-        images_to_gif(
-            image_filepaths_ps,
-            gif_outpath=f"experiments/results/figures/{split}_propensity_score.gif",
-            duration=700,
-        )
-
-
-    for split, filepath in {
-        "train": "train_gif_images_smd",
-        "val": "val_gif_images_smd",
-    }.items():
-        image_filepaths_smd = []
-        image_directory_smd = os.path.join(filepath, "media/images")
-        for root, dirs, files in os.walk(image_directory_smd):
-            for file in files:
-                if file.endswith(".png"):
-                    image_filepaths_smd.append(os.path.join(root, file))
-
-        images_to_gif(
-            image_filepaths_smd,
-            gif_outpath=f"experiments/results/figures/{split}_absolute_smd.gif",
-            duration=700,
-        )
-
-        for root, dirs, files in os.walk(image_directory_ps):
-            for file in files:
-                os.remove(os.path.join(root, file))
-
-        for root, dirs, files in os.walk(image_directory_smd):
-            for file in files:
-                os.remove(os.path.join(root, file))
 
     return model

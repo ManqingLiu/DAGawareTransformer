@@ -23,8 +23,9 @@ from src.data.ate.data_class import (
 
 
 class CausalDataset(Dataset):
-    def __init__(self, data, dag):
+    def __init__(self, data, dag, random_seed: int):
         self.data = data
+        self.random_seed = random_seed
 
         if isinstance(self.data, pd.DataFrame):
             self.data_binned = self.data.copy()
@@ -42,6 +43,11 @@ class CausalDataset(Dataset):
         elif isinstance(self.data, dict):
             self.bin_columns_for_ndarray()
 
+    def get_labels(self):
+        """Returns the treatment column to be used by torchsampler's ImbalancedDatasetSampler class 
+        so that it can oversample the treated group and balance untreated/treated observations"""
+        return self.data["t"].values
+    
     def __len__(self):
         if isinstance(self.data, pd.DataFrame):
             return len(self.data)
@@ -73,7 +79,7 @@ class CausalDataset(Dataset):
         for column, params in self.dag["input_nodes"].items():
             num_bins = params["num_categories"]
             binner = KBinsDiscretizer(
-                n_bins=num_bins, encode="ordinal", strategy="uniform", subsample=None
+                n_bins=num_bins, encode="ordinal", strategy="uniform", subsample=None, random_state=self.random_seed
             )
             if num_bins > 2:
                 self.data_binned[column] = binner.fit_transform(
@@ -91,7 +97,7 @@ class CausalDataset(Dataset):
         for column, params in self.dag["input_nodes"].items():
             num_bins = params["num_categories"]
             binner = KBinsDiscretizer(
-                n_bins=num_bins, encode="ordinal", strategy="uniform", subsample=None
+                n_bins=num_bins, encode="ordinal", strategy="uniform", subsample=None, random_state=self.random_seed
             )
             if num_bins > 2:
                 self.data_binned[column] = binner.fit_transform(
@@ -123,7 +129,7 @@ def make_train_data(
         "outcome": train_t.outcome,
     }
 
-    return CausalDataset(train_data_dict, dag)
+    return CausalDataset(train_data_dict, dag, random_seed)
 
 
 def make_validation_data(
@@ -141,7 +147,7 @@ def make_validation_data(
         "outcome": val_data_t.outcome,
     }
 
-    return CausalDataset(val_data_dict, dag)
+    return CausalDataset(val_data_dict, dag, random_seed)
 
 
 def make_test_data(
@@ -174,7 +180,7 @@ def make_test_data(
         "outcome": outcome.T.reshape(-1, 1),
     }
 
-    return CausalDataset(test_data_dict, dag), test_data.structural
+    return CausalDataset(test_data_dict, dag, random_seed=data_config['random_seed']), test_data.structural
 
 
 class PredictionTransformer:

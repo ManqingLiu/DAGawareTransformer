@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
@@ -5,17 +6,19 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from scipy.stats import ks_2samp
+import wandb
+from wandb.wandb_run import Run
 
 from src.dataset import CausalDataset, PredictionTransformer
-from utils import (IPTW_unstabilized, rmse, calculate_covariate_balance,
+from src.utils import (IPTW_unstabilized, rmse, calculate_covariate_balance,
                    smd_plot, plot_propensity_score_distribution, extract_number)
 
 
 def calculate_metrics(
-    dataset: pd.DataFrame, dag: Dict, predictions: np.array, prefix: str
+    dataset: pd.DataFrame, dag: Dict, predictions: np.array, prefix: str, random_seed: int
 ) -> Dict[str, float]:
     # assign column names to the predictions_df
-    causal_dataset = CausalDataset(dataset, dag)
+    causal_dataset = CausalDataset(dataset, dag, random_seed)
     prediction_transformer = PredictionTransformer(causal_dataset.bin_edges)
     transformed_predictions = prediction_transformer.transform(predictions)
 
@@ -27,7 +30,7 @@ def calculate_metrics(
     )
 
     X = predictions_final[
-        ["age", "education", "black", "hispanic", "married", "nodegree", "re74", "re75"]
+        ["age", "education", "black", "hispanic", "married", "nodegree", "re74", "re75", "u74", "u75"]
     ]
 
     abs_smd = calculate_covariate_balance(
@@ -58,9 +61,9 @@ def calculate_metrics(
     }
 
 
-def create_metric_plots(dataset: pd.DataFrame, dag: Dict, predictions: np.array, prefix: str, suffix: int) -> Dict[str, str]:
+def create_metric_plots(dataset: pd.DataFrame, dag: Dict, predictions: np.array, prefix: str, suffix: int, random_seed: int) -> Dict[str, str]:
     # assign column names to the predictions_df
-    causal_dataset = CausalDataset(dataset, dag)
+    causal_dataset = CausalDataset(dataset, dag, random_seed)
     prediction_transformer = PredictionTransformer(causal_dataset.bin_edges)
     transformed_predictions = prediction_transformer.transform(predictions)
 
@@ -112,3 +115,59 @@ def images_to_gif(image_fnames: List[str], gif_outpath: str, duration: int = 5):
     frame_one = frames[0]
     frame_one.save(gif_outpath, format="GIF", append_images=frames,
                save_all=True, duration=duration, loop=0)
+    
+
+def make_gifs(run: Run):
+    api = wandb.Api()
+    run = api.run(run.path)
+    for file in run.files():
+        if file.name.endswith(".png") and "Train" in file.name and "propensity" in file.name:
+            file.download(root="train_gif_images_ps", replace=True, exist_ok=True)
+        if file.name.endswith(".png") and "Val" in file.name and "propensity" in file.name:
+            file.download(root="val_gif_images_ps", replace=True, exist_ok=True)
+        if file.name.endswith(".png") and "Train" in file.name and "SMD" in file.name:
+            file.download(root="train_gif_images_smd", replace=True, exist_ok=True)
+        if file.name.endswith(".png") and "Val" in file.name and "SMD" in file.name:
+            file.download(root="val_gif_images_smd", replace=True, exist_ok=True)
+
+    for split, filepath in {
+        "train": "train_gif_images_ps",
+        "val": "val_gif_images_ps",
+    }.items():
+        image_filepaths_ps = []
+        image_directory_ps = os.path.join(filepath, "media/images")
+        for root, dirs, files in os.walk(image_directory_ps):
+            for file in files:
+                if file.endswith(".png"):
+                    image_filepaths_ps.append(os.path.join(root, file))
+
+        images_to_gif(
+            image_filepaths_ps,
+            gif_outpath=f"experiments/results/figures/{split}_propensity_score.gif",
+            duration=700,
+        )
+
+    for split, filepath in {
+        "train": "train_gif_images_smd",
+        "val": "val_gif_images_smd",
+    }.items():
+        image_filepaths_smd = []
+        image_directory_smd = os.path.join(filepath, "media/images")
+        for root, dirs, files in os.walk(image_directory_smd):
+            for file in files:
+                if file.endswith(".png"):
+                    image_filepaths_smd.append(os.path.join(root, file))
+
+        images_to_gif(
+            image_filepaths_smd,
+            gif_outpath=f"experiments/results/figures/{split}_absolute_smd.gif",
+            duration=700,
+        )
+
+        for root, dirs, files in os.walk(image_directory_ps):
+            for file in files:
+                os.remove(os.path.join(root, file))
+
+        for root, dirs, files in os.walk(image_directory_smd):
+            for file in files:
+                os.remove(os.path.join(root, file))
