@@ -13,7 +13,7 @@ from src.dataset import *
 from typing import Dict
 import time
 
-from utils import *
+from src.utils import *
 
 from tqdm import tqdm
 
@@ -23,13 +23,14 @@ def predict(model,
             data,
             dag,
             dataloader: DataLoader,
-            mask: bool):
+            mask: bool,
+            random_seed: int):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Using device: {device}')
     model = model.to(device)
     data = data[dag['nodes']]
 
-    dataset = CausalDataset(data, dag)
+    dataset = CausalDataset(data, dag, random_seed)
     model.eval()
 
     predictions = []

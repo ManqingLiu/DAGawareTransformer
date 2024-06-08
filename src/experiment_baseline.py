@@ -11,7 +11,7 @@ from sklearn import metrics
 from matplotlib import pyplot as plt
 
 #from src.dataset import DataObject
-from utils import rmse
+from src.utils import rmse
 
 if __name__ == '__main__':
     parser = ArgumentParser()

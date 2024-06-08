@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from utils import *
+from src.utils import *
 import json
 from argparse import ArgumentParser
 

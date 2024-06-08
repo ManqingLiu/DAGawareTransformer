@@ -2,6 +2,7 @@
 /data/
 myenv/
 .idea/
+.DS_Store
 __pycache__/
 wandb/
 *.egg-info

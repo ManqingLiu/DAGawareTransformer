@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from utils import *
+from src.utils import *
 import json
 from argparse import ArgumentParser
 

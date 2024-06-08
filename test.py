@@ -1,4 +1,4 @@
-from utils import *
+from src.utils import *
 
 if __name__ == '__main__':
     bias = relative_bias(-13856.372498899807, -14833.9960)
