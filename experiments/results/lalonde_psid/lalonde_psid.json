@@ -1,0 +1,106 @@
+[
+    {
+        "results": {
+            "ATE_true": 1794.34,
+            "ATE_IPTW": -2160.995159532455,
+            "RMSE_IPTW": 3955.335159532455,
+            "ATE_std": 0.0,
+            "RMSE_std": 1794.34,
+            "ATE_AIPW": -77230.95392602868,
+            "RMSE_AIPW": 79025.29392602868
+        },
+        "config": {
+            "training": {
+                "num_epochs": 60,
+                "batch_size": 32,
+                "learning_rate": 1e-06,
+                "weight_decay": 0,
+                "project_tag": "lalonde_psid"
+            },
+            "model": {
+                "num_layers": 4,
+                "dropout_rate": 0,
+                "embedding_dim": 128,
+                "num_heads": 8
+            }
+        }
+    },
+    {
+        "results": {
+            "ATE_true": 1794.34,
+            "ATE_IPTW": -7314.759611251768,
+            "RMSE_IPTW": 9109.099611251768,
+            "ATE_std": 0.0,
+            "RMSE_std": 1794.34,
+            "ATE_AIPW": -85344.58942146326,
+            "RMSE_AIPW": 87138.92942146325
+        },
+        "config": {
+            "training": {
+                "num_epochs": 70,
+                "batch_size": 32,
+                "learning_rate": 1e-06,
+                "weight_decay": 0,
+                "project_tag": "lalonde_psid"
+            },
+            "model": {
+                "num_layers": 4,
+                "dropout_rate": 0,
+                "embedding_dim": 128,
+                "num_heads": 32
+            }
+        }
+    },
+    {
+        "results": {
+            "ATE_true": 1794.34,
+            "ATE_IPTW": 2643.327963830895,
+            "RMSE_IPTW": 848.9879638308951,
+            "ATE_std": 0.0,
+            "RMSE_std": 1794.34,
+            "ATE_AIPW": -107160.34762656376,
+            "RMSE_AIPW": 108954.68762656375
+        },
+        "config": {
+            "training": {
+                "num_epochs": 10,
+                "batch_size": 32,
+                "learning_rate": 1e-05,
+                "weight_decay": 0,
+                "project_tag": "lalonde_psid"
+            },
+            "model": {
+                "num_layers": 4,
+                "dropout_rate": 0,
+                "embedding_dim": 128,
+                "num_heads": 2
+            }
+        }
+    },
+    {
+        "results": {
+            "ATE_true": 1794.34,
+            "ATE_IPTW": 23403.982764465552,
+            "RMSE_IPTW": 21609.642764465552,
+            "ATE_std": 0.0,
+            "RMSE_std": 1794.34,
+            "ATE_AIPW": -181739.47522829278,
+            "RMSE_AIPW": 183533.81522829278
+        },
+        "config": {
+            "training": {
+                "num_epochs": 10,
+                "batch_size": 32,
+                "learning_rate": 1e-05,
+                "weight_decay": 0,
+                "project_tag": "lalonde_psid"
+            },
+            "model": {
+                "num_layers": 4,
+                "dropout_rate": 0,
+                "embedding_dim": 128,
+                "num_heads": 2
+            }
+        }
+    }
+]

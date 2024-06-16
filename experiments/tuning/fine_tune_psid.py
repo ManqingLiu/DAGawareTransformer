@@ -1,84 +1,70 @@
 import ray
+import os
 from ray import train, tune
-from ray.train import Checkpoint
-from ray.tune.schedulers import ASHAScheduler
 import json
-from src.train.lalonde_psid.train import train as train_function
-from src.model import *
-import pandas as pd
-from src.dataset import CausalDataset
-from torch.utils.data import DataLoader
-from config import *
+from config import config_psid
 import torch
 from argparse import ArgumentParser
 from src.utils import log_results
-import os
+from src.data.data_preprocess import data_preprocess
+from src.experiment import experiment
+from src.train.lalonde_psid.train_metrics import std_rmse, ipw_rmse, cfcv_rmse
 
+def fine_tune(config, dag, train_dataloader, val_dataloader, val_data):
+    predictions = experiment(config, dag, train_dataloader, val_dataloader, val_data, random_seed=False)
+    std_rmse_ = std_rmse(predictions['pred_y_A0'], predictions['pred_y_A1'])
+    ipw_rmse_ = ipw_rmse(predictions['y'], predictions['t'], predictions['t_prob'])
+    cfcv_rmse_ = cfcv_rmse(predictions['y'], predictions['t'], predictions['pred_y_A0'],
+                        predictions['pred_y_A1'], predictions['t_prob'])
 
-def fine_tune(config, dag, train_data, holdout_data):
-    train_data = train_data[dag['nodes']]
-    train_dataset = CausalDataset(train_data, dag, random_seed=config['random_seed'])
-    train_dataloader = DataLoader(train_dataset, batch_size=config['training']['batch_size'], shuffle=True, collate_fn=train_dataset.collate_fn)
-
-    # Create the model
-    model = DAGTransformer(dag=dag, **config['model'])
-
-    # Train the model using the train function from train.py
-    train_function(model, train_dataloader, config['training'], mask=True, save_model=False, model_file=None)
-
-    # Evaluate the model on the holdout set and report the loss
-    holdout_data = holdout_data[dag['nodes']]
-    holdout_dataset = CausalDataset(holdout_data, dag, random_seed=config['random_seed'])
-    holdout_dataloader = DataLoader(holdout_dataset, batch_size=config['training']['batch_size'], shuffle=False, collate_fn=holdout_dataset.collate_fn)
-
-    model.eval()
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f'Using device: {device}')
-    with torch.no_grad():
-        holdout_loss = 0
-        for batch in holdout_dataloader:
-            batch = {k: v.to(device) for k, v in batch.items()}
-            outputs = model(batch, mask=True)
-            batch_loss, _ = causal_loss_fun(outputs, batch)
-            holdout_loss += batch_loss.item()
-        avg_holdout_loss = holdout_loss / len(holdout_dataloader)
-
-
-        train.report({"loss":  avg_holdout_loss})
+    train.report({"std_rmse":  std_rmse_, "ipw_rmse": ipw_rmse_, "cfcv_rmse": cfcv_rmse_})
 
 
 
 if __name__ == '__main__':
     current_directory = os.getcwd()
     print(f"Current directory: {current_directory}")
-
     parser = ArgumentParser()
-    parser.add_argument('--dag', type=str, required=True)
-    parser.add_argument('--data_train_file', type=str, required=True)
-    parser.add_argument('--data_holdout_file', type=str, required=True)
-    parser.add_argument('--results', type=str, required=True)
+    parser.add_argument(
+        "--config", type=str, required=True, default="config/train/lalonde_psid.json"
+    )
     args = parser.parse_args()
 
-    with open(args.dag) as f:
-        print(f'Loading dag file from {args.dag}')
+    with open(args.config) as f:
+        config = json.load(f)
+
+    filepaths = config["filepaths"]
+
+    with open(filepaths["dag"]) as f:
         dag = json.load(f)
 
-    train_data = pd.read_csv(args.data_train_file)
-    holdout_data = pd.read_csv(args.data_holdout_file)
+    (train_data, train_dataloader, val_data, val_dataloader, test_data, test_dataloader) = data_preprocess(
+        config, filepaths, dag
+    )
 
-    # Wrap the train_tabular_bert function with the dag argument
-    fine_tune_new = tune.with_parameters(fine_tune, dag=dag, train_data=train_data, holdout_data=holdout_data)
-
+    fine_tune_new = tune.with_parameters(fine_tune,
+                                         dag=dag,
+                                         train_dataloader=train_dataloader,
+                                         val_dataloader=val_dataloader,
+                                         val_data=val_data)
 
     analysis = tune.run(
         fine_tune_new,
         config=config_psid,
-        num_samples=10,  # Number of times to sample from the hyperparameter space
+        num_samples=1,  # Number of times to sample from the hyperparameter space
         resources_per_trial={"cpu": 1, "gpu": 1 if torch.cuda.is_available() else 0},
     )
 
-    best_trial = analysis.get_best_trial("loss", "min", "last")
-    print("Best trial config: {}".format(best_trial.config))
-    print("Best trial final validation loss: {}".format(best_trial.last_result["loss"]))
+    best_trial_std = analysis.get_best_trial("std_rmse", "min", "last")
+    print("Best trial config: {}".format(best_trial_std.config))
+    print("Best trial final validation std RMSE: {}".format(best_trial_std.last_result["std_rmse"]))
+    best_trial_ipw = analysis.get_best_trial("ipw_rmse", "min", "last")
+    print("Best trial config: {}".format(best_trial_ipw.config))
+    print("Best trial final validation IPW RMSE: {}".format(best_trial_ipw.last_result["ipw_rmse"]))
+    best_trial_cfcv = analysis.get_best_trial("cfcv_rmse", "min", "last")
+    print("Best trial config: {}".format(best_trial_cfcv.config))
+    print("Best trial final validation CFCV RMSE: {}".format(best_trial_cfcv.last_result["cfcv_rmse"]))
     # Log the results
-    log_results(best_trial.config, args.results)
+    log_results(best_trial_std.config, filepaths["result_file"])
+    log_results(best_trial_ipw.config, filepaths["result_file"])
+    log_results(best_trial_cfcv.config, filepaths["result_file"])

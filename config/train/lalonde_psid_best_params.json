@@ -1,0 +1,1 @@
+{"training": {"num_epochs": 2, "batch_size": 32, "learning_rate": 1e-06, "weight_decay": 0.01, "project_tag": "lalonde_psid", "dag_attention_mask": true, "imbalance_loss_weight": 0.01}, "model": {"num_layers": 2, "dropout_rate": 0.1, "embedding_dim": 128, "num_heads": 16}}

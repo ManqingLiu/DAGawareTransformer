@@ -1,5 +1,5 @@
 from typing import Dict
-
+import tqdm
 import pandas as pd
 import numpy as np
 import torch
@@ -7,20 +7,16 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import wandb
 
-from src.models.transformer_model import causal_loss_fun
+from src.models.transformer_model import causal_loss_fun, pdist2sq, safe_sqrt, wasserstein, CFR_loss
 from src.train.lalonde_psid.train_metrics import calculate_metrics, create_metric_plots
 
 
 def train(
     model: nn.Module,
-    val_data: pd.DataFrame,
-    train_data: pd.DataFrame,
-    dag: Dict,
     train_dataloader: DataLoader,
     val_dataloader: DataLoader,
-    test_dataloader: DataLoader,
     train_config: Dict,
-    random_seed: int,
+    imbalance_loss_weight: float
 ) -> nn.Module:
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -33,108 +29,71 @@ def train(
         lr=train_config["learning_rate"],
     )
 
-    # for epoch in tqdm(range(train_config["num_epochs"])):
+    bin_left_edges = {k: torch.tensor(v[:-1], dtype=torch.float32).to(device) for k, v in train_dataloader.dataset.bin_edges.items()}
+
     for epoch in range(train_config["num_epochs"]):
-        predictions = []
-        for _, batch in train_dataloader:
+        for batch_raw, batch_binned in train_dataloader:
             opt.zero_grad()
-            batch = {k: v.to(device) for k, v in batch.items()}
+            batch = {k: v.to(device) for k, v in batch_binned.items()}
             outputs = model(batch, mask=train_config["dag_attention_mask"])
 
-            batch_predictions = []
-            for output_name in outputs.keys():
-                # Detach the outputs and move them to cpu
-                output = outputs[output_name].detach().numpy()
-                output = np.exp(output) / np.sum(np.exp(output), axis=1, keepdims=True)
-                # Append the reshaped output to batch_predictions
-                batch_predictions.append(output)
-            # concatenate the batch predictions along the second axis
-            batch_predictions = np.concatenate(batch_predictions, axis=1)
-            predictions.append(batch_predictions)
+            transformed_outputs = {}
+            for output_name, output in outputs.items():
+                softmax_output = torch.softmax(output, dim=1)
+                if output_name == 'y':
+                    pred_y = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
+                    transformed_outputs[output_name] = pred_y
+                else:
+                    transformed_outputs[output_name] = softmax_output[:, 1]
+                    h_rep = output
 
-            batch_loss, batch_items = causal_loss_fun(outputs, batch)
-            for item in batch_items.keys():
-                wandb.log({f"Train: {item} loss": batch_items[item]})
+
+            t = batch_raw['t']
+            y = batch_raw['y']
+            e = transformed_outputs['t']
+            y_ = torch.squeeze(transformed_outputs['y'])
+            h_rep_norm = h_rep / safe_sqrt(torch.sum(h_rep ** 2, dim=1, keepdim=True))
+
+            # Use CFR loss function
+            batch_loss, batch_items = CFR_loss(t, e, y, y_, h_rep_norm, imbalance_loss_weight, return_items=True)
 
             batch_loss.backward()
+            # Gradient clipping
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             opt.step()
-            wandb.log({f"Train: average loss": batch_loss.item()})
+            wandb.log({f"Train: counterfactual loss": batch_loss.item()})
 
-        wandb.log(
-            calculate_metrics(
-                train_data,
-                dag,
-                np.concatenate(predictions, axis=0),
-                prefix="Train",
-                random_seed=random_seed,
-            )
-        )
-        plot_dict = create_metric_plots(
-            train_data,
-            dag,
-            np.concatenate(predictions, axis=0),
-            prefix="Train",
-            suffix=epoch,
-            random_seed=random_seed,
-        )
-        wandb.log(
-            {
-                plot_name: wandb.Image(image_path)
-                for plot_name, image_path in plot_dict.items()
-            }
-        )
 
         model.eval()
-        predictions = []
         with torch.no_grad():
             val_loss = 0
-            for _, batch in val_dataloader:
-                batch = {k: v.to(device) for k, v in batch.items()}
+            for batch_raw, batch_binned in val_dataloader:
+                batch = {k: v.to(device) for k, v in batch_binned.items()}
                 outputs = model(batch, mask=train_config["dag_attention_mask"])
 
-                batch_predictions = []
-                for output_name in outputs.keys():
-                    # Detach the outputs and move them to cpu
-                    output = outputs[output_name].cpu().numpy()
-                    output = np.exp(output) / np.sum(
-                        np.exp(output), axis=1, keepdims=True
-                    )
-                    # Append the reshaped output to batch_predictions
-                    batch_predictions.append(output)
-                # concatenate the batch predictions along the second axis
-                batch_predictions = np.concatenate(batch_predictions, axis=1)
-                predictions.append(batch_predictions)
+                transformed_outputs = {}
+                for output_name, output in outputs.items():
+                    softmax_output = torch.softmax(output, dim=1)
+                    if output_name == 'y':
+                        pred_y = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
+                        transformed_outputs[output_name] = pred_y
+                    else:
+                        transformed_outputs[output_name] = softmax_output[:, 1]
+                        h_rep = output
 
-                batch_loss, batch_items = causal_loss_fun(outputs, batch)
-                for item in batch_items.keys():
-                    wandb.log({f"Val: {item} loss": batch_items[item]})
-                val_loss += batch_loss.item()
+                t = batch_raw['t']
+                y = batch_raw['y']
+                e = transformed_outputs['t']
+                y_ = torch.squeeze(transformed_outputs['y'])
+                h_rep_norm = h_rep / safe_sqrt(torch.sum(h_rep ** 2, dim=1, keepdim=True))
 
-            wandb.log({f"Val: average loss": val_loss / len(batch)})
+                # Use CFR loss function
+                val_batch_loss, val_batch_items = CFR_loss(t, e, y, y_, h_rep_norm, imbalance_loss_weight,
+                                                           return_items=True)
 
-        wandb.log(
-            calculate_metrics(
-                val_data,
-                dag,
-                np.concatenate(predictions, axis=0),
-                prefix="Val",
-                random_seed=random_seed,
-            )
-        )
-        plot_dict = create_metric_plots(
-            val_data,
-            dag,
-            np.concatenate(predictions, axis=0),
-            prefix="Val",
-            suffix=epoch,
-            random_seed=random_seed,
-        )
-        wandb.log(
-            {
-                plot_name: wandb.Image(image_path)
-                for plot_name, image_path in plot_dict.items()
-            }
-        )
+                val_loss += val_batch_loss.item()
+            wandb.log({f"Val: counterfactual loss": val_loss/len(batch)})
+
         model.train()
 
     return model

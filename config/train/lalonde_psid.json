@@ -5,21 +5,23 @@
     "data_train_file": "data/lalonde/ldw_psid/lalonde_psid_train.csv",
     "data_val_file": "data/lalonde/ldw_psid/lalonde_psid_val.csv",
     "data_test_file": "data/lalonde/ldw_psid/lalonde_psid_test.csv",
-    "output_file": "experiments/predict/lalonde_psid/predictions_psid.csv"
+    "output_file": "experiments/predict/lalonde_psid/predictions_psid.csv",
+    "result_file": "config/train/lalonde_psid_best_params.json"
   },
   "training": {
-    "num_epochs": 10,
+    "num_epochs": 5,
     "batch_size": 32,
     "learning_rate": 1e-6,
-    "weight_decay": 0,
+    "weight_decay": 0.01,
     "project_tag": "lalonde_psid",
-    "dag_attention_mask": "True"
+    "dag_attention_mask": "True",
+    "imbalance_loss_weight": 0.01
   },
   "model": {
-    "num_layers": 4,
-    "dropout_rate": 0,
+    "num_layers": 2,
+    "dropout_rate": 0.1,
     "embedding_dim": 128,
-    "num_heads": 8
+    "num_heads": 4
   },
   "random_seed": 42
 }

@@ -37,7 +37,7 @@ module load python/3.10.11
 #python3 experiments/experiment_g_formula_fullsample_AIPW.py
 #python3 experiments/train/train_cps_sample0.py
 #python3 experiments/predict/predict_cps_sample0.py
-#python3 experiments/train/fine_tune.py
+python3 experiments/tuning/fine_tune_psid.py
 #python3 src/data/DGP_U10.py
 #python3 src/models/logistic_regression.py
 #for i in {0..99}
