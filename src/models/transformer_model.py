@@ -140,7 +140,7 @@ class DAGTransformer(nn.Module):
                           train_dataloader.dataset.bin_edges.items()}
 
         for epoch in range(train_config["num_epochs"]):
-            for batch_raw, batch_binned in train_dataloader:
+            for batch_ix, (batch_raw, batch_binned) in enumerate(train_dataloader):
                 opt.zero_grad()
                 batch = {k: v.to(device) for k, v in batch_binned.items()}
                 outputs = model(batch, mask=train_config["dag_attention_mask"])
@@ -161,11 +161,14 @@ class DAGTransformer(nn.Module):
                 y_ = torch.squeeze(transformed_outputs['y'])
                 h_rep_norm = h_rep / safe_sqrt(torch.sum(h_rep ** 2, dim=1, keepdim=True))
 
+                if epoch == 4 and batch_ix == 1:
+                    print(f"batch_ix: {batch_ix}")
+
                 # Use CFR loss function
                 batch_loss, batch_items = CFR_loss(t, e, y, y_, h_rep_norm, imbalance_loss_weight, return_items=True)
 
                 # Debugging print statements
-                print(f"batch_loss type: {type(batch_loss)}, value: {batch_loss}")
+                print(f"batch_ix: {batch_ix}, batch_loss type: {type(batch_loss)}, value: {batch_loss}")
 
                 if torch.isnan(batch_loss):
                     raise ValueError("NaN encountered in batch_loss")
