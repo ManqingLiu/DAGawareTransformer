@@ -161,14 +161,11 @@ class DAGTransformer(nn.Module):
                 y_ = torch.squeeze(transformed_outputs['y'])
                 h_rep_norm = h_rep / safe_sqrt(torch.sum(h_rep ** 2, dim=1, keepdim=True))
 
-                if epoch == 4 and batch_ix == 1:
-                    print(f"batch_ix: {batch_ix}")
-
                 # Use CFR loss function
                 batch_loss, batch_items = CFR_loss(t, e, y, y_, h_rep_norm, imbalance_loss_weight, return_items=True)
 
                 # Debugging print statements
-                print(f"batch_ix: {batch_ix}, batch_loss type: {type(batch_loss)}, value: {batch_loss}")
+                print(f"epoch: {epoch}, batch_ix: {batch_ix}, value: {batch_loss}")
 
                 if torch.isnan(batch_loss):
                     raise ValueError("NaN encountered in batch_loss")
@@ -177,12 +174,7 @@ class DAGTransformer(nn.Module):
                 # Gradient clipping
                 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
                 opt.step()
-                #wandb.log({f"Train: counterfactual loss": batch_loss.item()})
-                # Ensure batch_loss is a tensor
-                if isinstance(batch_loss, torch.Tensor):
-                    wandb.log({f"Train: counterfactual loss": batch_loss.item()})
-                else:
-                    raise TypeError(f"Expected batch_loss to be a tensor, but got {type(batch_loss)} instead.")
+                wandb.log({f"Train: counterfactual loss": batch_loss.item()})
 
             model.eval()
             with torch.no_grad():
@@ -303,7 +295,7 @@ def pdist2sq(X, Y):
     return D
 
 
-def safe_sqrt(X, eps=1e-12):
+def safe_sqrt(X, eps=1e-4):
     """ Computes the element-wise square root of a matrix with numerical stability """
     return torch.sqrt(X + eps)
 

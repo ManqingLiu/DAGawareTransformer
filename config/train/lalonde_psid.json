@@ -9,17 +9,17 @@
     "result_file": "config/train/lalonde_psid_best_params.json"
   },
   "training": {
-    "num_epochs": 5,
+    "num_epochs": 20,
     "batch_size": 32,
-    "learning_rate": 1e-6,
-    "weight_decay": 0.01,
+    "learning_rate": 1e-4,
+    "weight_decay": 1e-4,
     "project_tag": "lalonde_psid",
     "dag_attention_mask": "True",
     "imbalance_loss_weight": 0.01
   },
   "model": {
     "num_layers": 2,
-    "dropout_rate": 0.1,
+    "dropout_rate": 0.3,
     "embedding_dim": 128,
     "num_heads": 4
   },
