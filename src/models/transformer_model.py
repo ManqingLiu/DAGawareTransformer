@@ -1,13 +1,21 @@
+import json
 import torch.nn as nn
 import torch
 from typing import Dict
 from torch.utils.data import DataLoader
 import numpy as np
 import pandas as pd
+from sklearn.metrics import roc_auc_score
 import wandb
 
 from src.dataset import CausalDataset
 from src.utils import predict_function, replace_column_values
+from src.train.lalonde.train_metrics import calculate_val_metrics
+from src.train.ihdp.train_metrics import calculate_val_metrics_ihdp
+from src.evaluate.lalonde.evaluate_metrics import calculate_test_metrics
+from src.evaluate.ihdp.evaluate_metrics import calculate_test_metrics_ihdp
+from src.train.acic.train_metrics import calculate_val_metrics_acic
+from src.evaluate.acic.evaluate_metrics import calculate_test_metrics_acic
 
 
 class DAGTransformer(nn.Module):
@@ -65,51 +73,17 @@ class DAGTransformer(nn.Module):
             for node in self.output_nodes.keys()
         })
 
-
     def forward(self, x, mask=None):
-        if (x['t'] == 0).all():
-            embeddings = [self.embedding[node.replace('.', '_')](x[node].long()) for node in self.node_ids.keys()]
-            x_emb = torch.stack(embeddings).squeeze(2)
-            x_emb = x_emb.permute(1, 0, 2)
-            if mask:
-                attn_mask = self.attn_mask.repeat(x_emb.size(0) * self.num_heads, 1, 1)
-                attn_mask = attn_mask.to(x_emb.device)
-                x = self.encoder(x_emb, mask=attn_mask)
-            else:
-                x = self.encoder(x_emb)
+        embeddings = [self.embedding[node.replace('.', '_')](x[node].long()) for node in self.node_ids.keys()]
+        x = torch.stack(embeddings).squeeze(2)
+        x = x.permute(1, 0, 2)
+
+        if mask=="True":
+            attn_mask = self.attn_mask.repeat(x.size(0) * self.num_heads, 1, 1)
+            attn_mask = attn_mask.to(x.device)
+            x = self.encoder(x, mask=attn_mask)
         else:
-            # Create a mask for instances where 't' is 0
-            t0 = x['t'] == 0
-            # Use the mask to select the appropriate instances from 'x'
-            x_control = {k: v[t0] for k, v in x.items()}
-            # Modify the 'embeddings_control' line to use 'x_masked' instead of 'x'
-            embeddings_control = [self.embedding[node.replace('.', '_')](x_control[node].long()) for node in
-                                  self.node_ids.keys()]
-            t1 = x['t'] == 1
-            x_treatment = {k: v[t1] for k, v in x.items()}
-            embeddings_treatment = [self.embedding[node.replace('.', '_')](x_treatment[node].long()) for node in
-                                    self.node_ids.keys()]
-
-            x_control_emb = torch.stack(embeddings_control).squeeze(2)
-            x_treatment_emb = torch.stack(embeddings_treatment).squeeze(2)
-
-            x_control_emb = x_control_emb.permute(1, 0, 2)
-            x_treatment_emb = x_treatment_emb.permute(1, 0, 2)
-
-            if mask:
-                attn_mask_control = self.attn_mask.repeat(x_control_emb.size(0) * self.num_heads, 1, 1)
-                attn_mask_control = attn_mask_control.to(x_control_emb.device)
-                x_control = self.encoder(x_control_emb, mask=attn_mask_control)
-                attn_mask_treatment = self.attn_mask.repeat(x_treatment_emb.size(0) * self.num_heads, 1, 1)
-                attn_mask_treatment = attn_mask_treatment.to(x_treatment_emb.device)
-                x_treatment = self.encoder(x_treatment_emb, mask=attn_mask_treatment)
-            else:
-                x_control = self.encoder(x_control_emb)
-                x_treatment = self.encoder(x_treatment_emb)
-
-            x = torch.cat([x_control, x_treatment], dim=0)
-
-
+            x = self.encoder(x)
         node_outputs = {}
         for node_name in self.output_nodes.keys():
             node_id = self.node_ids[node_name]
@@ -117,14 +91,28 @@ class DAGTransformer(nn.Module):
 
         return node_outputs
 
+    def causal_consistency_loss(self, x, attn_mask):
+        jacobian = torch.autograd.functional.jacobian(lambda x: self.forward(x), x)
+        consistency_loss = torch.sum(torch.abs(jacobian) * attn_mask) / attn_mask.sum()
+        return consistency_loss
+
     def _train(
             self,
+            data_name: str,
+            estimator: str,
             model: nn.Module,
             train_dataloader: DataLoader,
             val_dataloader: DataLoader,
-            train_config: Dict,
-            imbalance_loss_weight: float
+            val_data: pd.DataFrame,
+            pseudo_ate_data: pd.DataFrame,
+            sample_id: int,
+            config: Dict,
+            dag: Dict,
+            imbalance_loss_weight: float,
+            random_seed: int = None
     ) -> nn.Module:
+
+        train_config = config[estimator]["training"]
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f"Using device: {device}")
@@ -139,7 +127,13 @@ class DAGTransformer(nn.Module):
         bin_left_edges = {k: torch.tensor(v[:-1], dtype=torch.float32).to(device) for k, v in
                           train_dataloader.dataset.bin_edges.items()}
 
+        rmse_cfcv = float('inf')
+        rmse_ipw = float('inf')
+
+
         for epoch in range(train_config["num_epochs"]):
+            print(f"Epoch: {epoch}")
+            model.train()
             for batch_ix, (batch_raw, batch_binned) in enumerate(train_dataloader):
                 opt.zero_grad()
                 batch = {k: v.to(device) for k, v in batch_binned.items()}
@@ -149,121 +143,219 @@ class DAGTransformer(nn.Module):
                 for output_name, output in outputs.items():
                     softmax_output = torch.softmax(output, dim=1)
                     if output_name == 'y':
-                        pred_y = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
+                        pred_y = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1,
+                                           keepdim=True)
                         transformed_outputs[output_name] = pred_y
                     else:
                         transformed_outputs[output_name] = softmax_output[:, 1]
                         h_rep = output
 
-                t = batch_raw['t']
-                y = batch_raw['y']
-                e = transformed_outputs['t']
-                y_ = torch.squeeze(transformed_outputs['y'])
+                t = batch_raw['t'].to(device)
+                y = batch_raw['y'].to(device)
+                e = transformed_outputs['t'].to(device)
+                y_ = torch.squeeze(transformed_outputs['y']).to(device)
                 h_rep_norm = h_rep / safe_sqrt(torch.sum(h_rep ** 2, dim=1, keepdim=True))
+                h_rep_norm = h_rep_norm.to(device)
+
 
                 # Use CFR loss function
-                batch_loss, batch_items = CFR_loss(t, e, y, y_, h_rep_norm, imbalance_loss_weight, return_items=True)
-
-                # Debugging print statements
-                print(f"epoch: {epoch}, batch_ix: {batch_ix}, value: {batch_loss}")
-
-                if torch.isnan(batch_loss):
-                    raise ValueError("NaN encountered in batch_loss")
+                batch_loss, batch_items = CFR_loss(t, e, y, y_, h_rep_norm,
+                                                   imbalance_loss_weight, return_items=True,
+                                                   eps=train_config["eps"])
 
                 batch_loss.backward()
                 # Gradient clipping
                 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
                 opt.step()
+                # print epoch number and batch loss
+                #print(f"Epoch: {epoch}, Batch: {batch_ix}, Loss: {batch_loss.item()}")
                 wandb.log({f"Train: counterfactual loss": batch_loss.item()})
 
             model.eval()
             with torch.no_grad():
                 val_loss = 0
-                for batch_raw, batch_binned in val_dataloader:
-                    batch = {k: v.to(device) for k, v in batch_binned.items()}
-                    outputs = model(batch, mask=train_config["dag_attention_mask"])
+                val_auc = 0
+                for batch_raw_val, batch_binned_val in val_dataloader:
+                    batch_val = {k: v.to(device) for k, v in batch_binned_val.items()}
+                    outputs_val = model(batch_val, mask=train_config["dag_attention_mask"])
 
-                    transformed_outputs = {}
-                    for output_name, output in outputs.items():
+                    transformed_outputs_val = {}
+                    for output_name, output in outputs_val.items():
                         softmax_output = torch.softmax(output, dim=1)
                         if output_name == 'y':
                             pred_y = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1,
                                                keepdim=True)
-                            transformed_outputs[output_name] = pred_y
+                            transformed_outputs_val[output_name] = pred_y
                         else:
-                            transformed_outputs[output_name] = softmax_output[:, 1]
+                            transformed_outputs_val[output_name] = softmax_output[:, 1]
                             h_rep = output
 
-                    t = batch_raw['t']
-                    y = batch_raw['y']
-                    e = transformed_outputs['t']
-                    y_ = torch.squeeze(transformed_outputs['y'])
+                    t = batch_raw_val['t'].to(device)
+                    y = batch_raw_val['y'].to(device)
+                    e = transformed_outputs_val['t'].to(device)
+                    y_ = torch.squeeze(transformed_outputs_val['y']).to(device)
                     h_rep_norm = h_rep / safe_sqrt(torch.sum(h_rep ** 2, dim=1, keepdim=True))
+                    h_rep_norm = h_rep_norm.to(device)
+
+                    #if len(set(t.detach().numpy())) > 1:
+                    #    auc = roc_auc_score(t, e)
+                        #print(f"The val batch AUC is: {auc}")
+
+                    #val_auc += auc.item()
+                    #val_auc_avg = val_auc / len(val_dataloader)
+
 
                     # Use CFR loss function
                     val_batch_loss, val_batch_items = CFR_loss(t, e, y, y_, h_rep_norm, imbalance_loss_weight,
-                                                               return_items=True)
+                                                               return_items=True, eps=train_config["eps"])
 
                     val_loss += val_batch_loss.item()
-                wandb.log({f"Val: counterfactual loss": val_loss / len(batch)})
+                    val_loss_avg = val_loss / len(val_dataloader)
+            #wandb.log({f"Val: AUC": val_auc_avg})
+            wandb.log({f"Val: counterfactual loss": val_loss_avg})
 
-            model.train()
+            predictions_val, metrics_val, _ = model.predict(model,
+                                            data_name,
+                                            val_data,
+                                            pseudo_ate_data,
+                                            sample_id,
+                                            dag=dag,
+                                            train_config=train_config,
+                                            random_seed=random_seed,
+                                            prefix="Val")
 
-        return model
+            for metric_name, metric_value in metrics_val.items():
+                print(f"Epoch: {epoch}: {metric_name}: {metric_value}")
+
+            rmse_cfcv = metrics_val.get("Val: RMSE for CFCV", float('inf'))
+            rmse_ipw = metrics_val.get("Val: RMSE for IPW", float('inf'))
+            
+            if "lalonde" in data_name:
+                wandb.log(
+                calculate_val_metrics(
+                    predictions_val,
+                    pseudo_ate_data,
+                    sample_id,
+                    prefix="Val",
+                    prop_score_threshold=train_config["prop_score_threshold"]
+                ))
+            elif data_name == "ihdp":
+                wandb.log(
+                calculate_val_metrics_ihdp(
+                    predictions_val,
+                    pseudo_ate_data,
+                    prefix="Val",
+                    prop_score_threshold=train_config["prop_score_threshold"]
+                ))
+            elif data_name == "acic":
+                wandb.log(
+                calculate_val_metrics_acic(
+                    predictions_val,
+                    pseudo_ate_data,
+                    prefix="Val",
+                    prop_score_threshold=train_config["prop_score_threshold"]
+                ))
+
+
+        print(f"RMSE for CFCV: {rmse_cfcv}")
+        print(f"RMSE for IPW: {rmse_ipw}")
+        return model, rmse_cfcv, rmse_ipw
 
     @staticmethod
     def predict(model,
+                data_name,
                 data,
+                pseudo_ate_data,
+                sample_id,
                 dag,
                 train_config: Dict,
-                mask: bool,
-                random_seed: int):
+                random_seed: int,
+                prefix: str = "Test"):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(f'Using device: {device}')
         batch_size = train_config["batch_size"]
         model = model.to(device)
 
-        data = data[dag['nodes']]
-        dataset = CausalDataset(data, dag, random_seed)
+        data_nodes = data[dag['nodes']]
+        dataset = CausalDataset(data_nodes, dag, random_seed)
         dataloader = DataLoader(
             dataset,
             batch_size=batch_size,
-            shuffle=True,
+            shuffle=False,
             collate_fn=dataset.collate_fn,
         )
 
-        data_A0 = replace_column_values(data, "t", 0)
+        data_A0 = replace_column_values(data_nodes, "t", 0)
         dataset_A0 = CausalDataset(data_A0, dag, random_seed)
         dataloader_A0 = DataLoader(
             dataset_A0,
             batch_size=batch_size,
-            shuffle=True,
+            shuffle=False,
             collate_fn=dataset.collate_fn,
         )
 
-        data_A1 = replace_column_values(data, "t", 1)
+        data_A1 = replace_column_values(data_nodes, "t", 1)
         dataset_A1 = CausalDataset(data_A1, dag, random_seed)
         dataloader_A1 = DataLoader(
             dataset_A1,
             batch_size=batch_size,
-            shuffle=True,
+            shuffle=False,
             collate_fn=dataset.collate_fn,
         )
 
-        model.eval()
-
-        predictions_t = predict_function(model, dataset, dataloader, mask)
-        predictions_y0 = predict_function(model, dataset_A0, dataloader_A0, mask)
-        predictions_y0 = predictions_y0.rename(columns={"pred_y": "pred_y_A0"})
-        predictions_y1 = predict_function(model, dataset_A1, dataloader_A1, mask)
-        predictions_y1 = predictions_y1.rename(columns={"pred_y": "pred_y_A1"})
+        predictions_t = predict_function(model, train_config, dataloader)['t']
+        # convert predictions_t to dataframe with column name t_prob
+        predictions_t = pd.DataFrame(predictions_t, columns=['t_prob'])
+        predictions_y0 = predict_function(model, train_config, dataloader_A0)['y']
+        # convert predictions_y0 to dataframe with column name pred_y_A0
+        predictions_y0 = pd.DataFrame(predictions_y0, columns=['pred_y_A0'])
+        predictions_y1 = predict_function(model, train_config, dataloader_A1)['y']
+        # convert predictions_y1 to dataframe with column name pred_y_A1
+        predictions_y1 = pd.DataFrame(predictions_y1, columns=['pred_y_A1'])
 
         final_predictions = pd.concat(
             [data,  predictions_t["t_prob"], predictions_y0["pred_y_A0"], predictions_y1["pred_y_A1"]],
             axis=1,
         )
 
-        return final_predictions
+        if "lalonde" in data_name:
+            metrics_val = calculate_val_metrics(
+                                            final_predictions,
+                                            pseudo_ate_data,
+                                            sample_id,
+                                            prefix="Val",
+                                            prop_score_threshold=train_config["prop_score_threshold"])
+
+            metrics_test = calculate_test_metrics(final_predictions,
+                                                  prop_score_threshold=train_config["prop_score_threshold"],
+                                                  prefix=prefix)
+        elif data_name == "ihdp":
+            metrics_val = calculate_val_metrics_ihdp(
+                                            final_predictions,
+                                            pseudo_ate_data,
+                                            prefix="Val",
+                                            prop_score_threshold=train_config["prop_score_threshold"])
+
+            metrics_test = calculate_test_metrics_ihdp(final_predictions,
+                                                       data['ite'],
+                                                  prop_score_threshold=train_config["prop_score_threshold"],
+                                                  prefix=prefix)
+
+        elif data_name == "acic":
+            metrics_val = calculate_val_metrics_acic(
+                                            final_predictions,
+                                            pseudo_ate_data,
+                                            prefix="Val",
+                                            prop_score_threshold=train_config["prop_score_threshold"])
+
+            metrics_test = calculate_test_metrics_acic(final_predictions,
+                                                       data['mu1']-data['mu0'],
+                                                  prop_score_threshold=train_config["prop_score_threshold"],
+                                                  prefix=prefix)
+
+
+
+
+        return final_predictions, metrics_val, metrics_test
 
 
 
@@ -295,35 +387,34 @@ def pdist2sq(X, Y):
     return D
 
 
-def safe_sqrt(X, eps=1e-4):
-    """ Computes the element-wise square root of a matrix with numerical stability """
-    return torch.sqrt(X + eps)
+def safe_sqrt(x, lbound=1e-5):
+    ''' Numerically safe version of PyTorch sqrt '''
+    return torch.sqrt(torch.clamp(x, min=lbound))
 
-def ensure_non_empty(X, eps=1e-12):
+def ensure_non_empty(X, eps=1e-6):
     """ Ensures that a tensor is non-empty by adding a small epsilon tensor if necessary """
     if X.size(0) == 0:
         X = torch.full((1, X.size(1)), eps, device=X.device)
     return X
 
-def wasserstein(X, t, p, lam=1, its=50, backpropT=False):
+def wasserstein(X, t, p, lam=1, its=50, backpropT=False, eps=1e-6):
     """ Returns the Wasserstein distance between treatment groups """
     Xt = X[t == 1]
     Xc = X[t == 0]
     nc = float(Xc.size(0))
     nt = float(Xt.size(0))
-    eps = 1e-12  # Small value to avoid division by zero
 
     # Add eps to Xt or Xc if they are empty
     Xt = ensure_non_empty(Xt, eps)
     Xc = ensure_non_empty(Xc, eps)
 
     # Compute distance matrix
-    M = safe_sqrt(pdist2sq(Xt, Xc))
+    M = safe_sqrt(pdist2sq(Xt, Xc), eps)
 
     # Estimate lambda and delta
     M_mean = torch.mean(M)
     # Calculate the dropout probability and cap it between 0 and 1
-    dropout_prob = np.clip(10 / (nc * nt + 0.01), 0.0, 1.0)
+    dropout_prob = np.clip(10 / (nc * nt + eps), 0.0, 1.0)
     # Apply dropout with the capped probability
     M_drop = torch.nn.functional.dropout(M, p=dropout_prob)
 
@@ -332,18 +423,18 @@ def wasserstein(X, t, p, lam=1, its=50, backpropT=False):
 
     # Compute new distance matrix
     Mt = M
-    row = delta * torch.ones((1, M.size(1)))
-    col = torch.cat([delta * torch.ones((M.size(0), 1)), torch.zeros((1, 1))], dim=0)
+    row = delta * torch.ones((1, M.size(1))).to(X.device)
+    col = torch.cat([delta * torch.ones((M.size(0), 1)).to(X.device), torch.zeros((1, 1)).to(X.device)], dim=0)
     Mt = torch.cat([M, row], dim=0)
     Mt = torch.cat([Mt, col], dim=1)
 
     # Compute marginal vectors
-    a = torch.cat([p * torch.ones((Xt.size(0), 1)) / (nt+0.01), (1 - p) * torch.ones((1, 1))], dim=0)
-    b = torch.cat([(1 - p) * torch.ones((Xc.size(0), 1)) / nc, p * torch.ones((1, 1))], dim=0)
+    a = torch.cat([p * torch.ones((Xt.size(0), 1)).to(X.device) / (nt+0.01), (1 - p) * torch.ones((1, 1)).to(X.device)], dim=0)
+    b = torch.cat([(1 - p) * torch.ones((Xc.size(0), 1)).to(X.device) / nc, p * torch.ones((1, 1)).to(X.device)], dim=0)
 
     # Compute kernel matrix
     Mlam = eff_lam * Mt
-    K = torch.exp(-Mlam) + 1e-6  # added constant to avoid nan
+    K = torch.exp(-Mlam) + eps
     U = K * Mt
     ainvK = K / a
 
@@ -367,6 +458,7 @@ def CFR_loss(t, e, y, y_, h_rep_norm,
              alpha: float,
              wass_iterations: int=10,
              wass_lambda: float=10.0,
+             eps: float=1e-6,
              wass_bpt: bool=True,
              return_items: bool=True):
     """
@@ -390,6 +482,8 @@ def CFR_loss(t, e, y, y_, h_rep_norm,
             Regularization parameter for the Wasserstein distance.
         wass_bpt : bool
             Flag indicating whether to backpropagate through the transport matrix in the Wasserstein distance calculation.
+        eps: float
+            Small value to ensure numerical stability.
         alpha : float
             Weighting factor for the imbalance error term.
 
@@ -417,6 +511,11 @@ def CFR_loss(t, e, y, y_, h_rep_norm,
         tot_error = CFR_loss(t, e, y, y_, h_rep_norm, wass_iterations=50, wass_lambda=1, wass_bpt=False, alpha=0.1)
         """
     ''' Compute sample reweighting '''
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    t = t.to(device)
+    e = e.to(device)
+    y = y.to(device)
+    y_ = y_.to(device)
     w_t = t * (1 - e) / e
     w_c = (1 - t) * e / (1 - e)
     sample_weight = torch.clamp(w_t + w_c, min=0.0, max=100.0)
@@ -424,8 +523,10 @@ def CFR_loss(t, e, y, y_, h_rep_norm,
     risk = torch.mean(sample_weight * torch.sqrt(torch.abs(y-y_)))
 
     p_ipm = 0.5
+    p_ipm = torch.tensor(p_ipm).to(device)
+    ''' Compute imbalance error '''
     imb_dist, imb_mat = wasserstein(h_rep_norm, t, p_ipm,
-                                    its=wass_iterations, lam=wass_lambda, backpropT=wass_bpt)
+                                    its=wass_iterations, lam=wass_lambda, backpropT=wass_bpt, eps=eps)
     imb_error = alpha * imb_dist
 
     ''' Total error '''

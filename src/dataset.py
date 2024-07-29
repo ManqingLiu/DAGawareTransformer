@@ -1,5 +1,3 @@
-from argparse import ArgumentParser
-import json
 from typing import Dict, Any
 
 import numpy as np
@@ -7,8 +5,6 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 from sklearn.preprocessing import KBinsDiscretizer
-from sklearn.model_selection import train_test_split
-
 from src.data.ate.data_class import PVTrainDataSet
 from src.data.ate import (
     generate_train_data_ate,
@@ -215,56 +211,3 @@ class PredictionTransformer:
         ).view(10, n_sample, 1)
 
         return transformed_predictions
-
-    def transform_frontdoor(self, predictions):
-        # m_predictions is the 3rd and 4th columns of the predictions
-        m_predictions = predictions[:, 2:4]
-        y_predictions = predictions[:, 4:]
-
-        m_prob = m_predictions[:, 1]  # Probability of m=1
-        if y_predictions.shape[1] == 2:
-            y_expected_value = y_predictions[:, 1]
-        elif y_predictions.shape[1] > 2:
-            y_expected_value = np.sum(y_predictions * self.bin_midpoints["Y"], axis=1)
-
-        transformed_predictions = pd.DataFrame(
-            {"m_prob": m_prob, "pred_y": y_expected_value}
-        )
-
-        return transformed_predictions
-
-
-if __name__ == "__main__":
-    parser = ArgumentParser()
-    parser.add_argument("--dag", type=str, required=True)
-    parser.add_argument("--data_file", type=str, required=True)
-    parser.add_argument("--train_output_file", type=str, required=True)
-    parser.add_argument("--val_output_file", type=str, required=True)
-    parser.add_argument("--test_output_file", type=str, required=True)
-
-    args = parser.parse_args()
-    data = pd.read_csv(args.data_file)
-
-    # cleaning
-    # rename re78 as y
-    data = data.rename(columns={"re78": "y"})
-    # rename treatment as t
-    data = data.rename(columns={"treat": "t"})
-
-    with open(args.dag) as f:
-        print(f"Loading dag file from {args.dag}")
-        dag = json.load(f)
-
-    data = data[dag["nodes"]]
-    # split to train and holdout set
-    train_data, temp_data = train_test_split(data, test_size=0.7, random_state=42)
-    val_data, test_data = train_test_split(temp_data, test_size=0.5, random_state=42)
-
-    train_data.to_csv(args.train_output_file, index=False)
-    val_data.to_csv(args.val_output_file, index=False)
-    test_data.to_csv(args.test_output_file, index=False)
-
-    # print average t in train_data
-    print(f"Average t in train data: {train_data['t'].mean()}")
-    # print average t in val_data
-    print(f"Average t in val data: {val_data['t'].mean()}")

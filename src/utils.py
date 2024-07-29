@@ -5,11 +5,15 @@ import pandas as pd
 import matplotlib
 import warnings
 import matplotlib.pyplot as plt
+import zipfile
+from urllib.parse import urlparse
 from scipy.stats import gaussian_kde
 
 from argparse import ArgumentParser
 import pandas as pd
+from pandas import DataFrame as pdDataFrame, Series as pdSeries
 import numpy as np
+import requests
 
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -165,8 +169,8 @@ def standardization(outcome_hat_A1, outcome_hat_A0):
 
 
 def rmse(value1, value2):
-    squared_difference = (value1 - value2) ** 2
-    root_mean_square_error = math.sqrt(squared_difference)
+    squared_difference = np.mean((value1 - value2) ** 2)
+    root_mean_square_error = np.sqrt(squared_difference)
     return root_mean_square_error
 
 def relative_bias(true_value, estimated_value):
@@ -222,14 +226,24 @@ def plot_attention_heatmap(attention_weights, layer_idx=0, head_idx=0, node_name
     plt.colorbar(im)
 
 
-def log_results(config, results_file):
-    # Extract the "training" and "model" parts of the config
-    training_config = config["training"]
-    model_config = config["model"]
+def log_results(estimator: str,
+                orig_config_path: str,
+                new_config: Dict[str, Any]) -> Dict[str, Any]:
+    # Load the original config from the JSON file
+    with open(orig_config_path, 'r') as file:
+        orig_config = json.load(file)
 
-    # Log the "training" and "model" configs
-    with open(results_file, 'w') as f:
-        json.dump({"training": training_config, "model": model_config}, f)
+    # Ensure orig_config is a dictionary
+    if not isinstance(orig_config, dict):
+        raise TypeError("The original config file does not contain a dictionary")
+
+    # Replace the "training" and "model" parts of the config
+    orig_config[estimator]["training"] = new_config[estimator]["training"]
+    orig_config[estimator]["model"] = new_config[estimator]["model"]
+
+    # Optionally, save the updated config back to the JSON file
+    with open(orig_config_path, 'w') as file:
+        json.dump(orig_config, file, indent=4)
 
 def log_results_evaluate(results, config, results_file):
     # Check if the file exists
@@ -500,26 +514,95 @@ def plot_propensity_score_distribution(
     ax.set_title(f"{x_type} Distribution, epoch:{epoch}")
     return ax
 
-def predict_function(model, dataset, dataloader, mask):
+def predict_function(model, train_config, dataloader):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    predictions = []
+    # Initialize an empty dictionary to store results
+    bin_left_edges = {k: torch.tensor(v[:-1], dtype=torch.float32).to(device) for k, v in
+                      dataloader.dataset.bin_edges.items()}
+    all_results = {output_name: [] for output_name in model.output_nodes.keys()}
     with torch.no_grad():
-        for _, batch in dataloader:
-            batch = {k: v.to(device) for k, v in batch.items()}
-            outputs = model(batch, mask=mask)
-            batch_predictions = []
-            for output_name in outputs.keys():
-                # Detach the outputs and move them to cpu
-                output = outputs[output_name].cpu().numpy()
-                output = np.exp(output) / np.sum(np.exp(output), axis=1, keepdims=True)
-                # Append the reshaped output to batch_predictions
-                batch_predictions.append(output)
-            # concatenate the batch predictions along the second axis
-            batch_predictions = np.concatenate(batch_predictions, axis=1)
-            predictions.append(batch_predictions)
+        for batch_raw, batch_binned in dataloader:
+            batch = {k: v.to(device) for k, v in batch_binned.items()}
+            outputs = model(batch, mask=train_config["dag_attention_mask"])
 
-    # assign column names to the predictions_df
-    predictions = np.concatenate(predictions, axis=0)
-    prediction_transformer = PredictionTransformer(dataset.bin_edges)
-    transformed_predictions = prediction_transformer.transform(predictions)
-    return transformed_predictions
+            transformed_outputs = {}
+            for output_name, output in outputs.items():
+                softmax_output = torch.softmax(output, dim=1)
+                if output_name == 'y':
+                    pred_y = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1,
+                                       keepdim=True)
+                    transformed_outputs[output_name] = pred_y
+                else:
+                    transformed_outputs[output_name] = softmax_output[:, 1].unsqueeze(1)
+
+                all_results[output_name].append(transformed_outputs[output_name].cpu())
+
+    # Concatenate results for each output name across all batches
+    for output_name in all_results:
+        if all_results[output_name]:  # Check if the list is not empty
+            all_results[output_name] = torch.cat(all_results[output_name], dim=0)
+        else:
+            all_results[output_name] = torch.tensor([])
+    return all_results
+
+
+DATA_FOLDER = 'data/ihdp'
+
+def download_file(url, file_path):
+    # open in binary mode
+    with open(file_path, "wb") as f:
+        # get request
+        response = requests.get(url)
+        # write to file
+        f.write(response.content)
+def download_dataset(url, dataset_name, dataroot=None, filename=None):
+    if dataroot is None:
+        dataroot = DATA_FOLDER
+    if filename is None:
+        filename = os.path.basename(urlparse(url).path)
+    file_path = os.path.join(dataroot, filename)
+    if os.path.isfile(file_path):
+        print('{} dataset already exists at {}'.format(dataset_name, file_path))
+    else:
+        print('Downloading {} dataset to {} ...'.format(dataset_name, file_path), end=' ')
+        download_file(url, file_path)
+        print('DONE')
+    return file_path
+
+def unzip(path_to_zip_file, unzip_dir=None):
+    unzip_path = os.path.splitext(path_to_zip_file)[0]
+    if os.path.isfile(unzip_path):
+        print('File already unzipped at', unzip_path)
+        return unzip_path
+
+    print('Unzipping {} to {} ...'.format(path_to_zip_file, unzip_path), end=' ')
+    if unzip_dir is None:
+        unzip_dir = os.path.dirname(path_to_zip_file)
+    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+        zip_ref.extractall(unzip_dir)
+    print('DONE')
+    return unzip_path
+
+
+def robust_lookup(df, indexer):
+    """
+    Robust way to apply pandas lookup when indices are not unique
+
+    Args:
+        df (pdDataFrame):
+        indexer (pdSeries): A Series whose index is either same or a subset of `df.index`
+                            and whose values are values from `df.columns`.
+                            If `a.index` contains values not in `df.index`
+                            they will have NaN values.
+
+    Returns:
+        pdSeries: a vector where (logically) `extracted[i] = df.loc[indexer.index[i], indexer[i]]`.
+            In most cases, when `indexer.index == df.index` this translates to
+            `extracted[i] = df.loc[i, indexer[i]]`
+    """
+    # Convert the index into
+    idx, col = indexer.factorize()  # convert text labels into integers
+    extracted = df.reindex(col, axis=1).reindex(indexer.index, axis=0)  # make sure the columns exist and the indeces are the same
+    extracted = extracted.to_numpy()[range(len(idx)), idx]  # numpy accesses by location, not by named index
+    extracted = pdSeries(extracted, index=indexer.index)
+    return extracted

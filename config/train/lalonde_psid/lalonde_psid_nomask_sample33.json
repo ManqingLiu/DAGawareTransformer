@@ -1,0 +1,56 @@
+{
+    "filepaths": {
+        "dag": "config/dag/lalonde_psid_dag.json",
+        "config": "config/train/lalonde_psid/lalonde_psid_sample33.json",
+        "data_file": "data/lalonde/ldw_psid/ldw_psid.csv",
+        "data_train_file": "data/lalonde/ldw_psid/sample33/train_data_33.csv",
+        "data_val_file": "data/lalonde/ldw_psid/sample33/val_data_33.csv",
+        "data_test_file": "data/lalonde/ldw_psid/sample33/test_data_33.csv",
+        "pseudo_ate_file": "src/train/lalonde/lalonde_psid/aipw_grf_pseudo_ate.csv",
+        "output_file": "experiments/predict/lalonde_psid/predictions_psid.csv",
+        "result_file_ipw": "experiments/results/lalonde_psid/lalonde_psid_best_params_ipw_nomask_sample33.json",
+        "result_file_cfcv": "experiments/results/lalonde_psid/lalonde_psid_best_params_cfcv_nomask_sample33.json"
+    },
+    "cfcv": {
+        "training": {
+            "num_epochs": 100,
+            "batch_size": 64,
+            "learning_rate": 0.0001,
+            "weight_decay": 1e-06,
+            "project_tag": "lalonde_psid",
+            "dag_attention_mask": "False",
+            "imbalance_loss_weight": 0.1,
+            "prop_score_threshold": 0.1,
+            "eps": 1e-06,
+            "time_limit": 18000
+        },
+        "model": {
+            "num_layers": 16,
+            "dropout_rate": 0,
+            "embedding_dim": 128,
+            "num_heads": 64
+        }
+    },
+    "ipw": {
+        "training": {
+            "num_epochs": 100,
+            "batch_size": 32,
+            "learning_rate": 0.0001,
+            "weight_decay": 0,
+            "project_tag": "lalonde_psid",
+            "dag_attention_mask": "False",
+            "imbalance_loss_weight": 100,
+            "prop_score_threshold": 0,
+            "eps": 1e-08,
+            "time_limit": 18000
+        },
+        "model": {
+            "num_layers": 2,
+            "dropout_rate": 0.1,
+            "embedding_dim": 64,
+            "num_heads": 16
+        }
+    },
+    "random_seed": 42,
+    "sample_id": 33
+}

@@ -1,0 +1,26 @@
+[
+    {
+        "results": {
+            "ATE_true": -7010.028426663955,
+            "ATE_IPTW": -8382.848452173099,
+            "RMSE_IPTW": 1372.8200255091442,
+            "ATE_AIPW": -8384.517294648233,
+            "RMSE_AIPW": 1374.488867984278
+        },
+        "config": {
+            "training": {
+                "num_epochs": 10,
+                "batch_size": 128,
+                "learning_rate": 1e-05,
+                "weight_decay": 0,
+                "project_tag": "lalonde_cps"
+            },
+            "model": {
+                "num_layers": 2,
+                "dropout_rate": 0.1,
+                "embedding_dim": 128,
+                "num_heads": 64
+            }
+        }
+    }
+]

@@ -1,0 +1,10 @@
+{
+    "Test: predicted CATE for standardization: ": 0.0,
+    "Test: NRMSE for standardization": 1.0,
+    "Test: predicted CATE for naive IPW": 1.1500145722028772,
+    "Test: NRMSE for naive IPW": 6.6116848598897855,
+    "Test: predicted CATE for IPW": -1.8907460763458812,
+    "Test: NRMSE for IPW": 3.4149176736873055,
+    "Test: predicted CATE for AIPW": -1.9537519326445463,
+    "Test: NRMSE for AIPW": 3.6353324008044443
+}

@@ -1,6 +1,7 @@
 # source the functions provided in part 1
 source("https://github.com/xuyiqing/lalonde/blob/main/tutorial/functions.R?raw=TRUE")
 
+setwd("/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS")
 load("data/lalonde/lalonde.RData")
 ldw_co$treat <- 1
 ldw_cps.plus <- rbind.data.frame(ldw_cps, ldw_co)
@@ -91,4 +92,5 @@ out5$rmse = rmse(rep(1794.34, nrow(out5)), out5$Estimate)
 
 
 write.csv(ldw_psid, "data/lalonde/ldw_psid.csv", row.names = FALSE)
+write.csv(ldw_cps, "data/lalonde/ldw_cps.csv", row.names = FALSE)
 names(ldw_psid)

@@ -1,27 +1,56 @@
 {
-  "filepaths": {
-    "dag": "config/dag/lalonde_psid_dag.json",
-    "config": "config/train/lalonde_psid.json",
-    "data_train_file": "data/lalonde/ldw_psid/lalonde_psid_train.csv",
-    "data_val_file": "data/lalonde/ldw_psid/lalonde_psid_val.csv",
-    "data_test_file": "data/lalonde/ldw_psid/lalonde_psid_test.csv",
-    "output_file": "experiments/predict/lalonde_psid/predictions_psid.csv",
-    "result_file": "config/train/lalonde_psid_best_params.json"
-  },
-  "training": {
-    "num_epochs": 20,
-    "batch_size": 32,
-    "learning_rate": 1e-4,
-    "weight_decay": 1e-4,
-    "project_tag": "lalonde_psid",
-    "dag_attention_mask": "True",
-    "imbalance_loss_weight": 0.01
-  },
-  "model": {
-    "num_layers": 2,
-    "dropout_rate": 0.3,
-    "embedding_dim": 128,
-    "num_heads": 4
-  },
-  "random_seed": 42
+    "filepaths": {
+        "dag": "config/dag/lalonde_psid_dag.json",
+        "config": "config/train/lalonde_psid/lalonde_psid_sample42.json",
+        "data_file": "data/lalonde/ldw_psid/ldw_psid.csv",
+        "data_train_file": "data/lalonde/ldw_psid/sample42/train_data_42.csv",
+        "data_val_file": "data/lalonde/ldw_psid/sample42/val_data_42.csv",
+        "data_test_file": "data/lalonde/ldw_psid/sample42/test_data_42.csv",
+        "pseudo_ate_file": "src/train/lalonde/lalonde_psid/aipw_grf_pseudo_ate.csv",
+        "output_file": "experiments/predict/lalonde_psid/predictions_psid.csv",
+        "result_file_ipw": "experiments/results/lalonde_psid/lalonde_psid_best_params_ipw_sample42.json",
+        "result_file_cfcv": "experiments/results/lalonde_psid/lalonde_psid_best_params_cfcv_sample42.json"
+    },
+    "cfcv": {
+        "training": {
+            "num_epochs": 8,
+            "batch_size": 64,
+            "learning_rate": 1e-06,
+            "weight_decay": 1e-06,
+            "project_tag": "lalonde_psid",
+            "dag_attention_mask": "True",
+            "imbalance_loss_weight": 0.5,
+            "prop_score_threshold": 0.1,
+            "eps": 1e-10,
+            "time_limit": 36000
+        },
+        "model": {
+            "num_layers": 4,
+            "dropout_rate": 0,
+            "embedding_dim": 128,
+            "num_heads": 8
+        }
+    },
+    "ipw": {
+        "training": {
+            "num_epochs": 500,
+            "batch_size": 64,
+            "learning_rate": 1e-04,
+            "weight_decay": 1e-06,
+            "project_tag": "lalonde_psid",
+            "dag_attention_mask": "True",
+            "imbalance_loss_weight": 50,
+            "prop_score_threshold": 0,
+            "eps": 1e-08,
+            "time_limit": 36000
+        },
+        "model": {
+            "num_layers": 4,
+            "dropout_rate": 0.1,
+            "embedding_dim": 512,
+            "num_heads": 8
+        }
+    },
+    "random_seed": 42,
+    "sample_id": 42
 }

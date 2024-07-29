@@ -1,0 +1,56 @@
+[
+    {
+        "results": {
+            "ATE_AIPW_baseline": -3237.429920063381
+        },
+        "config": null
+    },
+    {
+        "results": {
+            "ATE_true": -7084.696294968485,
+            "ATE_IPTW": -10149.13710092888,
+            "RMSE_IPTW": 3064.4408059603948,
+            "ATE_AIPW": -10149.702128069375,
+            "RMSE_AIPW": 3065.0058331008904
+        },
+        "config": {
+            "training": {
+                "num_epochs": 10,
+                "batch_size": 512,
+                "learning_rate": 0.001,
+                "weight_decay": 0,
+                "project_tag": "lalonde_cps"
+            },
+            "model": {
+                "num_layers": 3,
+                "dropout_rate": 0,
+                "embedding_dim": 128,
+                "num_heads": 16
+            }
+        }
+    },
+    {
+        "results": {
+            "ATE_true": -7084.696294968485,
+            "ATE_IPTW": -9448.269894879983,
+            "RMSE_IPTW": 2363.5735999114977,
+            "ATE_AIPW": -9449.50070194339,
+            "RMSE_AIPW": 2364.8044069749058
+        },
+        "config": {
+            "training": {
+                "num_epochs": 1000,
+                "batch_size": 64,
+                "learning_rate": 1e-05,
+                "weight_decay": 0.0002,
+                "project_tag": "lalonde_cps"
+            },
+            "model": {
+                "num_layers": 3,
+                "dropout_rate": 0.2,
+                "embedding_dim": 128,
+                "num_heads": 64
+            }
+        }
+    }
+]

@@ -2,11 +2,11 @@
 #SBATCH --job-name=myjob
 #SBATCH --output=experiments/results/output_%j.txt
 #SBATCH --error=experiments/results/error_%j.txt
-#SBATCH -c 15
-#SBATCH -t 1:00:00
-#SBATCH -p gpu_beam
-#SBATCH --gres=gpu:1
-#SBATCH --mem=10G
+#SBATCH -t 10:00:00
+#SBATCH -c 20
+#SBATCH -p gpu_quad
+#SBATCH --gres=gpu:rtx8000:2
+#SBATCH --mem=20G
 # You can change hostname to any command you would like to run
 hostname
 
@@ -33,13 +33,23 @@ module load python/3.10.11
 #pip3 install matplotlib seaborn
 #pip3 install doubleml
 #pip3 install pqdm
-#python3 summary_statistics_realcause.py
-#python3 experiments/experiment_g_formula_fullsample_AIPW.py
-#python3 experiments/train/train_cps_sample0.py
-#python3 experiments/predict/predict_cps_sample0.py
-python3 experiments/tuning/fine_tune_psid.py
-#python3 src/data/DGP_U10.py
-#python3 src/models/logistic_regression.py
+#python3 experiments/tuning/fine_tune_psid.py \
+#        --config config/train/lalonde_psid.json
+#for i in {0..49}
+#do
+#  python3 experiments/tuning/fine_tune_psid.py \
+#          --config config/train/lalonde_psid/lalonde_psid_sample${i}.json
+#done
+#python3 experiments/tuning/fine_tune_psid.py --config $1
+for i in {0..49}
+do
+python3 src/experiment.py \
+        --config config/train/lalonde_psid/lalonde_psid_nomask_sample${i}.json \
+        --estimator ipw \
+        --data_name lalonde
+done
+#python3 experiments/tuning/fine_tune_psid_ipw.py \
+#        --config config/train/lalonde_psid.json
 #for i in {0..99}
 #do
 #  python3 src/doubly_robust_baseline.py \
@@ -123,8 +133,8 @@ python3 experiments/tuning/fine_tune_psid.py
 #        --results \
 #        experiments/results/lalonde_psid/sample${i}/lalonde_psid_nomask.json
 #done
-python3 src/evaluate_final.py \
-        --data_name \
-        lalonde_psid \
-        --results \
-        experiments/results/lalonde_psid/lalonde_psid.json
+#python3 src/evaluate_final.py \
+#        --data_name \
+#        lalonde_psid \
+#        --results \
+#        experiments/results/lalonde_psid/lalonde_psid.json

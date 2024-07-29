@@ -6,7 +6,7 @@
 #SBATCH -t 1:00:00
 #SBATCH -p gpu_beam
 #SBATCH --gres=gpu:1
-#SBATCH --mem=10G
+#SBATCH --mem=5G
 # You can change hostname to any command you would like to run
 hostname
 
@@ -34,16 +34,23 @@ module load python/3.10.11
 #pip3 install doubleml
 #pip3 install pqdm
 #pip3 install tensorboard
+#pip3 install tensorflow
+#pip3 install --upgrade tensorboard
 
-
+python3 src/experiment.py \
+        --config config/train/acic.json \
+        --estimator \
+        cfcv \
+        --data_name \
+        acic
 #python3 src/models/NMMR/NMMR_experiments.py
-python3 experiments/experiment_proximal.py \
-        --dag \
-        config/dag/proximal_dag.json \
-        --config \
-        config/train/proximal/nmmr_u_transformer_n1000.json \
-        --results_dir \
-        experiments/results/proximal
+#python3 experiments/experiment_proximal.py \
+#        --dag \
+#       config/dag/proximal_dag.json \
+#        --config \
+#        config/train/proximal/nmmr_u_transformer_n1000.json \
+#        --results_dir \
+#        experiments/results/proximal
 
 #python3 main.py
 #python3 summary_statistics_realcause.py

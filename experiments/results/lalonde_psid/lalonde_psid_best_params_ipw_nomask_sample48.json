@@ -1,0 +1,8 @@
+{
+    "Test: predicted ATE for standardization: ": 0.0,
+    "Test: NRMSE for standardization": 1.0,
+    "Test: predicted ATE for IPW": -17920.558793851713,
+    "Test: NRMSE for IPW": 10.987270413551341,
+    "Test: predicted ATE for AIPW": -890.958178588063,
+    "Test: NRMSE for AIPW": 1.4965381023596773
+}

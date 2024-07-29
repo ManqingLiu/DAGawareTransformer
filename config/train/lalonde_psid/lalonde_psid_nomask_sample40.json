@@ -1,0 +1,56 @@
+{
+    "filepaths": {
+        "dag": "config/dag/lalonde_psid_dag.json",
+        "config": "config/train/lalonde_psid/lalonde_psid_sample40.json",
+        "data_file": "data/lalonde/ldw_psid/ldw_psid.csv",
+        "data_train_file": "data/lalonde/ldw_psid/sample40/train_data_40.csv",
+        "data_val_file": "data/lalonde/ldw_psid/sample40/val_data_40.csv",
+        "data_test_file": "data/lalonde/ldw_psid/sample40/test_data_40.csv",
+        "pseudo_ate_file": "src/train/lalonde/lalonde_psid/aipw_grf_pseudo_ate.csv",
+        "output_file": "experiments/predict/lalonde_psid/predictions_psid.csv",
+        "result_file_ipw": "experiments/results/lalonde_psid/lalonde_psid_best_params_ipw_nomask_sample40.json",
+        "result_file_cfcv": "experiments/results/lalonde_psid/lalonde_psid_best_params_cfcv_nomask_sample40.json"
+    },
+    "cfcv": {
+        "training": {
+            "num_epochs": 100,
+            "batch_size": 64,
+            "learning_rate": 1e-05,
+            "weight_decay": 1e-10,
+            "project_tag": "lalonde_psid",
+            "dag_attention_mask": "False",
+            "imbalance_loss_weight": 50,
+            "prop_score_threshold": 0.1,
+            "eps": 1e-06,
+            "time_limit": 18000
+        },
+        "model": {
+            "num_layers": 8,
+            "dropout_rate": 0.1,
+            "embedding_dim": 512,
+            "num_heads": 8
+        }
+    },
+    "ipw": {
+        "training": {
+            "num_epochs": 100,
+            "batch_size": 64,
+            "learning_rate": 0.0001,
+            "weight_decay": 1e-08,
+            "project_tag": "lalonde_psid",
+            "dag_attention_mask": "False",
+            "imbalance_loss_weight": 50,
+            "prop_score_threshold": 0.1,
+            "eps": 1e-08,
+            "time_limit": 18000
+        },
+        "model": {
+            "num_layers": 8,
+            "dropout_rate": 0.1,
+            "embedding_dim": 512,
+            "num_heads": 16
+        }
+    },
+    "random_seed": 42,
+    "sample_id": 40
+}

@@ -1,0 +1,32 @@
+[
+    {
+        "results": {
+            "ATE_AIPW_baseline": -3677.429911012283
+        },
+        "config": null
+    },
+    {
+        "results": {
+            "ATE_true": -7059.979015654079,
+            "ATE_IPTW": -10030.603124006633,
+            "RMSE_IPTW": 2970.624108352554,
+            "ATE_AIPW": -10031.74537878635,
+            "RMSE_AIPW": 2971.766363132271
+        },
+        "config": {
+            "training": {
+                "num_epochs": 100,
+                "batch_size": 512,
+                "learning_rate": 0.001,
+                "weight_decay": 0.01,
+                "project_tag": "lalonde_cps"
+            },
+            "model": {
+                "num_layers": 4,
+                "dropout_rate": 0,
+                "embedding_dim": 128,
+                "num_heads": 32
+            }
+        }
+    }
+]

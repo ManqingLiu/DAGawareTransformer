@@ -2,11 +2,11 @@
 #SBATCH --job-name=myjob
 #SBATCH --output=experiments/results/output_%j.txt
 #SBATCH --error=experiments/results/error_%j.txt
-#SBATCH -c 15
+#SBATCH -c 10
 #SBATCH -t 24:00:00
 #SBATCH -p gpu_beam
-#SBATCH --gres=gpu:1
-#SBATCH --mem=10G
+#SBATCH --gres=gpu:4
+#SBATCH --mem=15G
 # You can change hostname to any command you would like to run
 hostname
 
@@ -37,7 +37,35 @@ module load python/3.10.11
 #python3 experiments/experiment_g_formula_fullsample_AIPW.py
 #python3 experiments/train/train_cps_sample0.py
 #python3 experiments/predict/predict_cps_sample0.py
-#python3 experiments/train/fine_tune.py
+#python3 experiments/tuning/fine_tune_cps.py \
+#        --config config/train/lalonde_cps.json
+#python3 experiments/tuning/fine_tune_cps_cfcv.py \
+#        --config config/train/lalonde_cps.json
+#python3 experiments/tuning/fine_tune_psid_ipw.py \
+#for i in {0..49}
+#do
+#  python3 experiments/tuning/fine_tune.py \
+#          --config \
+#          config/train/lalonde_cps/lalonde_cps_sample${i}.json \
+#          --estimator \
+#          cfcv \
+#          --data_name \
+#          lalonde_cps
+#done
+#python3 experiments/tuning/fine_tune_cps_cfcv.py --config $1
+#python3 src/experiment.py \
+#        --config config/train/lalonde_cps/lalonde_cps_sample1.json \
+#        --estimator \
+#        cfcv \
+#        --data_name \
+#        lalonde_cps
+for i in {0..29}
+do
+python3 src/experiment.py \
+        --config config/train/lalonde_cps/lalonde_cps_sample${i}.json \
+        --estimator cfcv \
+        --data_name lalonde_cps
+done
 #python3 src/data/DGP_U10.py
 #python3 src/models/logistic_regression.py
 #python3 experiments/experiment_IPTW_unmeasuredU.py
@@ -67,18 +95,18 @@ module load python/3.10.11
 #    --train_output_file data/realcause_datasets/lalonde_cps/sample${i}/train/lalonde_cps_train.csv \
 #    --holdout_output_file data/realcause_datasets/lalonde_cps/sample${i}/holdout/lalonde_cps_holdout.csv
 #done
-for i in {0..99}
-do
-python3 experiments/tuning/fine_tune_cps.py \
-          --dag \
-          config/dag/lalonde_cps_dag.json \
-          --data_train_file \
-          data/realcause_datasets/lalonde_cps/sample${i}/train/lalonde_cps_train.csv \
-          --data_holdout_file \
-          data/realcause_datasets/lalonde_cps/sample${i}/holdout/lalonde_cps_holdout.csv \
-          --results \
-          config/train/lalonde_cps/sample${i}/lalonde_cps.json
-done
+#for i in {0..99}
+#do
+#python3 experiments/tuning/fine_tune_cps.py \
+#          --dag \
+#          config/dag/lalonde_cps_dag.json \
+#          --data_train_file \
+#          data/realcause_datasets/lalonde_cps/sample${i}/train/lalonde_cps_train.csv \
+#          --data_holdout_file \
+#          data/realcause_datasets/lalonde_cps/sample${i}/holdout/lalonde_cps_holdout.csv \
+#          --results \
+#          config/train/lalonde_cps/sample${i}/lalonde_cps.json
+#done
 #python3 src/dataset.py \
 #        --dag \
 #        config/dag/lalonde_cps_dag.json \

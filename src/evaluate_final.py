@@ -1,130 +1,79 @@
 import pandas as pd
 import json
+import numpy as np
 import os
 from src.utils import rmse, log_results_evaluate
 from argparse import ArgumentParser
 
+def extract_results(estimator: str,
+                    data_name: str,
+                    mask: bool=True):
+    # Initialize lists to hold the values
+    values = []
+    rnmse_values = []
 
-def aggregate_data(data_name):
-    # Initialize an empty list to hold data from all files
-    data_list = []
+    # Loop through the 50 sample files
+    for i in range(1, 10):
+        # Construct the file name based on the estimator
+        if estimator == 'ipw' and mask == True:
+            file_name = f'{data_name}_best_params_cfcv_sample{i}.json'
+            predicted_ate_key = "Test: predicted CATE for IPW"
+            nrmse_key = "Test: NRMSE for IPW"
+        elif estimator == 'ipw' and mask == False:
+            file_name = f'{data_name}_best_params_cfcv_nomask_sample{i}.json'
+            predicted_ate_key = "Test: predicted CATE for IPW"
+            nrmse_key = "Test: NRMSE for IPW"
+        elif estimator == 'cfcv' and mask == True:
+            file_name = f'{data_name}_best_params_cfcv_sample{i}.json'
+            predicted_ate_key = "Test: predicted CATE for AIPW"
+            nrmse_key = "Test: NRMSE for AIPW"
+        elif estimator == 'cfcv' and mask == False:
+            file_name = f'{data_name}_best_params_cfcv_nomask_sample{i}.json'
+            predicted_ate_key = "Test: predicted CATE for AIPW"
+            nrmse_key = "Test: NRMSE for AIPW"
+        else:
+            raise ValueError("Invalid estimator. Choose either 'ipw' or 'cfcv'.")
 
-    # Loop through each sample directory
-    for i in range(100):
-        directory = f'experiments/results/{data_name}/sample{i}'
-        json_file_path = os.path.join(directory, f'{data_name}.json')
-        nomask_json_file_path = os.path.join(directory, f'{data_name}_nomask.json')
-        baseline_json_file_path = os.path.join(directory, f'{data_name}_baseline.json')
-
-        # Open and load the regular JSON file
-        with open(json_file_path, 'r') as file:
+        # Load the JSON file
+        with open(file_name, 'r') as file:
             data = json.load(file)
-            results_dict = data[0]['results']
-            ATE_true = results_dict.get('ATE_true', None)
-            ATE_IPTW = results_dict.get('ATE_IPTW', None)
-            ATE_std = results_dict.get('ATE_std', None)
-            ATE_AIPW = results_dict.get('ATE_AIPW', None)
 
-        # Open and load the nomask JSON file
+            # Extract the values and append to the lists
+            value = data.get(predicted_ate_key)
+            values.append(value)
+            nrmse_value = data.get(nrmse_key)
+            rnmse_values.append(nrmse_value)
 
-        with open(nomask_json_file_path, 'r') as file:
-            nomask_data = json.load(file)
-            nomask_results_dict = nomask_data[0]['results']
-            ATE_IPTW_nomask = nomask_results_dict.get('ATE_IPTW', None)
-            ATE_std_nomask = nomask_results_dict.get('ATE_std', None)
-            ATE_AIPW_nomask = nomask_results_dict.get('ATE_AIPW', None)
+    # Compute statistics
+    mean_value = np.mean(values)
+    quantile_25 = np.quantile(values, 0.25)
+    quantile_75 = np.quantile(values, 0.75)
+    standard_error_value = np.std(values) / np.sqrt(len(values))
+    mean_rnmse = np.mean(rnmse_values)
+    standard_error_rnmse = np.std(rnmse_values) / np.sqrt(len(rnmse_values))
 
-        # Open and load the baseline JSON file
-        with open(baseline_json_file_path, 'r') as file:
-            baseline_data = json.load(file)
-            baseline_results_dict = baseline_data[0]['results']
-            ATE_AIPW_baseline = baseline_results_dict.get('ATE_AIPW_baseline', None)
+    # Create a DataFrame with the results
+    results_df = pd.DataFrame({
+        "Method": [estimator.upper()],
+        "mean ATE": [mean_value],
+        "se ATE": [standard_error_value],
+        "CI lower": [quantile_25],
+        "CI upper": [quantile_75],
+        "mean RNMSE": [mean_rnmse],
+        "se RNMSE": [standard_error_rnmse]
+    })
 
-
-        # Append the extracted data to the list with new labels for nomask values
-        data_list.append({
-            'ATE_true': ATE_true,
-            'ATE_AIPW_baseline': ATE_AIPW_baseline,
-            'ATE_IPTW': ATE_IPTW,
-            'ATE_std': ATE_std,
-            'ATE_AIPW': ATE_AIPW,
-            'ATE_IPTW_nomask': ATE_IPTW_nomask,
-            'ATE_std_nomask': ATE_std_nomask,
-            'ATE_AIPW_nomask': ATE_AIPW_nomask
-        })
-
-    # Create a DataFrame from the list
-    df = pd.DataFrame(data_list)
-
-    # Write the DataFrame to a CSV file
-    csv_filename = f'experiments/results/{data_name}/{data_name}_results.csv'
-    df.to_csv(csv_filename, index=False)
-    print(f'Data aggregated and saved to {csv_filename}')
-
-    return df
-
+    # Save the DataFrame to a CSV file
+    results_df.to_csv(f'results_{data_name}_mask{mask}_{estimator}.csv', index=False)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--data_name', type=str, required=True)
-    parser.add_argument('--results', type=str, required=True)
+    parser.add_argument("--estimator", type=str, required=True)
+    parser.add_argument("--data_name", type=str, required=True)
 
     args = parser.parse_args()
-    df = aggregate_data(args.data_name)
 
-    # calculate RMSE for ATE_AIPW_baseline using rmse function from utils.py
-    # use mean of ATE_true and mean of ATE_AIPW_baseline as inputs
-    ATE_true_mean = df['ATE_true'].mean()
-    ATE_AIPW_baseline_mean = df['ATE_AIPW_baseline'].mean()
-    rmse_AIPW_baseline = rmse(ATE_AIPW_baseline_mean, ATE_true_mean)
-    print(f"RMSE for ATE_AIPW_baseline: {rmse_AIPW_baseline:.4f}")
-
-    # calculate RMSE for ATE_IPTW using rmse function from utils.py
-    # use mean of ATE_true and mean of ATE_IPTW as inputs
-    ATE_IPTW_mean = df['ATE_IPTW'].mean()
-    rmse_IPTW = rmse(ATE_IPTW_mean, ATE_true_mean)
-    print(f"RMSE for ATE_IPTW: {rmse_IPTW:.4f}")
-
-    # calculate RMSE for ATE_std using rmse function from utils.py
-    # use mean of ATE_true and mean of ATE_std as inputs
-    ATE_std_mean = df['ATE_std'].mean()
-    rmse_std = rmse(ATE_std_mean, ATE_true_mean)
-    print(f"RMSE for ATE_std: {rmse_std:.4f}")
-
-    # calculate RMSE for ATE_AIPW using rmse function from utils.py
-    # use mean of ATE_true and mean of ATE_AIPW as inputs
-    ATE_AIPW_mean = df['ATE_AIPW'].mean()
-    rmse_AIPW = rmse(ATE_AIPW_mean, ATE_true_mean)
-    print(f"RMSE for ATE_AIPW: {rmse_AIPW:.4f}")
-
-
-    ATE_IPTW_nomask_mean = df['ATE_IPTW_nomask'].mean()
-    rmse_IPTW_nomask = rmse(ATE_IPTW_nomask_mean, ATE_true_mean)
-    ATE_std_nomask_mean = df['ATE_std_nomask'].mean()
-    rmse_std_nomask = rmse(ATE_std_nomask_mean, ATE_true_mean)
-    ATE_AIPW_nomask_mean = df['ATE_AIPW_nomask'].mean()
-    rmse_AIPW_nomask = rmse(ATE_AIPW_nomask_mean, ATE_true_mean)
-
-
-    # Gather results in a dictionary
-    results = {
-        'ATE_true_mean': ATE_true_mean,
-        'ATE_IPTW_mean': ATE_IPTW_mean,
-        'ATE_std_mean': ATE_std_mean,
-        'ATE_AIPW_mean': ATE_AIPW_mean,
-        'ATE_AIPW_baseline_mean': ATE_AIPW_baseline_mean,
-        'ATE_IPTW_nomask_mean': ATE_IPTW_nomask_mean,
-        'ATE_std_nomask_mean': ATE_std_nomask_mean,
-        'ATE_AIPW_nomask_mean': ATE_AIPW_nomask_mean,
-        'RMSE_IPTW': rmse_IPTW,
-        'RMSE_std': rmse_std,
-        'RMSE_AIPW': rmse_AIPW,
-        'RMSE_AIPW_baseline': rmse_AIPW_baseline,
-        'RMSE_IPTW_nomask': rmse_IPTW_nomask,
-        'RMSE_std_nomask': rmse_std_nomask,
-        'RMSE_AIPW_nomask': rmse_AIPW_nomask
-    }
-
-    # Log the results
-    log_results_evaluate(results, config=None, results_file=args.results)
+    # go to the directory where the results are stored (experiments/results/lalonde_psid)
+    os.chdir(f'experiments/results/{args.data_name}')
+    extract_results(args.estimator, args.data_name, mask=True)
 
