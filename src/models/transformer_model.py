@@ -1,11 +1,9 @@
-import json
 import torch.nn as nn
 import torch
 from typing import Dict
 from torch.utils.data import DataLoader
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_auc_score
 import wandb
 
 from src.dataset import CausalDataset
@@ -84,17 +82,13 @@ class DAGTransformer(nn.Module):
             x = self.encoder(x, mask=attn_mask)
         else:
             x = self.encoder(x)
+
         node_outputs = {}
         for node_name in self.output_nodes.keys():
             node_id = self.node_ids[node_name]
             node_outputs[node_name] = self.output_head[node_name](x[:, node_id, :])
 
         return node_outputs
-
-    def causal_consistency_loss(self, x, attn_mask):
-        jacobian = torch.autograd.functional.jacobian(lambda x: self.forward(x), x)
-        consistency_loss = torch.sum(torch.abs(jacobian) * attn_mask) / attn_mask.sum()
-        return consistency_loss
 
     def _train(
             self,
@@ -174,7 +168,6 @@ class DAGTransformer(nn.Module):
             model.eval()
             with torch.no_grad():
                 val_loss = 0
-                val_auc = 0
                 for batch_raw_val, batch_binned_val in val_dataloader:
                     batch_val = {k: v.to(device) for k, v in batch_binned_val.items()}
                     outputs_val = model(batch_val, mask=train_config["dag_attention_mask"])
@@ -197,24 +190,15 @@ class DAGTransformer(nn.Module):
                     h_rep_norm = h_rep / safe_sqrt(torch.sum(h_rep ** 2, dim=1, keepdim=True))
                     h_rep_norm = h_rep_norm.to(device)
 
-                    #if len(set(t.detach().numpy())) > 1:
-                    #    auc = roc_auc_score(t, e)
-                        #print(f"The val batch AUC is: {auc}")
-
-                    #val_auc += auc.item()
-                    #val_auc_avg = val_auc / len(val_dataloader)
-
-
                     # Use CFR loss function
                     val_batch_loss, val_batch_items = CFR_loss(t, e, y, y_, h_rep_norm, imbalance_loss_weight,
                                                                return_items=True, eps=train_config["eps"])
 
                     val_loss += val_batch_loss.item()
                     val_loss_avg = val_loss / len(val_dataloader)
-            #wandb.log({f"Val: AUC": val_auc_avg})
             wandb.log({f"Val: counterfactual loss": val_loss_avg})
 
-            predictions_val, metrics_val, _ = model.predict(model,
+            predictions_val, metrics_val, metrics_test = model.predict(model,
                                             data_name,
                                             val_data,
                                             pseudo_ate_data,
@@ -222,15 +206,16 @@ class DAGTransformer(nn.Module):
                                             dag=dag,
                                             train_config=train_config,
                                             random_seed=random_seed,
-                                            prefix="Val")
+                                            prefix="Test",
+                                            estimator=estimator)
 
-            for metric_name, metric_value in metrics_val.items():
+            for metric_name, metric_value in metrics_test.items():
                 print(f"Epoch: {epoch}: {metric_name}: {metric_value}")
 
-            rmse_cfcv = metrics_val.get("Val: RMSE for CFCV", float('inf'))
-            rmse_ipw = metrics_val.get("Val: RMSE for IPW", float('inf'))
+            rmse_cfcv = metrics_test.get("Test: NRMSE for AIPW", float('inf'))
+            rmse_ipw = metrics_test.get("Test: NRMSE for IPW", float('inf'))
             
-            if "lalonde" in data_name:
+            if data_name == "lalonde_cps":
                 wandb.log(
                 calculate_val_metrics(
                     predictions_val,
@@ -239,6 +224,23 @@ class DAGTransformer(nn.Module):
                     prefix="Val",
                     prop_score_threshold=train_config["prop_score_threshold"]
                 ))
+                wandb.log(
+                    metrics_test
+                )
+
+            if data_name == "lalonde_psid":
+                wandb.log(
+                    calculate_val_metrics(
+                        predictions_val,
+                        pseudo_ate_data,
+                        sample_id,
+                        prefix="Val",
+                        prop_score_threshold=train_config["prop_score_threshold"]
+                    ))
+                wandb.log(
+                    metrics_test
+                )
+
             elif data_name == "ihdp":
                 wandb.log(
                 calculate_val_metrics_ihdp(
@@ -255,6 +257,9 @@ class DAGTransformer(nn.Module):
                     prefix="Val",
                     prop_score_threshold=train_config["prop_score_threshold"]
                 ))
+                wandb.log(
+                    metrics_test
+                )
 
 
         print(f"RMSE for CFCV: {rmse_cfcv}")
@@ -270,7 +275,8 @@ class DAGTransformer(nn.Module):
                 dag,
                 train_config: Dict,
                 random_seed: int,
-                prefix: str = "Test"):
+                prefix: str = "Test",
+                estimator: str= "aipw"):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         batch_size = train_config["batch_size"]
         model = model.to(device)
@@ -305,6 +311,9 @@ class DAGTransformer(nn.Module):
         predictions_t = predict_function(model, train_config, dataloader)['t']
         # convert predictions_t to dataframe with column name t_prob
         predictions_t = pd.DataFrame(predictions_t, columns=['t_prob'])
+        predictions_y = predict_function(model, train_config, dataloader)['y']
+        # convert predictions_y to dataframe with column name pred_y
+        predictions_y = pd.DataFrame(predictions_y, columns=['pred_y'])
         predictions_y0 = predict_function(model, train_config, dataloader_A0)['y']
         # convert predictions_y0 to dataframe with column name pred_y_A0
         predictions_y0 = pd.DataFrame(predictions_y0, columns=['pred_y_A0'])
@@ -313,11 +322,11 @@ class DAGTransformer(nn.Module):
         predictions_y1 = pd.DataFrame(predictions_y1, columns=['pred_y_A1'])
 
         final_predictions = pd.concat(
-            [data,  predictions_t["t_prob"], predictions_y0["pred_y_A0"], predictions_y1["pred_y_A1"]],
+            [data,  predictions_t["t_prob"], predictions_y["pred_y"], predictions_y0["pred_y_A0"], predictions_y1["pred_y_A1"]],
             axis=1,
         )
 
-        if "lalonde" in data_name:
+        if data_name == "lalonde_cps":
             metrics_val = calculate_val_metrics(
                                             final_predictions,
                                             pseudo_ate_data,
@@ -327,7 +336,21 @@ class DAGTransformer(nn.Module):
 
             metrics_test = calculate_test_metrics(final_predictions,
                                                   prop_score_threshold=train_config["prop_score_threshold"],
-                                                  prefix=prefix)
+                                                  prefix=prefix,
+                                                  estimator=estimator)
+
+        elif data_name == "lalonde_psid":
+            metrics_val = calculate_val_metrics(
+                                            final_predictions,
+                                            pseudo_ate_data,
+                                            sample_id,
+                                            prefix="Val",
+                                            prop_score_threshold=train_config["prop_score_threshold"])
+
+            metrics_test = calculate_test_metrics(final_predictions,
+                                                  prop_score_threshold=train_config["prop_score_threshold"],
+                                                  prefix=prefix,
+                                                  estimator=estimator)
         elif data_name == "ihdp":
             metrics_val = calculate_val_metrics_ihdp(
                                             final_predictions,

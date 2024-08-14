@@ -2,21 +2,37 @@
   "n_repeat": 20,
   "data": {
     "name": "demand",
-    "n_sample": 1000
+    "n_sample": 1000,
+    "random_seed": 42
   },
-  "training": {
+  "training_transformer": {
+    "n_epochs": 100,
+    "batch_size": 1000,
+    "log_metrics": "False",
+    "learning_rate": 1e-04,
+    "l2_penalty": 0.001,
+    "alpha": 100,
+    "loss_name": "U_statistic",
+    "dag_attention_mask": "True"
+  },
+  "model_transformer": {
+    "name": "nmmr",
+    "num_layers": 1,
+    "dropout_rate": 0,
+    "embedding_dim": 20,
+    "num_heads": 1
+  },
+  "training_mlp": {
     "n_epochs": 100,
     "batch_size": 1000,
     "log_metrics": "False",
     "learning_rate": 0.003,
-    "l2_penalty": 0.001,
+    "l2_penalty": 3e-06,
     "loss_name": "U_statistic"
   },
-  "model": {
+  "model_mlp": {
     "name": "nmmr",
-    "num_layers": 1,
-    "dropout_rate": 0,
-    "embedding_dim": 40,
-    "num_heads": 1
+    "network_depth": 4,
+    "network_width": 80
   }
 }

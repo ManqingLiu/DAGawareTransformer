@@ -3,7 +3,7 @@ import os.path as op
 import numpy as np
 import pandas as pd
 
-from src.data.ate.data_class import PVTrainDataSet, RHCTestDataSet
+from src.data.ate.data_class import PVTrainDataSet
 
 DATA_PATH = pathlib.Path(__file__).resolve().parent.parent.parent.parent.joinpath("data/right_heart_catheterization")
 
