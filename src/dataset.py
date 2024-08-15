@@ -65,7 +65,7 @@ class CausalDataset(Dataset):
 
         for data, binned in batch_list:
             for key in self.dag["nodes"]:
-                batch_data[key].append(data[key].clone().detach())
+                batch_data[key].append(data[key].clone().detach())  # does detach disrupt autograd?
             for key in self.dag["input_nodes"]:
                 if binned[key] is not None:
                     batch_binned[key].append(torch.tensor(binned[key]))

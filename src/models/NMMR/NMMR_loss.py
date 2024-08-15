@@ -6,9 +6,9 @@ from torch.nn import CrossEntropyLoss
 def NMMR_loss_transformer(model_output,
                           target,
                           treatment,
-                          alpha,
                           kernel_matrix,
                           loss_name: str,
+                          alpha = 0.01,
                           return_items: bool = False):
     residual = target - model_output
     n = residual.shape[0]
@@ -24,21 +24,24 @@ def NMMR_loss_transformer(model_output,
     else:
         raise ValueError(f"{loss_name} is not valid. Must be 'U_statistic' or 'V_statistic'.")
 
-    # Contrastive Loss Component
-    contrastive_loss = 0
-    for i in range(n):
-        for j in range(n):
-            if treatment['treatment'][i] != treatment['treatment'][j]:  # Only compare different treatments
-                contrastive_loss += torch.norm(model_output[i] - model_output[j])
+    # Contrastive Loss Component #
+    treatment_mask = (treatment['treatment'].unsqueeze(0) != treatment['treatment'].unsqueeze(1))
+    
+    # Compute pairwise differences
+    differences = model_output.unsqueeze(0) - model_output.unsqueeze(1)
+    masked_differences = differences.squeeze() * treatment_mask
+    contrastive_loss = torch.negative(torch.norm(differences))
 
     # You can weight this contrastive loss with a hyperparameter
-    total_loss = loss[0, 0] - alpha * contrastive_loss / (n * (n - 1))
+    total_loss = loss[0, 0] + alpha * contrastive_loss
 
     if return_items:
         batch_items = {
             'residual': residual,
             'kernel_matrix': K,
-            'loss': total_loss.item()
+            'contrastive_loss': contrastive_loss.item(),
+            'causal_loss': loss[0, 0].item(),
+            'total_loss': total_loss.item()
         }
         return total_loss, batch_items
     else:

@@ -5,7 +5,6 @@ import numpy as np
 from src.dataset import *
 
 import torch
-from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader as Dataloader
 import torch.optim as optim
 import torch.nn as nn
@@ -69,22 +68,20 @@ class NMMR_Trainer_DemandExperiment(object):
 
         bin_left_edges = {k: torch.tensor(v[:-1], dtype=torch.float32).to(device) for k, v in train_dataloader.dataset.bin_edges.items()}
         for epoch in range(self.train_config_transformer['n_epochs']):
-            for batch_raw, batch_binned in train_dataloader:
-                # Remove keys with NoneType values
-                keys_to_remove = [key for key, value in batch_binned.items() if value is None]
-                for key in keys_to_remove:
-                    del batch_binned[key]
+            for batch_raw, batch_binned in train_dataloader: 
                 optimizer.zero_grad()
                 batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
                 # send batch_raw to device
                 batch_raw = {k: v.to(device) for k, v in batch_raw.items()}
+                
+                # TODO: check masking during forward pass
                 outputs = model(batch_binned, mask="True")
 
                 # Transform the model outputs back to the original scale
                 transformed_outputs = {}
                 for output_name, output in outputs.items():
-                    softmax_output = torch.softmax(output, dim=1)
-                    weighted_avg = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
+                    # softmax_output = torch.softmax(output, dim=1)  # TODO: remove/replace after testing
+                    weighted_avg = torch.sum(output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
                     transformed_outputs[output_name] = weighted_avg
 
                 labels = {'outcome': batch_raw['outcome']}
@@ -102,14 +99,15 @@ class NMMR_Trainer_DemandExperiment(object):
 
                 batch_loss, batch_items = NMMR_loss_transformer(model_output,
                                                                 target,
-                                                                treatment,
-                                                                alpha,
+                                                                treatment_binned,
                                                                 kernel_matrix_train,
                                                                 loss_name=self.train_config_transformer['loss_name'],
+                                                                alpha=0.01,
                                                                 return_items=True)
                 batch_loss.backward()
                 optimizer.step()
-                wandb.log({'Training loss transformer': batch_loss})
+                for item in batch_items.keys():
+                    wandb.log({f"train_{item}": batch_items[item]})
 
             model.eval()
             with torch.no_grad():
@@ -121,12 +119,12 @@ class NMMR_Trainer_DemandExperiment(object):
                     # Transform the model outputs back to the original scale
                     transformed_outputs = {}
                     for output_name, output in outputs.items():
-                        softmax_output = torch.softmax(output, dim=1)
-                        weighted_avg = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
+                        # softmax_output = torch.softmax(output, dim=1)
+                        weighted_avg = torch.sum(output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
                         transformed_outputs[output_name] = weighted_avg
 
                     labels = {'outcome': batch_raw['outcome']}
-                    treatment = {'treatment': batch_raw['treatment']}
+                    treatment_binned = {'treatment': batch_binned['treatment']}
                     kernel_inputs_val = torch.cat((batch_raw['treatment'], batch_raw['treatment_proxy1'],
                                                     batch_raw['treatment_proxy2']), dim=1)
                     kernel_matrix_val = self.compute_kernel(kernel_inputs_val)
@@ -138,21 +136,16 @@ class NMMR_Trainer_DemandExperiment(object):
 
                     batch_loss, batch_items = NMMR_loss_transformer(model_output,
                                                                     target,
-                                                                    treatment,
-                                                                    alpha,
+                                                                    treatment_binned,
                                                                     kernel_matrix_val,
                                                                     loss_name=self.train_config_transformer['loss_name'],
+                                                                    alpha=0.01,
                                                                     return_items=True)
                     for item in batch_items.keys():
-                        wandb.log({item: batch_items[item]})
-                    wandb.log({'Validation loss transformer': batch_loss})
+                        wandb.log({f"val_{item}": batch_items[item]})
 
-                E_w_haw, oos_loss = self.predict_transformer(model, self.data_config, val_data, self.dag, self.n_sample, test_dataloader)
-                # print E_w_haw for each epoch
-                print(f"Epoch: {epoch}, E_w_haw_transformer: {E_w_haw}")
-                # print oos loss for each epoch
-                print(f"Epoch: {epoch}, OOS loss transformer: {oos_loss.item()}")
-                wandb.log({'OOS loss transformer': oos_loss})
+                E_w_haw, oos_loss, E_ydoA, predictions = self.predict_transformer(model, self.data_config, val_data, self.dag, self.n_sample, test_dataloader)
+                wandb.log({'OOS loss transformer': oos_loss, 'E_w_haw_transformer': E_w_haw, 'E_ydoA': E_ydoA, 'predictions': predictions})
 
         return model
 
@@ -173,34 +166,24 @@ class NMMR_Trainer_DemandExperiment(object):
         model = model.to(device)
 
         bin_left_edges = {k: np.array(v[:-1], dtype=np.float32) for k, v in test_dataloader.dataset.bin_edges.items()}
-
         softmaxes = []
         with torch.no_grad():
-            for batch_raw, batch_binned in test_dataloader:
+            for _, batch_binned in test_dataloader:
                 batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
-                outputs = model(batch_binned, mask="True")
-                # print average of the output for each batch number
-                # print(f"Average of the output for each batch number: {torch.mean(outputs['outcome'])}")
-                batch_predictions = []
-                for output_name in outputs.keys():
-                    # Detach the outputs and move them to cpu
-                    output = outputs[output_name].cpu().numpy()
-                    output = np.exp(output) / np.sum(np.exp(output), axis=1, keepdims=True)
-                    # Append the reshaped output to batch_predictions
-                    batch_predictions.append(output)
-                # concatenate the batch predictions along the second axis
-                batch_predictions = np.concatenate(batch_predictions, axis=1)
-                softmaxes.append(batch_predictions)
+                outputs = model(batch_binned, mask="True")    
+                output = outputs['outcome'].cpu().numpy()
+                softmaxes.append(output)
 
         # concatenate and unbin the predictions
-        softmaxes_list = np.concatenate(softmaxes, axis=0)
-        predictions = np.sum(softmaxes_list * bin_left_edges[output_name], axis=1)
+        # TODO: verify the tensor operations here for computing oos_loss
+        softmaxes = np.concatenate(softmaxes, axis=0)
+        predictions = np.sum(softmaxes * bin_left_edges['outcome'], axis=1)
         predictions_reshape = predictions.reshape(n_sample, 10, order='F')
         E_w_haw = np.mean(predictions_reshape, axis=0)
         test_data, E_ydoA = make_test_data(data_config, val_data, dag)
         oos_loss = np.mean((E_w_haw - E_ydoA) ** 2)
 
-        return E_w_haw, oos_loss
+        return E_w_haw, oos_loss, E_ydoA, predictions
 
 
     def train_mlp(self,

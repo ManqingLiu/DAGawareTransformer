@@ -49,6 +49,10 @@ def NMMR_experiment(
     val_data_t = PVTrainDataSetTorch.from_numpy(val_data_mlp)
     test_data_t = PVTestDataSetTorch.from_numpy(test_data_mlp)
 
+    # mlp vs. transformer data: train data is the same, val data is different (TODO: why?)
+    # test_data_mlp.treatment is (10, 1) while test_data_transformer.data['treatment'] is (10_000, 1)
+
+    # collate_fn seems totally fine
     train_dataloader = DataLoader(
         train_data_transformer,
         batch_size=train_config_transformer["batch_size"],
@@ -70,6 +74,7 @@ def NMMR_experiment(
         collate_fn=test_data_transformer.collate_fn,
     )
 
+    # __init__() just saves variables
     trainer = NMMR_Trainer_DemandExperiment(
         config,
         data_config,
@@ -85,7 +90,7 @@ def NMMR_experiment(
     model_transformer = trainer.train_transformer(train_dataloader, val_data_transformer, val_dataloader, test_dataloader)
 
     n_sample = data_config.get("n_sample", None)
-    E_w_haw_transformer, oos_loss_transformer = trainer.predict_transformer(
+    E_w_haw_transformer, oos_loss_transformer, _, _ = trainer.predict_transformer(
         model_transformer, data_config, val_data_transformer, dag, n_sample, test_dataloader
     )
 

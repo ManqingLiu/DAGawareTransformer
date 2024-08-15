@@ -4,12 +4,12 @@ myenv/
 .env
 .idea/
 .DS_Store
-*.pyc
 wandb/
 *.egg-info
 */results/proximal.DS_Store
 .python-version
 __pycache__/
+*.pyc
 .vscode
 experiments/predict/*
 experiments/model/*

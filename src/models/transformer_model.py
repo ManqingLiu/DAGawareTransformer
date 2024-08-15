@@ -61,17 +61,22 @@ class DAGTransformer(nn.Module):
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=self.embedding_dim,
                                                         nhead=self.num_heads,
                                                         dropout=self.dropout_rate,
+                                                        dim_feedforward=self.embedding_dim,  # TODO: this used to be the default (2048) so the flow was 20 -> 2048 -> 20 dim
                                                         activation='relu',
                                                         batch_first=True)
 
         self.encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_layers)
 
         self.output_head = nn.ModuleDict({
-            node: nn.Linear(self.embedding_dim, self.output_nodes[node]['num_categories'])
+            node: nn.Sequential(
+            nn.Linear(self.embedding_dim, self.output_nodes[node]['num_categories']),
+            nn.Softmax(dim=1)
+            )
             for node in self.output_nodes.keys()
         })
 
     def forward(self, x, mask=None):
+        # TODO: embeddings are dim 20
         embeddings = [self.embedding[node.replace('.', '_')](x[node].long()) for node in self.node_ids.keys()]
         x = torch.stack(embeddings).squeeze(2)
         x = x.permute(1, 0, 2)
