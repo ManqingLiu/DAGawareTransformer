@@ -8,6 +8,7 @@ import torch
 from torch.utils.data import DataLoader as Dataloader
 import torch.optim as optim
 import torch.nn as nn
+import tqdm
 import wandb
 
 from src.data.ate.data_class import PVTrainDataSetTorch, PVTestDataSetTorch
@@ -66,9 +67,12 @@ class NMMR_Trainer_DemandExperiment(object):
         optimizer = optim.Adam(list(model.parameters()), lr=self.train_config_transformer['learning_rate'],
                                weight_decay=self.train_config_transformer['l2_penalty'])
 
+        epoch_bar = tqdm.tqdm(range(self.train_config_transformer['n_epochs']), desc="Training", position=0, leave=True)
         bin_left_edges = {k: torch.tensor(v[:-1], dtype=torch.float32).to(device) for k, v in train_dataloader.dataset.bin_edges.items()}
-        for epoch in range(self.train_config_transformer['n_epochs']):
-            for batch_raw, batch_binned in train_dataloader: 
+        for epoch in epoch_bar:
+            model.train(True)
+            batch_bar = tqdm.tqdm(train_dataloader, desc=f"Epoch {epoch+1}", position=1, leave=False)
+            for batch_raw, batch_binned in batch_bar: 
                 optimizer.zero_grad()
                 batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
                 # send batch_raw to device
@@ -109,6 +113,10 @@ class NMMR_Trainer_DemandExperiment(object):
                 for item in batch_items.keys():
                     wandb.log({f"train_{item}": batch_items[item]})
 
+                batch_bar.set_postfix(loss=batch_loss.item())
+            
+            batch_bar.close()
+
             model.eval()
             with torch.no_grad():
                 for batch_raw, batch_binned in val_dataloader:
@@ -147,6 +155,10 @@ class NMMR_Trainer_DemandExperiment(object):
                 E_w_haw, oos_loss, E_ydoA, predictions = self.predict_transformer(model, self.data_config, val_data, self.dag, self.n_sample, test_dataloader)
                 wandb.log({'OOS loss transformer': oos_loss, 'E_w_haw_transformer': E_w_haw, 'E_ydoA': E_ydoA, 'predictions': predictions})
 
+            epoch_bar.set_postfix(val_loss=batch_loss.item())
+        
+        epoch_bar.close()
+
         return model
 
     @staticmethod
@@ -162,7 +174,6 @@ class NMMR_Trainer_DemandExperiment(object):
         # Note: the mean is taken over the n_sample axis, so we obtain {intervention_array_len} number of expected values
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(f'Using device: {device}')
         model = model.to(device)
 
         bin_left_edges = {k: np.array(v[:-1], dtype=np.float32) for k, v in test_dataloader.dataset.bin_edges.items()}
@@ -237,12 +248,12 @@ class NMMR_Trainer_DemandExperiment(object):
 
                 wandb.log({'Validation loss mlp': causal_loss_val})
 
-                E_w_haw, oos_loss = self.predict_mlp(model, self.data_config, test_data_t, val_data_t)
+                E_w_haw, oos_loss, predictions = self.predict_mlp(model, self.data_config, test_data_t, val_data_t)
                 # print E_w_haw for each epoch
                 print(f"Epoch: {epoch}, E_w_haw_mlp: {E_w_haw}")
                 # print oos loss for each epoch
                 print(f"Epoch: {epoch}, OOS loss mlp: {oos_loss.item()}")
-                wandb.log({'OOS loss mlp': oos_loss})
+                wandb.log({'OOS loss mlp': oos_loss, "MLP predictions": predictions})
 
         return model
 
@@ -263,8 +274,8 @@ class NMMR_Trainer_DemandExperiment(object):
         # Compute model's predicted E[Y | do(A)] = E_w[h(a, w)]
         # Note: the mean is taken over the n_sample axis, so we obtain {intervention_array_len} number of expected values
         with torch.no_grad():
-            E_w_haw = torch.mean(model(model_inputs_test), dim=1)
+            mlp_predictions = model(model_inputs_test)
+            E_w_haw = torch.mean(mlp_predictions, dim=1)
             oos_loss = torch.mean((E_w_haw - test_data.structural) ** 2)
 
-        return E_w_haw.cpu(), oos_loss
-
+        return E_w_haw.cpu(), oos_loss, mlp_predictions.cpu()

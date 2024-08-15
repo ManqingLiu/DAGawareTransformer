@@ -95,7 +95,7 @@ def NMMR_experiment(
     )
 
     model_mlp = trainer.train_mlp(train_t, test_data_t, val_data_t)
-    E_w_haw_mlp, oos_loss_mlp = trainer.predict_mlp(
+    E_w_haw_mlp, oos_loss_mlp, _ = trainer.predict_mlp(
         model_mlp, data_config, test_data_t, val_data_t
     )
     

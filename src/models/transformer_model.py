@@ -114,7 +114,6 @@ class DAGTransformer(nn.Module):
         train_config = config[estimator]["training"]
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print(f"Using device: {device}")
         model = model.to(device)
 
         opt = torch.optim.AdamW(
