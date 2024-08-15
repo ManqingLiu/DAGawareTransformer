@@ -31,8 +31,8 @@ class CausalDataset(Dataset):
         self.dag = dag
         self.bin_edges = {}
 
-        self.num_nodes = len(self.dag["nodes"])
-        self.dag["node_ids"] = dict(zip(self.dag["nodes"], range(self.num_nodes)))
+        self.num_nodes = len(self.dag["input_nodes"])
+        self.dag["node_ids"] = dict(zip(self.dag["input_nodes"], range(self.num_nodes)))
 
         if isinstance(self.data, pd.DataFrame):
             self.bin_columns()
@@ -55,16 +55,20 @@ class CausalDataset(Dataset):
         if isinstance(self.data, pd.DataFrame):
             return self.data.iloc[idx], self.data_binned.iloc[idx]
         elif isinstance(self.data, dict):
-            return {key: self.data[key][idx] for key in self.data}, {key: self.data_binned[key][idx] for key in self.data_binned}
+            return {key: self.data[key][idx] for key in self.data}, {key: self.data_binned[key][idx]
+                                                                     for key in self.data_binned
+                                                                     if self.data_binned[key] is not None}
     
     def collate_fn(self, batch_list):
-        batch_data = {key: [] for key in self.dag["input_nodes"]}
+        batch_data = {key: [] for key in self.dag["nodes"]}
         batch_binned = {key: [] for key in self.dag["input_nodes"]}
 
         for data, binned in batch_list:
+            for key in self.dag["nodes"]:
+                batch_data[key].append(data[key].clone().detach())
             for key in self.dag["input_nodes"]:
-                batch_data[key].append(torch.tensor(data[key]))
-                batch_binned[key].append(torch.tensor(binned[key]))
+                if binned[key] is not None:
+                    batch_binned[key].append(torch.tensor(binned[key]))
 
         collated_data = {key: torch.stack(batch_data[key]) for key in batch_data}
         collated_binned = {key: torch.stack(batch_binned[key]) for key in batch_binned}
@@ -102,9 +106,7 @@ class CausalDataset(Dataset):
                 self.data_binned[column] = self.data_binned[column].astype(int)
                 self.bin_edges[column] = binner.bin_edges_[0]
             elif num_bins == 2:
-                self.data_binned[column] = pd.cut(
-                    self.data[column], bins=2, labels=False
-                ).to_numpy()
+                self.data_binned[column] = self.data[column].numpy().flatten()
 
     def get_bin_left_edges(self):
         return {k: v[:-1] for k, v in self.bin_edges.items()}
@@ -150,7 +152,7 @@ def make_test_data(
     data_config: Dict[str, Any], val_data: CausalDataset, dag: Dict[str, Any]
 ) -> CausalDataset:
     
-    '''num_W_test is the numnber of samples in the validation set and the number of samples
+    '''num_W_test is the number of samples in the validation set and the number of samples
     used to estimate the expected value of the bridge function at each intervention level.
     
     Returns a CausalDataset where self.data has 5 keys each with shape (num intervention levels, num val samples)'''
@@ -163,17 +165,17 @@ def make_test_data(
     treatment = test_data_t.treatment.expand(-1, num_W_test)  # (intervention_array_len, num_W_test)
 
     # Z1, Z2, W and Y initially have shape (num_W_test,) but are copied column-wise to have shape (num_W_test, intervention_array_len)
-    treatment_proxy1 = val_data.data['treatment_proxy1'].expand(-1, intervention_array_len)
-    treatment_proxy2 = val_data.data['treatment_proxy2'].expand(-1, intervention_array_len)
-    outcome_proxy = val_data.data['outcome_proxy'].expand(-1, intervention_array_len)
-    outcome = val_data.data['outcome'].expand(-1, intervention_array_len)
+    treatment_proxy1 = val_data.data['treatment_proxy1'].T.expand(intervention_array_len, num_W_test)
+    treatment_proxy2 = val_data.data['treatment_proxy2'].T.expand(intervention_array_len, num_W_test)
+    outcome_proxy = val_data.data['outcome_proxy'].T.expand(intervention_array_len, num_W_test)
+    outcome = val_data.data['outcome'].T.expand(intervention_array_len, num_W_test)
 
     test_data_dict = {
         "treatment": treatment.reshape(-1, 1),
-        "treatment_proxy1": treatment_proxy1.T.reshape(-1, 1),
-        "treatment_proxy2": treatment_proxy2.T.reshape(-1, 1),
-        "outcome_proxy": outcome_proxy.T.reshape(-1, 1),
-        "outcome": outcome.T.reshape(-1, 1),
+        "treatment_proxy1": treatment_proxy1.reshape(-1, 1),
+        "treatment_proxy2": treatment_proxy2.reshape(-1, 1),
+        "outcome_proxy": outcome_proxy.reshape(-1, 1),
+        "outcome": outcome.reshape(-1, 1),
     }
 
     return CausalDataset(test_data_dict, dag, random_seed=data_config['random_seed']), test_data.structural
