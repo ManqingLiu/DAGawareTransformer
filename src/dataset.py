@@ -51,7 +51,7 @@ class CausalDataset(Dataset):
             first_key = next(iter(self.data))
             return len(self.data[first_key])
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int):
         if isinstance(self.data, pd.DataFrame):
             return self.data.iloc[idx], self.data_binned.iloc[idx]
         elif isinstance(self.data, dict):
