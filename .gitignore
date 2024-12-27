@@ -15,5 +15,6 @@ experiments/predict/*
 experiments/model/*
 media/*
 *.png
-*.gif*.pdf
+*.gif
+*.pdf
 experiments/tuning/

@@ -104,8 +104,8 @@ python3 src/experiment.py \
   - Naming Convention: `<DATA_NAME>_sample<SAMPLE_ID>.json`
   - Examples:
     - `acic_sample1.json`
-    - `lalonde-cps_sample2.json`
-    - `lalonde-psid_sample3.json`
+    - `lalonde_cps_sample2.json`
+    - `lalonde_psid_sample3.json`
 
 - **DAG_TYPE**: The type of Directed Acyclic Graph (DAG) to use
   - Options:
