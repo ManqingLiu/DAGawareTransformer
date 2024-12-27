@@ -5,7 +5,11 @@
 
 ## Overview
 
-This repository contains the implementation of a DAG-aware Transformer model for causal inference, as described in our paper [insert paper title and link when available]. Our model incorporates causal structure into the attention mechanism, allowing for more accurate modeling of causal relationships in various estimation frameworks including G-formula, Inverse Probability Weighting (IPW), and Augmented Inverse Probability Weighting (AIPW).
+This repository contains the implementation of a DAG-aware Transformer model for causal inference, as described 
+in our paper [DAG aware Transformer for Causal Effect Estimation](https://arxiv.org/abs/2410.10044). Our model 
+incorporates causal structure into the attention mechanism, allowing for more accurate modeling of 
+causal relationships in various estimation frameworks including G-formula, Inverse Probability Weighting (IPW), 
+and Augmented Inverse Probability Weighting (AIPW).
 
 ## Key Features
 
@@ -138,8 +142,38 @@ python3 src/experiment.py \
         --data_name lalonde-cps
 ```
 
+#### Note for AIPW
+To get the result where you train outcome regression and propensity score models separately, 
+you can run the following command:
 
-### Demand Dataset (Proximal Inference)
+1. Get predictions for outcome regression (e.g. for ACIC):
+```bash
+python3 src/experiment.py \
+        --config config/train/acic/acic_sample1.json \
+        --dag dag_g_formula \
+        --estimator g-formula \
+        --data_name acic
+```
+
+2. Get predictions for propensity score (e.g. for ACIC):
+```bash
+python3 src/experiment.py \
+        --config config/train/acic/acic_sample1.json \
+        --dag dag_ipw \
+        --estimator ipw \
+        --data_name acic
+```
+
+3. Plug in the predicted values to AIPW estimator (e.g. for ACIC):
+```bash
+python3 src/evaluate/acic/evaluate_metrics.py \
+        --data_name acic \
+        --estimator aipw \
+        --sample_id 1
+
+````
+
+### Demand Dataset 
 
 ```bash
 python3 src/experiment_proximal.py \

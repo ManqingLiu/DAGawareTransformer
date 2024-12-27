@@ -1,6 +1,8 @@
 from typing import Dict
 import numpy as np
 from src.utils import rmse
+from argparse import ArgumentParser
+import pandas as pd
 
 def nrmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """Normalized mean-squared-error."""
@@ -76,9 +78,9 @@ def calculate_test_metrics_acic(
                 f"{prefix}: NRMSE for IPW with stabilized weights": ipw_nrmse_stable_}
     else:
         # For t = 1, set t_prob to 0.33 if it's below 0.33
-        predictions.loc[(predictions['t'] == 1) & (predictions['t_prob'] < ps_upper_bound), 't_prob'] = ps_upper_bound
+        # predictions.loc[(predictions['t'] == 1) & (predictions['t_prob'] < ps_upper_bound), 't_prob'] = ps_upper_bound
         # For t = 0, set t_prob to 0.15 if it's below 0.15
-        predictions.loc[(predictions['t'] == 0) & (predictions['t_prob'] < ps_lower_bound), 't_prob'] = ps_lower_bound
+        # predictions.loc[(predictions['t'] == 0) & (predictions['t_prob'] < ps_lower_bound), 't_prob'] = ps_lower_bound
         ate_aipw, aipw_nrmse_ = aipw_nrmse(predictions['y'], predictions['t'], predictions['pred_y_A0'],
                                            predictions['pred_y_A1'], predictions['t_prob'], ite)
         return {f"{prefix}: predicted ATE for AIPW": ate_aipw,
@@ -86,3 +88,19 @@ def calculate_test_metrics_acic(
                 f"{prefix}: mean of t_prob among treated": np.mean(predictions['t_prob'][predictions['t'] == 1]),
                 f"{prefix}: mean of t_prob among control": np.mean(predictions['t_prob'][predictions['t'] == 0])}
 
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument("--sample_id", type=int, required=True)
+    parser.add_argument("--estimator", type=str, required=True)
+    parser.add_argument("--data_name", type=str, required=True)
+    args = parser.parse_args()
+
+    pred_g_formula = pd.read_csv(f"experiments/predict/{args.data_name}/predictions_g_formula_sample{args.sample_id}.csv")
+    pred_ipw = pd.read_csv(f"experiments/predict/{args.data_name}/predictions_ipw_sample{args.sample_id}.csv")
+
+    ate_aipw, aipw_nrmse = aipw_nrmse(pred_g_formula['y'], pred_g_formula['t'], pred_g_formula['pred_y_A0'],
+                          pred_g_formula['pred_y_A1'], pred_ipw['t_prob'])
+
+    # print results
+    print(f"Predicted ATE for AIPW (Sep): {ate_aipw}")
+    print(f"NRMSE for AIPW (Sep): {aipw_nrmse}")
