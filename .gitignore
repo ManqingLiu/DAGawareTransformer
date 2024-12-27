@@ -13,5 +13,6 @@ experiments/predict/*
 experiments/model/*
 media/*
 *.png
-*.gifDAGawareTransformer_NeurIPS2024_CRL.pdf
+*.gif
+*.pdf
 DAGawareTransformer_NeurIPS_2024_CRL.pdf
