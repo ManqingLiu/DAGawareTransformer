@@ -17,12 +17,6 @@ class PVTestDataSet(NamedTuple):
     structural: Optional[np.ndarray]
 
 
-class RHCTestDataSet(NamedTuple):
-    treatment: np.ndarray
-    outcome_proxy: np.ndarray
-    backdoor: np.ndarray
-
-
 class PVTrainDataSetTorch(NamedTuple):
     treatment: torch.Tensor
     treatment_proxy: torch.Tensor
@@ -68,25 +62,9 @@ class PVTestDataSetTorch(NamedTuple):
         structural = None
         if self.structural is not None:
             structural = self.structural.cuda()
+            structural_binary = self.structural_binary.cuda()
         return PVTestDataSetTorch(treatment=self.treatment.cuda(),
                                   structural=structural)
-
-
-class RHCTestDataSetTorch(NamedTuple):
-    treatment: torch.Tensor
-    outcome_proxy: torch.Tensor
-    backdoor: torch.Tensor
-
-    @classmethod
-    def from_numpy(cls, test_data: RHCTestDataSet):
-        return RHCTestDataSetTorch(treatment=torch.tensor(test_data.treatment, dtype=torch.float32),
-                                   outcome_proxy=torch.tensor(test_data.outcome_proxy, dtype=torch.float32),
-                                   backdoor=torch.tensor(test_data.backdoor, dtype=torch.float32))
-
-    def to_gpu(self):
-        return RHCTestDataSetTorch(treatment=self.treatment.cuda(),
-                                   outcome_proxy=self.outcome_proxy.cuda(),
-                                   backdoor=self.backdoor.cuda())
 
 
 def split_train_data(train_data: PVTrainDataSet, split_ratio=0.5):

@@ -1,9 +1,0 @@
-  0%|          | 0/100 [00:00<?, ?it/s]
-Traceback (most recent call last):
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py", line 102, in <module>
-    train(model, dataloader, train_config, mask=True, model_file=args.model_train_file)
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/train.py", line 48, in train
-    batch_loss, batch_items = causal_loss_fun(outputs, batch, return_items=True)
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/model.py", line 131, in causal_loss_fun
-    for output_name in outputs.keys():
-AttributeError: 'tuple' object has no attribute 'keys'

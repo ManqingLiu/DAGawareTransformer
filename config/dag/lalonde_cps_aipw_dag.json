@@ -1,0 +1,33 @@
+{
+  "nodes": ["age","education","black","hispanic","married","nodegree","re74","re75","u74","u75","t","y"],
+  "input_nodes": {
+    "age": {"num_categories":  10},
+    "education": {"num_categories":  5},
+    "black": {"num_categories":  2},
+    "hispanic": {"num_categories":  2},
+    "married": {"num_categories":  2},
+    "nodegree": {"num_categories":  2},
+    "re74": {"num_categories":  10},
+    "re75": {"num_categories":  10},
+    "u74": {"num_categories":  2},
+    "u75": {"num_categories":  2},
+    "t": {"num_categories":  2},
+    "y": {"num_categories":  10}},
+
+  "output_nodes": {
+    "t": {"num_categories":  2},
+    "y": {"num_categories":  10}
+    },
+ "edges": {
+    "age": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "education": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "black": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "hispanic": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "married": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "nodegree": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "re74": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "re75": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "t": ["t","y"],
+    "y": ["y"]
+  }
+}

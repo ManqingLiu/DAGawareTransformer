@@ -1,0 +1,95 @@
+{
+    "filepaths": {
+        "dag_g_formula": "config/dag/acic_g_formula_dag.json",
+        "dag_ipw": "config/dag/acic_ipw_dag.json",
+        "dag_aipw": "config/dag/acic_aipw_dag.json",
+        "config": "config/train/acic/acic_sample2.json",
+        "data_train_file": "data/acic/sample2/data_train_2.csv",
+        "data_val_file": "data/acic/sample2/data_val_2.csv",
+        "data_test_file": "data/acic/sample2/data_test_2.csv",
+        "pseudo_cate_file": "data/acic/sample2/pseudo_ite_2.csv",
+        "predictions_g-formula": "experiments/predict/acic/predictions_g_formula_sample2.csv",
+        "predictions_ipw": "experiments/predict/acic/predictions_ipw_sample2.csv",
+        "predictions_aipw": "experiments/predict/acic/predictions_aipw_sample2.csv"
+    },
+    "loss_type": {
+        "g-formula-loss": "g-formula-loss",
+        "ipw-loss": "ipw-loss",
+        "cfcv": "aipw-loss"
+    },
+    "g-formula": {
+        "training": {
+            "n_epochs": 300,
+            "batch_size": 64,
+            "log_metrics": "False",
+            "learning_rate": 0.001,
+            "l2_penalty": 3e-08,
+            "alpha": 0,
+            "loss_type": "g-formula-loss",
+            "dag_attention_mask": "True"
+        },
+        "model": {
+        "name": "acic",
+            "activation": "gelu",
+        "network_width": 40,
+        "input_layer_depth": 8,
+        "num_layers": 16,
+        "dropout_rate": 0.0001,
+        "embedding_dim": 256,
+        "feedforward_dim": 1024,
+        "num_heads": 4,
+        "encoder_weight": 0.02
+        }
+    },
+    "aipw": {
+       "training": {
+            "n_epochs": 500,
+            "batch_size": 64,
+            "log_metrics": "False",
+            "learning_rate": 1e-04,
+            "l2_penalty": 3e-05,
+            "alpha": 0,
+            "loss_type": "aipw-loss",
+            "dag_attention_mask": "True",
+            "ps_lower_bound": 0.28,
+            "ps_upper_bound": 0.34
+        },
+        "model": {
+        "name": "acic",
+            "activation": "gelu",
+        "network_width": 80,
+        "input_layer_depth": 4,
+        "num_layers": 4,
+        "dropout_rate": 0.0001,
+        "embedding_dim": 256,
+        "feedforward_dim": 512,
+        "num_heads": 4,
+        "encoder_weight": 1
+        }
+    },
+     "ipw": {
+        "training": {
+            "n_epochs": 20,
+            "batch_size": 256,
+            "log_metrics": "False",
+            "learning_rate": 1e-03,
+            "l2_penalty": 3e-05,
+            "loss_type": "ipw-loss",
+            "dag_attention_mask": "True"
+        },
+        "model": {
+        "name": "acic",
+            "activation": "gelu",
+        "network_width": 40,
+        "input_layer_depth": 8,
+        "num_layers": 2,
+        "dropout_rate": 0.0001,
+        "embedding_dim": 40,
+        "feedforward_dim": 80,
+        "num_heads": 2,
+        "encoder_weight": 0.02
+        }
+    },
+    "random_seed": 42,
+    "sample_id": 2
+}

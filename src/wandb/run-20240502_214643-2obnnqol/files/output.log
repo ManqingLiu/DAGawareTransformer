@@ -1,4 +1,0 @@
-embedding.U1.weight: Parameter containing:
-tensor([[-0.5457, -0.0895, -1.1243,  ..., -1.1190, -0.9158,  0.5099],
-        [-0.4913, -0.6098, -1.2724,  ...,  0.2422,  0.4523,  1.0715]],
-       requires_grad=True)

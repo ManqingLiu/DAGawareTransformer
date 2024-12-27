@@ -3,12 +3,10 @@ numba
 torch
 numpy
 pandas
-PIL
 scikit-learn
 wandb
 ray[tune]
 openpyxl
 matplotlib
 seaborn
-doubleml
 tqdm

@@ -1,0 +1,96 @@
+{
+    "filepaths": {
+        "dag_g_formula": "config/dag/lalonde_cps_g_formula_dag.json",
+        "dag_ipw": "config/dag/lalonde_cps_ipw_dag.json",
+        "dag_aipw": "config/dag/lalonde_cps_aipw_dag.json",
+        "config": "config/train/lalonde_cps/lalonde_cps_sample10.json",
+        "data_file": "data/lalonde/ldw_cps/ldw_cps.csv",
+        "data_train_file": "data/lalonde/ldw_cps/sample10/train_data_10.csv",
+        "data_val_file": "data/lalonde/ldw_cps/sample10/val_data_10.csv",
+        "data_test_file": "data/lalonde/ldw_cps/sample10/test_data_10.csv",
+        "pseudo_ate_file": "src/train/lalonde/lalonde_cps/aipw_grf_pseudo_ate.csv",
+        "predictions_g-formula": "experiments/predict/lalonde_cps/predictions_g_formula_sample10.csv",
+        "predictions_ipw": "experiments/predict/lalonde_cps/predictions_ipw_sample10.csv",
+        "predictions_aipw": "experiments/predict/lalonde_cps/predictions_aipw_sample10.csv"
+    },
+    "loss_type": {
+        "g-formula-loss": "g-formula-loss",
+        "ipw-loss": "ipw-loss",
+        "cfcv": "cfcv"
+    },
+    "g-formula": {
+        "training": {
+            "n_epochs": 33,
+            "batch_size": 32,
+            "log_metrics": "False",
+            "learning_rate": 0.001,
+            "l2_penalty": 3e-03,
+            "alpha": 0,
+            "loss_type": "g-formula-loss",
+            "dag_attention_mask": "True",
+            "imbalance_loss_weight": 0,
+            "prop_score_threshold": 0.1
+        },
+        "model": {
+        "name": "lalonde_cps",
+            "activation": "gelu",
+        "network_width": 80,
+        "input_layer_depth": 4,
+        "num_layers": 2,
+        "dropout_rate": 0.0001,
+        "embedding_dim": 40,
+        "feedforward_dim": 80,
+        "num_heads": 2,
+        "encoder_weight": 0.02
+        }
+    },
+    "aipw": {
+       "training": {
+            "n_epochs": 8,
+            "batch_size": 32,
+            "log_metrics": "False",
+            "learning_rate": 0.001,
+            "l2_penalty": 3e-03,
+            "alpha": 0,
+            "loss_type": "aipw-loss",
+            "dag_attention_mask": "True"
+        },
+        "model": {
+        "name": "lalonde_cps",
+            "activation": "gelu",
+        "network_width": 80,
+        "input_layer_depth": 4,
+        "num_layers": 1,
+        "dropout_rate": 0.0001,
+        "embedding_dim": 40,
+        "feedforward_dim": 80,
+        "num_heads": 1,
+        "encoder_weight": 0.02
+        }},
+     "ipw": {
+        "training": {
+            "n_epochs": 10,
+            "batch_size": 32,
+            "log_metrics": "False",
+            "learning_rate": 0.001,
+            "l2_penalty": 3e-05,
+            "alpha": 0,
+            "loss_type": "ipw-loss",
+            "dag_attention_mask": "True"
+        },
+        "model": {
+        "name": "lalonde_cps",
+            "activation": "gelu",
+        "network_width": 80,
+        "input_layer_depth": 1,
+        "num_layers": 1,
+        "dropout_rate": 0.0001,
+        "embedding_dim": 40,
+        "feedforward_dim": 80,
+        "num_heads": 1,
+        "encoder_weight": 0.02
+        }
+     },
+    "random_seed": 42,
+    "sample_id": 1
+}

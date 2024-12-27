@@ -1,9 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 173, in <module>
-    final_u_params = model.back_propagate(lr=0.00001, n_iters=1000, reg_lambda=0.1, grad_clip=0)
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 91, in back_propagate
-    batch_loss.backward()
-  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/_tensor.py", line 522, in backward
-    torch.autograd.backward(
-  File "/Users/manqingliu/opt/anaconda3/envs/Myenv/lib/python3.10/site-packages/torch/autograd/__init__.py", line 266, in backward
-    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass

@@ -1,7 +1,15 @@
 from src.models.NMMR.kernel_utils import calculate_kernel_matrix_batched
+import torch
+from torch.nn import CrossEntropyLoss
 
 
-def NMMR_loss_transformer(model_output, target, kernel_matrix, loss_name: str, return_items: bool = False):
+def NMMR_loss_transformer(model_output,
+                          target,
+                          treatment,
+                          kernel_matrix,
+                          loss_name: str,
+                          alpha: int,
+                          return_items: bool = False):
     residual = target - model_output
     n = residual.shape[0]
     K = kernel_matrix
@@ -16,17 +24,26 @@ def NMMR_loss_transformer(model_output, target, kernel_matrix, loss_name: str, r
     else:
         raise ValueError(f"{loss_name} is not valid. Must be 'U_statistic' or 'V_statistic'.")
 
-    loss_value = loss[0, 0]
+    # Contrastive Loss Component #
+    treatment_mask = (treatment['treatment'].unsqueeze(0) != treatment['treatment'].unsqueeze(1))
+    
+    # Compute pairwise differences
+    differences = model_output.unsqueeze(0) - model_output.unsqueeze(1)
+    masked_differences = differences.squeeze() * treatment_mask
+    contrastive_loss = torch.negative(torch.norm(differences))
+
+    # You can weight this contrastive loss with a hyperparameter
+    total_loss = loss[0, 0] + alpha * contrastive_loss
 
     if return_items:
         batch_items = {
             'residual': residual,
             'kernel_matrix': K,
-            'loss': loss_value.item()
+            'total_loss': total_loss.item()
         }
-        return loss_value, batch_items
+        return total_loss, batch_items
     else:
-        return loss_value
+        return total_loss
 
 def NMMR_loss(model_output, target, kernel_matrix, loss_name: str):  # batch_indices=None):
     residual = target - model_output
