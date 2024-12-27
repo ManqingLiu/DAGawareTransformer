@@ -1,13 +1,15 @@
 .gitignore
 /data/
 myenv/
+.env
 .idea/
 .DS_Store
-__pycache__/
 wandb/
 *.egg-info
 */results/proximal.DS_Store
+.python-version
 __pycache__/
+*.pyc
 .vscode
 experiments/predict/*
 experiments/model/*
@@ -15,4 +17,5 @@ media/*
 *.png
 *.gif
 *.pdf
-DAGawareTransformer_NeurIPS_2024_CRL.pdf
+*.gif
+experiments/tuning/

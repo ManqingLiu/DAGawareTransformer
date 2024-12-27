@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 166, in <module>
-    original_u_values = model.map_u_to_original_scale(u_values)
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 113, in map_u_to_original_scale
-    bin_edges = self.bin_edges['U1']
-KeyError: 'U1'

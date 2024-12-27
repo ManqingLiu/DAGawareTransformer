@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 163, in <module>
-    final_u_params = model.back_propagate(lr=0.0001, n_iters=100, reg_lambda=0.01, grad_clip=1.0)
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 74, in back_propagate
-    batch_loss, batch_items = causal_loss_fun(outputs, batch, return_items=True)
-NameError: name 'causal_loss_fun' is not defined

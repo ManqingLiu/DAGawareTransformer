@@ -1,0 +1,30 @@
+{
+    "data": {
+        "name": "demand",
+        "n_sample": 10000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": 1000,
+        "batch_size": 32,
+        "log_metrics": "False",
+        "learning_rate": 0.001,
+        "l2_penalty": 3e-06,
+        "alpha": 0,
+        "loss_name": "V_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "activation": "gelu",
+        "network_width": 160,
+        "input_layer_depth": 8,
+        "num_layers": 1,
+        "dropout_rate": 0,
+        "embedding_dim": 40,
+        "feedforward_dim": 80,
+        "num_heads": 1,
+        "encoder_weight": 0.001
+    },
+    "n_repeat": 20
+}

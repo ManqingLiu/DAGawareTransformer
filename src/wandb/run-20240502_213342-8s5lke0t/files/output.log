@@ -1,8 +1,0 @@
-
-embedding.U1.weight
-Traceback (most recent call last):
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 121, in <module>
-    model = ubackprop.back_propagate()
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 80, in back_propagate
-    param -= lr * param.grad
-RuntimeError: a leaf Variable that requires grad is being used in an in-place operation.

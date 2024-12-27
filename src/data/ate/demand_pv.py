@@ -7,6 +7,8 @@ from src.data.ate.data_class import PVTrainDataSet, PVTestDataSet
 def psi(t: np.ndarray) -> np.ndarray:
     return 2 * ((t - 5) ** 4 / 600 + np.exp(-4 * (t - 5) ** 2) + t / 10 - 2)
 
+def cal_outcome(price, views, demand):
+    return np.clip(np.exp((views - price) / 10.0), None, 5.0) * price - 5 * psi(demand)
 
 def generatate_demand_core(n_sample: int, rng, Z_noise: float = 1, W_noise: float = 1):
     demand = rng.uniform(0, 10, n_sample)
@@ -29,21 +31,17 @@ def generate_train_demand_pv(n_sample: int, Z_noise: float = 1, W_noise: float =
                           outcome=outcome[:, np.newaxis],
                           backdoor=None)
 
-
-def cal_outcome(price, views, demand):
-    return np.clip(np.exp((views - price) / 10.0), None, 5.0) * price - 5 * psi(demand)
-
-
 def cal_structural(p: float, W_noise: float = 1):
     rng = default_rng(seed=42)
     demand = rng.uniform(0, 10.0, 10000)
     views = 7 * psi(demand) + 45 + rng.normal(0, W_noise, 10000)
     outcome = cal_outcome(p, views, demand)
-    return np.mean(outcome)
+    mean_outcome = np.mean(outcome)
+    return mean_outcome
 
 
 def generate_test_demand_pv(W_noise: float = 1, **kwargs):
     price = np.linspace(10, 30, 10)
-    treatment = np.array([cal_structural(p, W_noise) for p in price])
-    return PVTestDataSet(structural=treatment[:, np.newaxis],
+    outcomes = np.array([cal_structural(p, W_noise) for p in price])
+    return PVTestDataSet(structural=outcomes[:, np.newaxis],
                          treatment=price[:, np.newaxis])

@@ -1,7 +1,0 @@
-dataset,prop_score_model,ate_bias,ate_std_error,ate_rmse
-lalonde_psid,kNN,-913.46,1224.24,1527.47
-lalonde_cps,DecisionTree,-1063.8,1314.97,1691.4
-twins,LogisticRegression_l2_liblinear,-0.01,0.01,0.01
-lalonde_psid,LogisticRegression,-2127.49,1478.04,2590.52
-lalonde_cps,LogisticRegression,-1308.94,2255.57,2607.86
-twins,LogisticRegression,-0.01,0.01,0.02

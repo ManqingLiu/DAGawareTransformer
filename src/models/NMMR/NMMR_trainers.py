@@ -5,18 +5,16 @@ import numpy as np
 from src.dataset import *
 
 import torch
-from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader as Dataloader
 import torch.optim as optim
 import torch.nn as nn
-from tqdm import tqdm
+import tqdm
 import wandb
 
-from src.data.ate.data_class import PVTrainDataSetTorch, PVTestDataSetTorch, RHCTestDataSet
-from src.models.NMMR.NMMR_loss import NMMR_loss, NMMR_loss_batched, NMMR_loss_transformer
-from src.models.NMMR.NMMR_model import MLP_for_NMMR, cnn_for_dsprite
-from src.models.NMMR.kernel_utils import calculate_kernel_matrix, calculate_kernel_matrix_batched, rbf_kernel
-from src.models.transformer_model import DAGTransformer, causal_loss_fun
+from src.data.ate.data_class import PVTrainDataSetTorch, PVTestDataSetTorch
+from src.models.NMMR.NMMR_loss import NMMR_loss, NMMR_loss_transformer
+from src.models.NMMR.NMMR_model import MLP_for_NMMR, DAGTransformer
+from src.models.NMMR.kernel_utils import calculate_kernel_matrix
 
 
 class NMMR_Trainer_DemandExperiment(object):
@@ -24,166 +22,271 @@ class NMMR_Trainer_DemandExperiment(object):
                  configs: Dict[str, Any],
                  data_configs: Dict[str, Any],
                  dag: Dict[str, Any],
-                 train_config: Dict[str, Any],
-                 model_config: Dict[str, Any],
-                 mask: bool,
-                 random_seed: int,
-                 dump_folder: Optional[Path] = None):
+                 train_config_transformer: Dict[str, Any],
+                 model_config_transformer: Dict[str, Any],
+                 train_config_mlp: Dict[str, Any],
+                 model_config_mlp: Dict[str, Any]):
+
+        wandb.init(project="DAG transformer",
+                   config=configs,
+                   tags='proximal_demand')
 
         self.configs = configs
         self.data_config = data_configs
         self.dag = dag
-        self.mask = mask
-        self.train_config = train_config
-        self.model_config = model_config
+        self.train_config_transformer = train_config_transformer
+        self.model_config_transformer = model_config_transformer
+        self.train_config_mlp = train_config_mlp
+        self.model_config_mlp = model_config_mlp
         self.n_sample = self.data_config['n_sample']
-        self.n_epochs = train_config['n_epochs']
-        self.batch_size = train_config['batch_size']
+        self.mask = self.train_config_transformer['dag_attention_mask']
         self.gpu_flg = torch.cuda.is_available()
-        self.log_metrics = train_config['log_metrics'] == "True"
-        self.l2_penalty = train_config['l2_penalty']
-        self.learning_rate = train_config['learning_rate']
-        self.loss_name = train_config['loss_name']
-        self.num_layers = model_config['num_layers']
-        self.dropout_rate = model_config['dropout_rate']
-        self.embedding_dim = model_config['embedding_dim']
-        self.num_heads = model_config['num_heads']
-        self.name = model_config['name']
 
         self.mse_loss = nn.MSELoss()
         self.cross_entropy_loss = nn.CrossEntropyLoss()
 
-        if self.log_metrics:
-            self.writer = SummaryWriter(log_dir=op.join(dump_folder, f"tensorboard_log_{random_seed}"))
-            self.causal_train_losses = []
-            self.causal_val_losses = []
-
     def compute_kernel(self, kernel_inputs):
-
         return calculate_kernel_matrix(kernel_inputs)
 
-
-
-    def train(self,
+    def train_transformer(self,
           train_dataloader: Dataloader,
+          val_data: CausalDataset,
           val_dataloader: Dataloader,
-          verbose: int = 0) -> DAGTransformer:
+          test_dataloader: Dataloader) -> DAGTransformer:
 
         model = DAGTransformer(dag=self.dag,
-                            **self.model_config)
+                            **self.model_config_transformer)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        model = model.to(device)
         print(f'Using device: {device}')
 
-        wandb.init(project="DAG transformer",
-                   config=self.configs,
-                   tags='proximal_demand')
+        optimizer = optim.Adam(list(model.parameters()), lr=self.train_config_transformer['learning_rate'],
+                               weight_decay=self.train_config_transformer['l2_penalty'])
 
-        optimizer = optim.Adam(list(model.parameters()), lr=self.learning_rate, weight_decay=self.l2_penalty)
+        epoch_bar = tqdm.tqdm(range(self.train_config_transformer['n_epochs']), desc="Training", position=0, leave=True)
 
-        bin_left_edges = {k: torch.tensor(v[:-1], dtype=torch.float32).to(device) for k, v in train_dataloader.dataset.bin_edges.items()}
-        bin_midpoints = {k: torch.tensor((v[1:] + v[:-1]) / 2, dtype=torch.float32).to(device) for k, v in train_dataloader.dataset.bin_edges.items()}
-
-        for _ in tqdm(range(self.n_epochs)):
-            for batch_raw, batch_binned in train_dataloader:
+        for epoch in epoch_bar:
+            model.train(True)
+            batch_bar = tqdm.tqdm(train_dataloader, desc=f"Epoch {epoch+1}", position=1, leave=False)
+            for batch_raw, batch_binned in batch_bar: 
                 optimizer.zero_grad()
                 batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
-                outputs = model(batch_binned, mask=self.mask)
+                # send batch_raw to device
+                batch_raw = {k: v.to(device) for k, v in batch_raw.items()}
 
-                # Transform the model outputs back to the original scale
-                transformed_outputs = {}
-                for output_name, output in outputs.items():
-                    softmax_output = torch.softmax(output, dim=1)
-                    weighted_avg = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
-                    transformed_outputs[output_name] = weighted_avg
+                outputs = model(batch_raw, mask=self.mask)
 
                 labels = {'outcome': batch_raw['outcome']}
+                treatment_binned = {'treatment': batch_binned['treatment']}
                 kernel_inputs_train = torch.cat((batch_raw['treatment'], batch_raw['treatment_proxy1'],
                                                 batch_raw['treatment_proxy2']), dim=1)
                 kernel_matrix_train = self.compute_kernel(kernel_inputs_train)
 
-                model_output = transformed_outputs['outcome']
+                model_output = outputs['outcome']
+                model_output = model_output.to(device)
                 target = labels['outcome']
+                target = target.to(device)
+                alpha = self.train_config_transformer['alpha']
 
-                batch_loss, batch_items = NMMR_loss_transformer(model_output, target, kernel_matrix_train,
-                                                        loss_name=self.loss_name, return_items=True)
-                print(f"Traing Loss: {batch_loss}")
-                for item in batch_items.keys():
-                    wandb.log({item: batch_items[item]})
+                batch_loss, batch_items = NMMR_loss_transformer(model_output,
+                                                                target,
+                                                                treatment_binned,
+                                                                kernel_matrix_train,
+                                                                loss_name=self.train_config_transformer['loss_name'],
+                                                                alpha=alpha,
+                                                                return_items=True)
                 batch_loss.backward()
                 optimizer.step()
-                wandb.log({'Training loss': batch_loss})
+                for item in batch_items.keys():
+                    wandb.log({f"train_{item}": batch_items[item]})
+
+                batch_bar.set_postfix(loss=batch_loss.item())
+            
+            batch_bar.close()
 
             model.eval()
             with torch.no_grad():
                 for batch_raw, batch_binned in val_dataloader:
                     batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
-                    outputs = model(batch_binned, mask=self.mask)
-
-                    # Transform the model outputs back to the original scale
-                    transformed_outputs = {}
-                    for output_name, output in outputs.items():
-                        softmax_output = torch.softmax(output, dim=1)
-                        weighted_avg = torch.sum(softmax_output * bin_left_edges[output_name].to(device), dim=1, keepdim=True)
-                        transformed_outputs[output_name] = weighted_avg
+                    batch_raw = {k: v.to(device) for k, v in batch_raw.items()}
+                    outputs = model(batch_raw, mask=self.mask)
 
                     labels = {'outcome': batch_raw['outcome']}
+                    treatment_binned = {'treatment': batch_binned['treatment']}
                     kernel_inputs_val = torch.cat((batch_raw['treatment'], batch_raw['treatment_proxy1'],
                                                     batch_raw['treatment_proxy2']), dim=1)
                     kernel_matrix_val = self.compute_kernel(kernel_inputs_val)
 
-                    model_output = transformed_outputs['outcome']
+                    model_output = outputs['outcome']
+                    model_output = model_output.to(device)
                     target = labels['outcome']
+                    target = target.to(device)
 
-                    batch_loss, batch_items = NMMR_loss_transformer(model_output, target, kernel_matrix_val,
-                                                            loss_name=self.loss_name, return_items=True)
-                    print(f"Validation Loss: {batch_loss}")
+                    batch_loss, batch_items = NMMR_loss_transformer(model_output,
+                                                                    target,
+                                                                    treatment_binned,
+                                                                    kernel_matrix_val,
+                                                                    loss_name=self.train_config_transformer['loss_name'],
+                                                                    alpha=alpha,
+                                                                    return_items=True)
                     for item in batch_items.keys():
-                        wandb.log({item: batch_items[item]})
-                    wandb.log({'Validation loss': batch_loss})
+                        wandb.log({f"val_{item}": batch_items[item]})
 
-        wandb.finish()
+                E_w_haw, oos_loss, E_ydoA, predictions = self.predict_transformer(model,
+                                                                                  self.data_config,
+                                                                                  val_data,
+                                                                                  self.dag,
+                                                                                  self.n_sample,
+                                                                                  test_dataloader,
+                                                                                  self.mask
+                                                                                  )
+                # print(f"Epoch: {epoch}, E_w_haw_transformer: {E_w_haw}")
+                # print oos loss for each epoch
+                print(f"Epoch: {epoch}, OOS loss transformer: {oos_loss.item()}")
+                wandb.log({'OOS loss transformer': oos_loss,
+                           #'E_w_haw_transformer':  wandb.Histogram(E_w_haw),
+                           'E_ydoA':  wandb.Histogram(E_ydoA),
+                          'predictions': predictions})
+
+            epoch_bar.set_postfix(val_loss=batch_loss.item())
+        
+        epoch_bar.close()
 
         return model
 
-    def predict(self,
-                n_sample,
-                test_dataloader):
+    @staticmethod
+    def predict_transformer(model: DAGTransformer,
+                data_config: Dict[str, Any],
+                val_data: CausalDataset,
+                dag: Dict[str, Any],
+                n_sample: int,
+                test_dataloader: Dataloader,
+                mask: bool = False):
         # Create a 3-dim array with shape [intervention_array_len, n_samples, 2]
         # This will contain the test values for do(A) chosen by Xu et al. as well as {n_samples} random draws for W
         # Compute model's predicted E[Y | do(A)] = E_w[h(a, w)]
         # Note: the mean is taken over the n_sample axis, so we obtain {intervention_array_len} number of expected values
-        model = DAGTransformer(dag=self.dag,
-                               **self.model_config)
-
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(f'Using device: {device}')
         model = model.to(device)
 
-        bin_left_edges = {k: np.array(v[:-1], dtype=np.float32) for k, v in test_dataloader.dataset.bin_edges.items()}
+        all_predictions = []
+        all_treatments = []
 
-
-        softmaxes = []
         with torch.no_grad():
-            for _, batch_binned in test_dataloader:
-                batch_binned = {k: v.to(device) for k, v in batch_binned.items()}
-                outputs = model(batch_binned, mask=True)
-                batch_predictions = []
-                for output_name in outputs.keys():
-                    # Detach the outputs and move them to cpu
-                    output = outputs[output_name].cpu().numpy()
-                    output = np.exp(output) / np.sum(np.exp(output), axis=1, keepdims=True)
-                    # Append the reshaped output to batch_predictions
-                    batch_predictions.append(output)
-                # concatenate the batch predictions along the second axis
-                batch_predictions = np.concatenate(batch_predictions, axis=1)
-                softmaxes.append(batch_predictions)
+            for batch_raw, batch_binned in test_dataloader:
+                batch_raw = {k: v.to(device) for k, v in batch_raw.items()}
+                outputs = model(batch_raw, mask=mask)
+                predictions = outputs['outcome'].cpu().numpy()
+                treatments = batch_raw['treatment'].cpu().numpy()
 
-        # concatenate and unbin the predictions
-        softmaxes = np.concatenate(softmaxes, axis=0)
-        predictions = np.sum(softmaxes * bin_left_edges[output_name], axis=1)
-        
-        E_w_haw = np.mean(predictions.reshape(10, n_sample, 1), axis=1)  # should return 10 expected values
+                all_predictions.append(predictions)
+                all_treatments.append(treatments)
 
-        return E_w_haw
+        all_predictions = np.concatenate(all_predictions)
+
+        # Reshape the array to [10, n_sample]
+        reshaped_predictions = all_predictions.reshape(-1, n_sample)
+
+        # Calculate the mean along the second axis
+        E_w_haw = np.mean(reshaped_predictions, axis=1).reshape(-1,1)
+
+        test_data, E_ydoA = make_test_data(data_config, val_data, dag)
+        oos_loss = np.mean((E_w_haw - E_ydoA) ** 2)
+
+        return E_w_haw, oos_loss, E_ydoA, all_predictions
+
+
+    def train_mlp(self,
+                  train_t: PVTrainDataSetTorch,
+                  test_data_t: PVTestDataSetTorch,
+                  val_data_t: PVTrainDataSetTorch,
+                  verbose: int = 0) -> MLP_for_NMMR:
+
+        # inputs consist of (A, W) tuples
+        model = MLP_for_NMMR(input_dim=2, train_params=self.model_config_mlp)
+
+        if self.gpu_flg:
+            train_t = train_t.to_gpu()
+            val_data_t = val_data_t.to_gpu()
+            test_data_t = test_data_t.to_gpu()
+            model.cuda()
+
+        # weight_decay implements L2 penalty
+        optimizer = optim.Adam(list(model.parameters()), lr=self.train_config_mlp['learning_rate'],
+                               weight_decay=self.train_config_mlp['l2_penalty'])
+
+        # train model
+        for epoch in range(self.train_config_mlp['n_epochs']):
+            permutation = torch.randperm(self.n_sample)
+
+            for i in range(0, self.n_sample, self.train_config_mlp['batch_size']):
+                indices = permutation[i:i + self.train_config_mlp['batch_size']]
+                batch_A, batch_W, batch_y = train_t.treatment[indices], train_t.outcome_proxy[indices], \
+                                            train_t.outcome[indices]
+
+                optimizer.zero_grad()
+                batch_x = torch.cat((batch_A, batch_W), dim=1)
+                pred_y = model(batch_x)
+                kernel_inputs_train = torch.cat((train_t.treatment[indices], train_t.treatment_proxy[indices]), dim=1)
+                kernel_matrix_train = self.compute_kernel(kernel_inputs_train)
+
+                causal_loss_train = NMMR_loss(pred_y, batch_y, kernel_matrix_train, self.train_config_mlp['loss_name'])
+                causal_loss_train.backward()
+                optimizer.step()
+                wandb.log({'Training loss mlp': causal_loss_train})
+
+            model.eval()
+            with torch.no_grad():
+
+                preds_val = model(torch.cat((val_data_t.treatment, val_data_t.outcome_proxy), dim=1))
+
+                # compute the full kernel matrix
+                kernel_inputs_val = torch.cat((val_data_t.treatment, val_data_t.treatment_proxy), dim=1)
+                kernel_matrix_val = self.compute_kernel(kernel_inputs_val)
+
+                # calculate and log the causal loss (validation)
+                causal_loss_val = NMMR_loss(preds_val, val_data_t.outcome, kernel_matrix_val, self.train_config_mlp['loss_name'])
+
+                wandb.log({'Validation loss mlp': causal_loss_val})
+
+                E_w_haw, oos_loss, predictions = self.predict_mlp(model, self.data_config, test_data_t, val_data_t)
+                # print E_w_haw for each epoch
+                print(f"Epoch: {epoch}, E_w_haw_mlp: {E_w_haw}")
+                # print oos loss for each epoch
+                print(f"Epoch: {epoch}, OOS loss mlp: {oos_loss.item()}")
+                wandb.log({'OOS loss mlp': oos_loss,
+                           'E_w_haw_mlp': wandb.Histogram(E_w_haw),
+                           "MLP predictions": predictions})
+
+        return model
+
+    @staticmethod
+    def predict_mlp(model: MLP_for_NMMR,
+                    data_config: Dict[str, Any],
+                    test_data_t: PVTestDataSetTorch,
+                    val_data_t: PVTrainDataSetTorch,
+                    gpu_flg: bool = False):
+        # Create a 3-dim array with shape [intervention_array_len, n_samples, 2]
+        # This will contain the test values for do(A) chosen by Xu et al. as well as {n_samples} random draws for W
+        if gpu_flg:
+            test_data_t = test_data_t.to_gpu()
+            val_data_t = val_data_t.to_gpu()
+            model.cuda()
+        test_data = generate_test_data_ate(data_config=data_config)
+        intervention_array_len = test_data_t.treatment.shape[0]
+        num_W_test = val_data_t.outcome_proxy.shape[0]
+        temp1 = test_data_t.treatment.expand(-1, num_W_test)
+        temp2 = val_data_t.outcome_proxy.expand(-1, intervention_array_len)
+        model_inputs_test = torch.stack((temp1, temp2.T), dim=-1)
+
+        # Compute model's predicted E[Y | do(A)] = E_w[h(a, w)]
+        # Note: the mean is taken over the n_sample axis, so we obtain {intervention_array_len} number of expected values
+        with torch.no_grad():
+            mlp_predictions = model(model_inputs_test)
+            E_w_haw = torch.mean(mlp_predictions, dim=1)
+            pred = E_w_haw.cpu()
+            oos_loss = torch.mean((pred - test_data.structural) ** 2)
+
+        return E_w_haw.cpu(), oos_loss, mlp_predictions.cpu()
