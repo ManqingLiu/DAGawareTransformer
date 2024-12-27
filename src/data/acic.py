@@ -5,8 +5,7 @@ import pandas as pd
 
 from sklearn.utils import Bunch
 from sklearn.model_selection import train_test_split
-
-from src.data.utils_data import identify_binary_columns
+from sklearn.utils import resample
 
 
 
@@ -18,7 +17,7 @@ def load_data_file(file_name, data_dir_name, sep=","):
     return data
 
 
-def load_acic16(instance=1, raw=False, data_dir_name='data'):
+def load_acic16(instance=10, raw=True):
     """ Loads single dataset from the 2016 Atlantic Causal Inference Conference data challenge.
 
     The dataset is based on real covariates but synthetically simulates the treatment assignment
@@ -78,17 +77,6 @@ def load_acic16(instance=1, raw=False, data_dir_name='data'):
     if raw:
         return X, zymu
 
-    non_numeric_cols = X.select_dtypes(include=[object]).columns
-    X = pd.get_dummies(X, columns=non_numeric_cols, drop_first=True)
-
-    # Potential outcomes:
-    po = zymu[["mu0", "mu1"]]
-    po = po.rename(columns=lambda x: x.strip("mu"))
-
-    descriptors = pd.Series(data="No true meaning", index=X.columns)
-    data = Bunch(X=X, a=a, y=y, po=po, descriptors=descriptors)
-    return data
-
 def data_split_acic(data, filepaths):
     X = data[0]
     zymu = data[1]
@@ -111,7 +99,7 @@ def process_all_samples(config_dir):
             config = json.load(f)
 
         filepaths = config["filepaths"]
-        data = load_acic16(instance=instance, raw=True, data_dir_name=config.get("data_dir_name", 'data'))
+        data = load_acic16(instance=instance, raw=True)
         data_split_acic(data, filepaths)
 
 if __name__ == '__main__':

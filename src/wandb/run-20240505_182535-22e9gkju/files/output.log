@@ -1,8 +1,0 @@
-
-dict_keys(['X', 'A', 'Y'])
-Traceback (most recent call last):
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 179, in <module>
-    recovered_u = model.recover_u(final_u_params)
-  File "/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS/src/u_back_prop.py", line 128, in recover_u
-    output = outputs['U1'].cpu().numpy()
-KeyError: 'U1'

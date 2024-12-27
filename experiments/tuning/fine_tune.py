@@ -113,8 +113,7 @@ if __name__ == '__main__':
     # Step 1: Define a dictionary mapping data names to configurations
     configurations = {
         "lalonde_cps": config_lalonde_cps,
-        "acic": config_acic,  # Assuming you have a config_acic defined similarly to config_lalonde_cps
-        # Add more mappings as needed
+        "acic": config_acic
     }
 
     # Step 2: Select the correct configuration using args.data_name

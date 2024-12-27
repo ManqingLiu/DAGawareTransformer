@@ -29,28 +29,18 @@ def calculate_val_metrics_acic(
     predictions: np.array,
     pseudo_ite: pd.DataFrame,
     prefix: str,
-    prop_score_threshold: float=0
+    estimator: str,
+    sample_id: int
 ) -> Dict[str, float]:
-    if prop_score_threshold > 0:
-        indices = predictions['t_prob'] < np.float32(prop_score_threshold)
-        predictions.loc[indices, "t_prob"] = np.float32(prop_score_threshold)
-
-        indices = predictions['t_prob'] > 1 - np.float32(prop_score_threshold)
-        predictions.loc[indices, "t_prob"] = 1 - np.float32(prop_score_threshold)
-
-    ps_trt = np.mean(predictions['t_prob'][predictions['t'] == 1])
-    ps_ctrl = np.mean(predictions['t_prob'][predictions['t'] == 0])
     predictions['ite'] = predictions['mu1']-predictions['mu0']
-    std_rmse_ = std_rmse(predictions['pred_y_A0'], predictions['pred_y_A1'], pseudo_ite['ite'])
-    ipw_rmse_ = ipw_rmse(predictions['y'], predictions['t'], predictions['t_prob'], pseudo_ite['ite'])
-    cfcv_rmse_ = cfcv_rmse(predictions['y'], predictions['t'], predictions['pred_y_A0'],
-                           predictions['pred_y_A0'], predictions['t_prob'],
-                           pseudo_ite['ite'])
-
-    return {
-        f"{prefix}: Propensity score for treatment (mean)": ps_trt,
-        f"{prefix}: Propensity score for control (mean)": ps_ctrl,
-        f"{prefix}: RMSE for standardization": std_rmse_,
-        f"{prefix}: RMSE for IPW": ipw_rmse_,
-        f"{prefix}: RMSE for CFCV": cfcv_rmse_
-    }
+    pseudo_ite_value = pseudo_ite.iloc[sample_id]["ate"]
+    if estimator == "g-formula":
+        std_rmse_ = std_rmse(predictions['pred_y_A0'], predictions['pred_y_A1'], pseudo_ite_value)
+        return {f"{prefix}: RMSE for standardization": std_rmse_}
+    elif estimator == "ipw":
+        ipw_rmse_ = ipw_rmse(predictions['y'], predictions['t'], predictions['t_prob'], pseudo_ite_value)
+        return {f"{prefix}: RMSE for IPW": ipw_rmse_}
+    else:
+        cfcv_rmse_ = cfcv_rmse(predictions['y'], predictions['t'], predictions['mu0'],
+                           predictions['mu1'], predictions['t_prob'], pseudo_ite_value)
+        return {f"{prefix}: RMSE for CFCV": cfcv_rmse_}

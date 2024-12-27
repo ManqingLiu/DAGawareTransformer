@@ -219,3 +219,313 @@ config_acic = {
     },
   "random_seed": 42
 }
+
+config_proximal_n1000_u = {
+    "data": {
+        "name": "demand",
+        "n_sample": 1000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([100, 300, 500, 1000, 3000, 5000]),
+        "batch_size": tune.choice([32, 64, 100, 1000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4, 1e-5]),
+        "l2_penalty": tune.choice([1e-3, 1e-4, 1e-5, 1e-6, 3e-06]),
+        "alpha": 0,
+        "loss_name": "U_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "activation": tune.choice(["relu", "gelu"]),
+        "network_width": tune.choice([80, 160, 320, 640]),
+        "input_layer_depth": tune.choice([4, 8, 16]),
+        "num_layers": tune.choice([1, 2]),
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3, 0.4]),
+        "embedding_dim": tune.choice([10, 20, 40, 80]),
+        "feedforward_dim": 80,
+        "num_heads": tune.choice([1, 2]),
+        "encoder_weight": tune.uniform(0.01, 0.1)
+    },
+    "n_repeat": 20
+}
+
+config_proximal_n1000_u_z = {
+    "data": {
+        "name": "demand",
+        "n_sample": 1000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([300, 350, 380, 400, 450, 480, 500, 800]),
+        "batch_size": tune.choice([32, 64, 100, 1000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4]),
+        "l2_penalty": 3e-06,
+        "alpha": 0,
+        "loss_name": "U_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "activation": tune.choice(["relu", "gelu"]),
+        "network_width": tune.choice([80, 160, 320, 640]),
+        "input_layer_depth": tune.choice([4, 8, 16]),
+        "num_layers": tune.choice([1, 2, 4]),
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3]),
+        "embedding_dim": tune.choice([10, 20, 40, 80]),
+        "feedforward_dim": 80,
+        "num_heads": tune.choice([1, 2, 4]),
+        "encoder_weight": tune.uniform(0.001, 0.1)
+    },
+    "n_repeat": 20
+}
+
+
+config_proximal_n5000_u = {
+    "data": {
+        "name": "demand",
+        "n_sample": 5000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([10, 50, 100, 150, 200]),
+        "batch_size": tune.choice([128, 256, 512, 1000, 3000, 5000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4, 1e-5, 1e-6]),
+        "l2_penalty": tune.choice([3, 2, 1, 1e-3, 1e-4, 1e-5, 1e-6]),
+        "alpha": tune.uniform(0, 1),
+        "loss_name": "U_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "num_layers": 1,
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "embedding_dim": tune.choice([8, 16, 32, 64, 128, 512]),
+        "num_heads": tune.grid_search([1, 2, 4])
+    },
+    "n_repeat": 20
+}
+
+config_proximal_n5000_u_z = {
+    "data": {
+        "name": "demand",
+        "n_sample": 5000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([300, 350, 380, 400, 450, 480, 500, 800, 1000, 2000, 3000]),
+        "batch_size": tune.choice([32, 64, 100, 1000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4]),
+        "l2_penalty": tune.choice([3e-04, 3e-05, 3e-06]),
+        "alpha": 0,
+        "loss_name": "U_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "activation": tune.choice(["relu", "gelu"]),
+        "network_width": tune.choice([80, 160, 320, 640]),
+        "input_layer_depth": tune.choice([4, 8, 16]),
+        "num_layers": tune.choice([1, 2, 4]),
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3]),
+        "embedding_dim": tune.choice([10, 20, 40, 80]),
+        "feedforward_dim": 80,
+        "num_heads": tune.choice([1, 2, 4]),
+        "encoder_weight": tune.uniform(0.001, 0.1)
+    },
+    "n_repeat": 20
+}
+
+config_proximal_n10000_u = {
+    "data": {
+        "name": "demand",
+        "n_sample": 10000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([10, 50, 100, 150, 200, 300, 500, 1000]),
+        "batch_size": tune.choice([256, 512, 1000, 3000, 5000, 7000, 10000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4, 1e-5, 1e-6]),
+        "l2_penalty": tune.choice([3, 2, 1, 1e-3, 1e-4, 1e-5, 1e-6]),
+        "alpha": tune.uniform(0, 1),
+        "loss_name": "U_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "num_layers": 1,
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "embedding_dim": tune.choice([32, 64, 128, 512]),
+        "num_heads": tune.grid_search([1, 2, 4])
+    },
+    "n_repeat": 20
+}
+
+
+config_proximal_n50000_u = {
+    "data": {
+        "name": "demand",
+        "n_sample": 50000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([10, 50, 100, 150, 200, 500, 1000]),
+        "batch_size": tune.choice([512, 1000, 3000, 5000, 10000, 30000, 50000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4, 1e-5, 1e-6]),
+        "l2_penalty": tune.choice([3, 2, 1, 1e-3, 1e-4, 1e-5, 1e-6]),
+        "alpha": tune.uniform(0, 1),
+        "loss_name": "U_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "num_layers": 1,
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "embedding_dim": tune.choice([32, 64, 128, 512]),
+        "num_heads": tune.grid_search([1, 2, 4])
+    },
+    "n_repeat": 20
+}
+
+config_proximal_n50000_u_z = {
+    "data": {
+        "name": "demand",
+        "n_sample": 50000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([1000, 2000]),
+        "batch_size": tune.choice([32, 64, 100, 1000, 2000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4]),
+        "l2_penalty": tune.choice([3e-04, 3e-05, 3e-06]),
+        "alpha": 0,
+        "loss_name": "U_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "activation": tune.choice(["relu", "gelu"]),
+        "network_width": tune.choice([80, 160, 320, 640]),
+        "input_layer_depth": tune.choice([4, 8, 16]),
+        "num_layers": tune.choice([1, 2, 4]),
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3]),
+        "embedding_dim": tune.choice([10, 20, 40, 80]),
+        "feedforward_dim": 80,
+        "num_heads": tune.choice([1, 2, 4]),
+        "encoder_weight": tune.uniform(0.001, 0.1)
+    },
+    "n_repeat": 20
+}
+
+
+config_proximal_n1000_v = {
+    "data": {
+        "name": "demand",
+        "n_sample": 1000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([10, 50, 100, 150]),
+        "batch_size": tune.choice([512, 1000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4, 1e-5, 1e-6]),
+        "l2_penalty": tune.choice([3, 2, 1, 1e-3, 1e-4, 1e-5, 1e-6]),
+        "alpha": tune.uniform(0, 1),
+        "loss_name": "V_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "num_layers": 1,
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "embedding_dim": tune.choice([8, 16, 32, 64, 128, 512]),
+        "num_heads": 1
+    },
+    "n_repeat": 20
+}
+
+config_proximal_n5000_v = {
+    "data": {
+        "name": "demand",
+        "n_sample": 5000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([10, 50, 100, 150, 200]),
+        "batch_size": tune.choice([128, 256, 512, 1000, 3000, 5000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4, 1e-5, 1e-6]),
+        "l2_penalty": tune.choice([3, 2, 1, 1e-3, 1e-4, 1e-5, 1e-6]),
+        "alpha": tune.uniform(0, 1),
+        "loss_name": "V_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "num_layers": 1,
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "embedding_dim": tune.choice([8, 16, 32, 64, 128, 512]),
+        "num_heads": tune.grid_search([1, 2, 4])
+    },
+    "n_repeat": 20
+}
+
+config_proximal_n10000_v = {
+    "data": {
+        "name": "demand",
+        "n_sample": 10000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([10, 50, 100, 150, 200, 300, 500, 1000]),
+        "batch_size": tune.choice([256, 512, 1000, 3000, 5000, 7000, 10000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4, 1e-5, 1e-6]),
+        "l2_penalty": tune.choice([3, 2, 1, 1e-3, 1e-4, 1e-5, 1e-6]),
+        "alpha": tune.uniform(0, 1),
+        "loss_name": "V_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "num_layers": 1,
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "embedding_dim": tune.choice([32, 64, 128, 512]),
+        "num_heads": tune.grid_search([1, 2, 4])
+    },
+    "n_repeat": 20
+}
+
+
+config_proximal_n50000_v = {
+    "data": {
+        "name": "demand",
+        "n_sample": 50000,
+        "random_seed": 42
+    },
+    "training_transformer": {
+        "n_epochs": tune.choice([10, 50, 100, 150, 200, 500, 1000]),
+        "batch_size": tune.choice([512, 1000, 3000, 5000, 10000, 30000, 50000]),
+        "log_metrics": "False",
+        "learning_rate": tune.choice([1e-3, 1e-4, 1e-5, 1e-6]),
+        "l2_penalty": tune.choice([3, 2, 1, 1e-3, 1e-4, 1e-5, 1e-6]),
+        "alpha": tune.uniform(0, 1),
+        "loss_name": "V_statistic",
+        "dag_attention_mask": "True"
+    },
+    "model_transformer": {
+        "name": "nmmr",
+        "num_layers": 1,
+        "dropout_rate": tune.choice([0, 0.1, 0.2, 0.3, 0.4, 0.5]),
+        "embedding_dim": tune.choice([32, 64, 128, 512]),
+        "num_heads": tune.grid_search([1, 2, 4])
+    },
+    "n_repeat": 20
+}

@@ -65,7 +65,11 @@ class CausalDataset(Dataset):
 
         for data, binned in batch_list:
             for key in self.dag["nodes"]:
-                batch_data[key].append(data[key].clone().detach())  # does detach disrupt autograd?
+                # Ensure data[key] is a tensor before calling clone
+                if isinstance(data[key], torch.Tensor):
+                    batch_data[key].append(data[key].clone())
+                else:
+                    batch_data[key].append(torch.tensor(data[key]).clone())
             for key in self.dag["input_nodes"]:
                 if binned[key] is not None:
                     batch_binned[key].append(torch.tensor(binned[key]))
@@ -134,7 +138,7 @@ def make_validation_data(
     data_config: Dict[str, Any], dag: Dict[str, Any], random_seed: int
 ) -> CausalDataset:
     """ Returns a CausalDataset where self.data has 5 keys each with shape (num_samples, ) """
-    val_data = generate_val_data_ate(data_config=data_config, rand_seed=random_seed + 1)
+    val_data = generate_val_data_ate(data_config=data_config, rand_seed=random_seed)
     val_data_t = PVTrainDataSetTorch.from_numpy(val_data)
 
     val_data_dict = {

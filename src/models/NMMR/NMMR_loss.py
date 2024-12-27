@@ -8,7 +8,7 @@ def NMMR_loss_transformer(model_output,
                           treatment,
                           kernel_matrix,
                           loss_name: str,
-                          alpha = 0.01,
+                          alpha: int,
                           return_items: bool = False):
     residual = target - model_output
     n = residual.shape[0]
@@ -39,8 +39,6 @@ def NMMR_loss_transformer(model_output,
         batch_items = {
             'residual': residual,
             'kernel_matrix': K,
-            'contrastive_loss': contrastive_loss.item(),
-            'causal_loss': loss[0, 0].item(),
             'total_loss': total_loss.item()
         }
         return total_loss, batch_items

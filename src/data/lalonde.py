@@ -71,4 +71,4 @@ if __name__ == "__main__":
 
     data = pd.read_csv(filepaths["data_file"])
 
-    data_sample_split_lalonde(data, dag, dataname='ldw_cps', iters=50, output_dir='data/lalonde')
+    data_sample_split_lalonde(data, dag, dataname='ldw_cps', iters=10, output_dir='data/lalonde')

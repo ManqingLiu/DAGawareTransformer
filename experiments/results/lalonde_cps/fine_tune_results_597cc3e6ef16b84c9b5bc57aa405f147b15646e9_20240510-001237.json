@@ -1,1 +1,0 @@
-{"results": {"training": {"num_epochs": 50, "batch_size": 128, "learning_rate": 0.0001, "weight_decay": 0.01, "project_tag": "lalonde_cps"}, "model": {"num_layers": 3, "dropout_rate": 0, "embedding_dim": 256, "num_heads": 16}}, "hyperparameters": 1.2162805944681168}

@@ -18,7 +18,29 @@
     "t": {"num_categories":  2},
     "y": {"num_categories":  10}
     },
-  "edges": {
+  "edges_g_formula": {
+    "age": ["y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "education": ["y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "black": ["y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "hispanic": ["y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "married": ["y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "nodegree": ["y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "re74": ["y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "re75": ["y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "y": ["y"]
+  },
+  "edges_ipw": {
+    "age": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "education": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "black": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "hispanic": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "married": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "nodegree": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "re74": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "re75": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
+    "t": ["t"]
+  },
+  "edges_cfcv": {
     "age": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
     "education": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],
     "black": ["t","y","age","education","black","hispanic","married","nodegree","re74","re75", "u74", "u75"],

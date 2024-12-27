@@ -1,53 +1,95 @@
 {
     "filepaths": {
-        "dag": "config/dag/acic_dag.json",
+        "dag_g_formula": "config/dag/acic_g_formula_dag.json",
+        "dag_ipw": "config/dag/acic_ipw_dag.json",
+        "dag_aipw": "config/dag/acic_aipw_dag.json",
         "config": "config/train/acic/acic_sample7.json",
         "data_train_file": "data/acic/sample7/data_train_7.csv",
         "data_val_file": "data/acic/sample7/data_val_7.csv",
         "data_test_file": "data/acic/sample7/data_test_7.csv",
         "pseudo_cate_file": "data/acic/sample7/pseudo_ite_7.csv",
-        "result_file_ipw": "experiments/results/acic/acic_best_params_ipw_sample7.json",
-        "result_file_cfcv": "experiments/results/acic/acic_best_params_cfcv_sample7.json",
-        "pseudo_ate_file": "data/acic/sample7/pseudo_ite_7.csv"
+        "predictions_g-formula": "experiments/predict/acic/predictions_g_formula_sample7.csv",
+        "predictions_ipw": "experiments/predict/acic/predictions_ipw_sample7.csv",
+        "predictions_aipw": "experiments/predict/acic/predictions_aipw_sample7.csv"
     },
-    "cfcv": {
+    "loss_type": {
+        "g-formula-loss": "g-formula-loss",
+        "ipw-loss": "ipw-loss",
+        "cfcv": "aipw-loss"
+    },
+    "g-formula": {
         "training": {
-            "num_epochs": 30,
+            "n_epochs": 500,
             "batch_size": 64,
-            "learning_rate": 0.0001,
-            "weight_decay": 1e-08,
-            "project_tag": "acic",
+            "log_metrics": "False",
+            "learning_rate": 0.001,
+            "l2_penalty": 3e-08,
+            "alpha": 0,
+            "loss_type": "g-formula-loss",
             "dag_attention_mask": "True",
-            "imbalance_loss_weight": 0.05,
-            "prop_score_threshold": 0,
-            "eps": 1e-06,
-            "time_limit": 14400
+            "imbalance_loss_weight": 0,
+            "prop_score_threshold": 0.1
         },
         "model": {
-            "num_layers": 8,
-            "dropout_rate": 0,
-            "embedding_dim": 64,
-            "num_heads": 2
+        "name": "acic",
+            "activation": "gelu",
+        "network_width": 40,
+        "input_layer_depth": 8,
+        "num_layers": 16,
+        "dropout_rate": 0.0001,
+        "embedding_dim": 256,
+        "feedforward_dim": 1024,
+        "num_heads": 4,
+        "encoder_weight": 0.02
         }
     },
-    "ipw": {
-        "training": {
-            "num_epochs": 88,
-            "batch_size": 64,
-            "learning_rate": 1e-07,
-            "weight_decay": 1e-10,
-            "project_tag": "acic",
+    "aipw": {
+       "training": {
+            "n_epochs": 500,
+            "batch_size": 128,
+            "log_metrics": "False",
+            "learning_rate": 1e-04,
+            "l2_penalty": 3e-08,
+            "alpha": 0,
+            "loss_type": "aipw-loss",
             "dag_attention_mask": "True",
-            "imbalance_loss_weight": 10,
-            "prop_score_threshold": 0,
-            "eps": 1e-10,
-            "time_limit": 36000
+            "ps_lower_bound": 0.267,
+            "ps_upper_bound": 0.303
         },
         "model": {
-            "num_layers": 4,
-            "dropout_rate": 0.1,
-            "embedding_dim": 128,
-            "num_heads": 32
+        "name": "acic",
+            "activation": "gelu",
+        "network_width": 40,
+        "input_layer_depth": 4,
+        "num_layers": 4,
+        "dropout_rate": 0.001,
+        "embedding_dim": 256,
+        "feedforward_dim": 512,
+        "num_heads": 2,
+        "encoder_weight": 0.2
+        }
+    },
+     "ipw": {
+        "training": {
+            "n_epochs": 4,
+            "batch_size": 64,
+            "log_metrics": "False",
+            "learning_rate": 0.001,
+            "l2_penalty": 3e-05,
+            "loss_type": "ipw-loss",
+            "dag_attention_mask": "True"
+        },
+        "model": {
+        "name": "lalonde_cps",
+            "activation": "gelu",
+        "network_width": 80,
+        "input_layer_depth": 6,
+        "num_layers": 2,
+        "dropout_rate": 0.0001,
+        "embedding_dim": 40,
+        "feedforward_dim": 80,
+        "num_heads": 2,
+        "encoder_weight": 0.02
         }
     },
     "random_seed": 42,

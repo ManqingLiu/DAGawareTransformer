@@ -2,27 +2,21 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from typing import Dict
+import math
 
-class ContinuousEmbedding(nn.Module):
-    def __init__(self, input_dim, embedding_dim):
-        super().__init__()
-        self.linear = nn.Linear(input_dim, embedding_dim)
-        self.activation = nn.LeakyReLU(0.01)
-
-    def forward(self, x):
-        return self.activation(self.linear(x))
 
 class DAGTransformer(nn.Module):
-    '''
-    This is a transformer module that takes in the adjacency matrix of the graph
-    '''
     def __init__(self,
                  dag: Dict,
+                 network_width: int,
                  embedding_dim: int,
                  feedforward_dim: int,
                  num_heads: int,
                  num_layers: int,
                  dropout_rate: float,
+                 input_layer_depth: int,
+                 encoder_weight: float,
+                 activation: str,
                  name: str = None):
 
         super(DAGTransformer, self).__init__()
@@ -33,28 +27,45 @@ class DAGTransformer(nn.Module):
         self.id2node = {v: k for k, v in self.node_ids.items()}
 
         self.num_nodes = len(self.node_ids.keys())
+        self.network_width = network_width
         self.embedding_dim = embedding_dim
         self.feedforward_dim = feedforward_dim
         self.num_heads = num_heads
         self.num_layers = num_layers
         self.dropout_rate = dropout_rate
-        self.name=name
+        self.encoder_weight = encoder_weight
+        self.activation = activation
+        self.name = name
 
         self.adj_matrix = torch.zeros(self.num_nodes, self.num_nodes)
+
         for source_node_name in self.edges.keys():
             source_node_id = self.node_ids[source_node_name]
             for target_node in self.edges[source_node_name]:
                 target_node_id = self.node_ids[target_node]
                 self.adj_matrix[source_node_id, target_node_id] = 1
 
-
         self.attn_mask = ~(self.adj_matrix.bool().T)
 
-        # Create embeddings (input_dim is always 1 for continuous variables)
-        self.embedding = nn.ModuleDict({
-            node: ContinuousEmbedding(1, self.embedding_dim)
-            for node in self.input_nodes.keys()
-        })
+
+        # Calculate input dimension
+        self.input_dim = len(self.input_nodes)
+
+        # Create layer list similar to MLP
+        self.layer_list = nn.ModuleList()
+        for i in range(input_layer_depth):
+            if i == 0:
+                self.layer_list.append(nn.Linear(3, self.network_width))
+            else:
+                self.layer_list.append(nn.Linear(self.network_width, self.network_width))
+            self.layer_list.append(nn.ReLU())
+            self.layer_list.append(nn.Dropout(self.dropout_rate))
+
+        # Add final layer with output dimension 1
+        self.layer_list.append(nn.Linear(self.network_width, 1))
+
+        # Input embedding layer
+        self.input_embedding = nn.Linear(1, embedding_dim)
 
         # Create encoder layers
         encoder_layer = nn.TransformerEncoderLayer(
@@ -62,58 +73,54 @@ class DAGTransformer(nn.Module):
             nhead=self.num_heads,
             dim_feedforward=self.feedforward_dim,
             dropout=self.dropout_rate,
-            activation='relu',
-            batch_first=True
+            activation=self.activation,
+            batch_first=True,
+            norm_first=True
         )
 
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
 
-        # Create output heads (output_dim is 1 for continuous variables)
-        self.output_head = nn.ModuleDict({
-            node: nn.Linear(self.embedding_dim, 1)
-            for node in self.output_nodes.keys()
-        })
+        # Add a linear transformation for a_w_embeddings
+        self.embed_to_scalar = nn.Linear(embedding_dim * 2, 1)
 
-    def forward(self, x, mask=True):
-        # Convert inputs to float and calculate scaling factors
-        x_float = {node: x[node].float() for node in self.input_nodes.keys()}
-        input_mean = torch.stack([x_float[node].mean() for node in self.input_nodes.keys()])
-        input_std = torch.stack([x_float[node].std() for node in self.input_nodes.keys()])
-        input_std = torch.where(input_std == 0, torch.ones_like(input_std), input_std)  # Avoid division by zero
 
-        # Normalize inputs
-        x_normalized = {node: (x_float[node] - input_mean[i]) / input_std[i]
-                        for i, node in enumerate(self.input_nodes.keys())}
-        embeddings = []
-        for node in self.node_ids.keys():
-            # Ensure input is 2D: [batch_size, 1]
-            node_input = x_normalized[node].view(-1, 1) if x_normalized[node].dim() == 1 else x_normalized[node]
-            embedded = self.embedding[node](node_input)
-            embeddings.append(embedded)
+    def forward(self, x, mask=False):
 
-        x = torch.stack(embeddings, dim=1)
+        # Combine all inputs into a single tensor
+        combined_input = torch.stack([x[node].float() for node in self.input_nodes.keys()], dim=1).squeeze(-1)
 
-        if mask:
-            attn_mask = self.attn_mask.repeat(x.size(0) * self.num_heads, 1, 1)
+        # Transformer part
+        node_embeddings = [self.input_embedding(x[node].float()) for node in self.input_nodes.keys()]
+        transformer_input = torch.stack(node_embeddings, dim=1)
+
+        # Process the encoder
+        if mask==True:
+            attn_mask = self.attn_mask.repeat(transformer_input.size(0) * self.num_heads, 1, 1)
             attn_mask = attn_mask.to(x.device)
-            x = self.encoder(x, mask=attn_mask)
+            transformer_output = self.encoder(transformer_input, mask=attn_mask)
         else:
-            x = self.encoder(x)
+            transformer_output = self.encoder(transformer_input)
 
+        # Extract A and W embeddings from transformer output
+        a_w_embeddings = transformer_output[:,:2,:].view(transformer_output.size(0), -1)
+
+        a_w_scalar = self.embed_to_scalar(a_w_embeddings)
+
+        # Combine original input with transformer output
+        combined_input = torch.cat([combined_input[:, :2], a_w_scalar * self.encoder_weight], dim=1)
+
+        # Process through layers
+        for layer in self.layer_list[:-1]:  # All layers except the last
+            combined_input = layer(combined_input)
+
+        # Last layer without activation
+        node_output = self.layer_list[-1](combined_input)
+
+        # Split the output into individual node outputs
         node_outputs = {}
         for node_name in self.output_nodes.keys():
-            node_id = self.node_ids[node_name]
-            node_outputs[node_name] = self.output_head[node_name](x[:, node_id, :]).squeeze(-1)
+            node_outputs[node_name] = node_output
 
-        # Denormalize only the outcome node
-        outcome_node = list(self.output_nodes.keys())[0]  # Assuming there's only one output node
-        if outcome_node in x_float:
-            outcome_mean = x_float[outcome_node].mean()
-            outcome_std = x_float[outcome_node].std()
-            outcome_std = outcome_std if outcome_std != 0 else 1.0  # Avoid division by zero
-            node_outputs[outcome_node] = node_outputs[outcome_node] * outcome_std + outcome_mean
-        else:
-            print(f"Warning: {outcome_node} not found in input data. Output will not be denormalized.")
 
         return node_outputs
 

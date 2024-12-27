@@ -37,6 +37,63 @@ treat <- "t"
 covar <- c("age", "education", "black", "hispanic", "married",
            "nodegree", "re74", "re75", "u74", "u75")
 
+g_formula_grf <- function(train_data, test_data, Y, treat, covar, true_ate=1794.34, seed=42) {
+  set.seed(seed)
+  
+  # Create training data that includes treatment as a predictor
+  X_train <- data.frame(train_data[, covar, drop = FALSE], 
+                        treat = train_data[, treat])
+  
+  # Train a single model on full data
+  model <- regression_forest(
+    X = X_train,
+    Y = train_data[, Y],
+    seed = seed,
+    tune.parameters = "all"
+  )
+  
+  # Create two versions of test data: all treated and all control
+  test_treated <- test_data
+  test_control <- test_data
+  test_treated[, treat] <- 1  # Set everyone to treated
+  test_control[, treat] <- 0  # Set everyone to control
+  
+  # Create feature matrices for prediction
+  X_test_treated <- data.frame(test_treated[, covar, drop = FALSE], 
+                               treat = test_treated[, treat])
+  X_test_control <- data.frame(test_control[, covar, drop = FALSE], 
+                               treat = test_control[, treat])
+  
+  # Predict potential outcomes
+  y1_pred <- predict(model, X_test_treated)$predictions  # Y^{a=1}
+  y0_pred <- predict(model, X_test_control)$predictions  # Y^{a=0}
+  
+  # Calculate individual treatment effects
+  ite <- y1_pred - y0_pred
+  
+  # Calculate ATE
+  ate <- mean(ite)
+  
+  # Calculate NRMSE
+  nrmse_ate <- nrmse(true_ate, ate)
+  
+  return(c(ate = ate, nrmse_ate = nrmse_ate))
+}
+
+train_data <- read.csv(paste0("data/lalonde/ldw_psid/sample", 10, "/train_data_", 10, ".csv"))
+test_data <- read.csv(paste0("data/lalonde/ldw_psid/sample", 10, "/test_data_", 10, ".csv"))
+results <- g_formula_grf(
+  train_data = train_data,
+  test_data = test_data,
+  Y = "y",
+  treat = "t",
+  covar = c("age", "education", "black", "hispanic", "married",
+            "nodegree", "re74", "re75", "u74", "u75"),
+  true_ate = 1794.34,
+  seed = 42
+)
+
+
 
 # IPW naive (uniform weight where weight is the mean of t)
 ipw_naive <- function(test_data, Y, treat, covar,true_ate=1794.34, seed=42) {
@@ -58,21 +115,34 @@ ipw_naive(ldw_psid_test, Y, treat, covar)
 # IPW (GRF)
 ipw_grf <- function(train_data, test_data, Y, treat, covar,true_ate=1794.34, seed=42) {
   set.seed(seed)
+  
+  # Check for and remove near-zero variance predictors
+  nzv <- nearZeroVar(train_data[, covar, drop = FALSE])
+  if (length(nzv) > 0) {
+    covar <- covar[-nzv]
+  }
+  
   # Estimate the propensity scores using a probability forest on the training data
   ps_model <- probability_forest(X = train_data[, covar, drop = FALSE], Y = as.factor(train_data[, treat]), seed = seed)
   ps <- predict(ps_model, test_data[, covar, drop = FALSE])$predictions[, 2]
+  test_data$ps <- ps
+  # Summarize propensity scores by treatment group
+  #ps_summary <- tapply(test_data$ps, test_data[, treat], summary)
+  #print(ps_summary)
   # Create the formula for the outcome regression
-  fml <- as.formula(paste(Y, "~", treat))
+  #fml <- as.formula(paste(Y, "~", treat))
   # Calculate weights for ATE on the test data
-  weights <- ifelse(test_data[, treat] == 1, 1 / ps, 1 / (1 - ps))
+  #weights <- ifelse(test_data[, treat] == 1, 1 / ps, 1 / (1 - ps))
   # Fit the weighted linear model on the test data
-  out <- summary(lm_robust(fml, data = test_data, weights = weights, se_type = "stata"))$coefficients[treat, c(1, 2, 5, 6)]
-  ate <- out[1]
+  #out <- summary(lm_robust(fml, data = test_data, weights = weights, se_type = "stata"))$coefficients[treat, c(1, 2, 5, 6)]
+  #ate <- out[1]
+  t <- test_data[, treat]
+  y <- test_data[, Y]
+  ite = (t * y / ps) - ((1 - t) * y / (1 - ps))
+  ate <- mean(ite)
   nrmse_ate <- nrmse(true_ate, ate)
   return(c(ate = ate, nrmse_ate = nrmse_ate))
 }
-
-ipw_grf(ldw_psid_train, ldw_psid_test, Y, treat, covar)
 
 
 aipw_grf <- function(train_data, test_data, Y, treat, covar, true_ate=1794.34, seed=42) {
@@ -100,6 +170,12 @@ aipw_grf <- function(train_data, test_data, Y, treat, covar, true_ate=1794.34, s
 
 aipw_grf(ldw_psid_train, ldw_psid_test, Y, treat, covar)
 
+train_data <- read.csv(paste0("data/lalonde/ldw_psid/sample", 49, "/train_data_", 49, ".csv"))
+test_data <- read.csv(paste0("data/lalonde/ldw_psid/sample", 49, "/test_data_", 49, ".csv"))
+mean(test_data[,treat])
+ipw_naive(test_data, Y, treat, covar)
+ipw_grf(train_data, test_data, Y, treat, covar)
+
 # execute all estimators
 estimate_all_bl <- function(train_data, test_data, Y, treat, covar,
                          methods=c("IPW (Naive)",
@@ -126,19 +202,17 @@ estimate_all_bl <- function(train_data, test_data, Y, treat, covar,
 
 estimate_all_bl(ldw_psid_train, ldw_psid_test, Y, treat, covar)
 
-# Initialize storage for results
-all_results <- list()
 
 report_results <- function(all_results) {
   methods <- c("IPW (Naive)", "IPW (GRF)", 
                "AIPW (GRF)")
   
   # Initialize storage for ATE estimates and RNMSE for each method
-  ate_estimates <- matrix(NA, nrow = 50, ncol = 3)
-  rnmse_estimates <- matrix(NA, nrow = 50, ncol = 3)
+  ate_estimates <- matrix(NA, nrow = 10, ncol = 3)
+  rnmse_estimates <- matrix(NA, nrow = 10, ncol = 3)
   
   # Extract ATE estimates and RMSE for each method
-  for (i in 1:50) {
+  for (i in 1:10) {
     for (j in 1:3) {
       ate_estimates[i, j] <- all_results[[i]][j, 1]
       rnmse_estimates[i, j] <- all_results[[i]][j, 2]
@@ -168,18 +242,23 @@ report_results <- function(all_results) {
   return(results)
 }
 
-# Initialize storage for results
-all_results <- list()
+# Loop through sample1 to sample10
+# Define the specific samples
+samples <- c(1, 2, 3, 4, 5, 8, 10, 16, 40, 49)
 
-# Loop through sample0 to sample49
-for (i in 0:49) {
-  train_data <- read.csv(paste0("data/lalonde/ldw_psid/sample", i, "/train_data_", i, ".csv"))
-  test_data <- read.csv(paste0("data/lalonde/ldw_psid/sample", i, "/test_data_", i, ".csv"))
+# Initialize an empty list to store results
+all_results <- vector("list", length(samples))
+
+# Loop through the specified samples
+for (i in seq_along(samples)) {
+  sample <- samples[i]
+  
+  train_data <- read.csv(paste0("data/lalonde/ldw_psid/sample", sample, "/train_data_", sample, ".csv"))
+  test_data <- read.csv(paste0("data/lalonde/ldw_psid/sample", sample, "/test_data_", sample, ".csv"))
   
   result <- estimate_all_bl(train_data, test_data, Y, treat, covar)
-  all_results[[i + 1]] <- result
+  all_results[[i]] <- result
 }
-
 # Generate the report
 results_report <- report_results(all_results)
 print(results_report)
