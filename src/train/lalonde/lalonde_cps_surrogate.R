@@ -1,12 +1,7 @@
 # source the functions provided in part 1
 source("https://github.com/xuyiqing/lalonde/blob/main/tutorial/functions.R?raw=TRUE")
 
-setwd("/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer_NeurIPS")
-ldw_psid_train <- read.csv("data/lalonde/ldw_psid/lalonde_psid_train.csv")
-ldw_psid_val <- read.csv("data/lalonde/ldw_psid/lalonde_psid_val.csv")
-ldw_psid_test <- read.csv("data/lalonde/ldw_psid/lalonde_psid_test.csv")
-ldw_cps_train <- read.csv("data/lalonde/ldw_cps/lalonde_cps_train.csv")
-ldw_cps_val <- read.csv("data/lalonde/ldw_cps/lalonde_cps_val.csv")
+setwd("/Users/manqingliu/Dropbox/Harvard/Research/DAGawareTransformer")
 
 # define variables
 Y <- "y"
@@ -71,22 +66,22 @@ aipw.grf_surrogate <- function(train_data, val_data, Y, treat, covar, true_ate=1
 }
 
 # Initialize an empty data frame to store the results
-results <- data.frame(ate = numeric(50), rmse_ate = numeric(50))
+results <- data.frame(ate = numeric(10), rmse_ate = numeric(10))
 
-# Loop through sample0 to sample49
-for (i in 0:49) {
+# Loop through sample1 to sample10
+for (i in 1:10) {
   train_data <- read.csv(paste0("data/lalonde/ldw_cps/sample", i, "/train_data_", i, ".csv"))
   val_data <- read.csv(paste0("data/lalonde/ldw_cps/sample", i, "/val_data_", i, ".csv"))
   test_data <- read.csv(paste0("data/lalonde/ldw_cps/sample", i, "/test_data_", i, ".csv"))
   
   result <- aipw.grf_surrogate(train_data, val_data, Y, treat, covar)
-  results[i+1, ] <- result
+  results[i, ] <- result
 }
 
 # Print the results
 print(results)
 print(mean(results$ate))
-print(mean(results$rmse_ate)) # 1641.105
+print(mean(results$rmse_ate)) # 2659.493
 
 # Save the results to a CSV file
 write.csv(results, "src/train/lalonde/lalonde_cps/aipw_grf_pseudo_ate.csv", row.names = FALSE)
