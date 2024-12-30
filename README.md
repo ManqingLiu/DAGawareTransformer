@@ -98,7 +98,7 @@ python3 src/experiment.py \
         --config config/train/<DATA_NAME>/<DATA_NAME>_sample<SAMPLE_ID>.json \
         --dag <DAG_TYPE> \
         --estimator <ESTIMATOR_TYPE> \
-        --data_name <DATA_NAME>[myjob.sh](scripts%2Fmyjob.sh)
+        --data_name <DATA_NAME>
 ```
 
 #### Parameters
