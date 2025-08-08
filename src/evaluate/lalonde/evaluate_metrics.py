@@ -87,8 +87,8 @@ if __name__ == '__main__':
     parser.add_argument("--data_name", type=str, required=True)
     args = parser.parse_args()
 
-    pred_g_formula = pd.read_csv(f"experiments/predict/{args.data_name}/predictions_g_formula_sample{args.sample_id}.csv")
-    pred_ipw = pd.read_csv(f"experiments/predict/{args.data_name}/predictions_ipw_sample{args.sample_id}.csv")
+    pred_g_formula = pd.read_csv(f"experiments/results/{args.data_name}/predictions_g_formula_sample{args.sample_id}.csv")
+    pred_ipw = pd.read_csv(f"experiments/results/{args.data_name}/predictions_ipw_sample{args.sample_id}.csv")
 
     ate_aipw, aipw_nrmse = aipw_nrmse(pred_g_formula['y'], pred_g_formula['t'], pred_g_formula['pred_y_A0'],
                           pred_g_formula['pred_y_A1'], pred_ipw['t_prob'])

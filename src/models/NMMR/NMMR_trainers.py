@@ -193,7 +193,12 @@ class NMMR_Trainer_DemandExperiment(object):
         E_w_haw = np.mean(reshaped_predictions, axis=1).reshape(-1,1)
 
         test_data, E_ydoA = make_test_data(data_config, val_data, dag)
-        oos_loss = np.mean((E_w_haw - E_ydoA) ** 2)
+        #oos_loss = np.mean((E_w_haw - E_ydoA) ** 2)
+        def nrmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+            """Normalized mean-squared-error."""
+            return np.sqrt(np.mean((y_true - y_pred) ** 2) / np.mean(y_true ** 2))
+
+        oos_loss = nrmse(E_w_haw, E_ydoA)
 
         return E_w_haw, oos_loss, E_ydoA, all_predictions
 

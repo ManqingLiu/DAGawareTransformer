@@ -8,91 +8,73 @@
         "data_val_file": "data/acic/sample5/data_val_5.csv",
         "data_test_file": "data/acic/sample5/data_test_5.csv",
         "pseudo_cate_file": "data/acic/sample5/pseudo_ite_5.csv",
-        "predictions_g-formula": "experiments/predict/acic/predictions_g_formula_sample5.csv",
-        "predictions_ipw": "experiments/predict/acic/predictions_ipw_sample5.csv",
-        "predictions_aipw": "experiments/predict/acic/predictions_aipw_sample5.csv"
+        "predictions_g-formula": "experiments/results/acic/predictions_g_formula_sample5.csv",
+        "predictions_ipw": "experiments/results/acic/predictions_ipw_sample5.csv",
+        "predictions_aipw": "experiments/results/acic/predictions_aipw_sample5.csv"
     },
-    "loss_type": {
-        "g-formula-loss": "g-formula-loss",
-        "ipw-loss": "ipw-loss",
-        "cfcv": "aipw-loss"
+   "g-formula": {
+          "model": {
+      "network_width": 20,
+      "embedding_dim": 20,
+      "feedforward_dim": 40,
+      "num_heads": 1,
+      "num_layers": 1,
+      "dropout_rate": 0.001,
+      "activation": "relu",
+      "use_layernorm": false,
+      "input_layer_depth": 4,
+      "encoder_weight": 0
     },
-    "g-formula": {
-        "training": {
-            "n_epochs": 500,
-            "batch_size": 64,
-            "log_metrics": "False",
-            "learning_rate": 0.001,
-            "l2_penalty": 3e-08,
-            "alpha": 0,
-            "loss_type": "g-formula-loss",
-            "dag_attention_mask": "True",
-            "imbalance_loss_weight": 0,
-            "prop_score_threshold": 0.1
-        },
-        "model": {
-        "name": "acic",
-            "activation": "gelu",
-        "network_width": 40,
-        "input_layer_depth": 8,
-        "num_layers": 16,
-        "dropout_rate": 0.0001,
-        "embedding_dim": 256,
-        "feedforward_dim": 1024,
-        "num_heads": 4,
-        "encoder_weight": 0.02
-        }
+    "training": {
+      "n_epochs": 100,
+      "batch_size": 64,
+      "learning_rate": 0.001,
+      "l2_penalty": 1e-6,
+      "dag_attention_mask": false
+    }
     },
-    "aipw": {
-       "training": {
-            "n_epochs": 500,
-            "batch_size": 256,
-            "log_metrics": "False",
-            "learning_rate": 1e-04,
-            "l2_penalty": 3e-08,
-            "alpha": 0,
-            "loss_type": "aipw-loss",
-            "dag_attention_mask": "True",
-            "ps_lower_bound": 0.263,
-            "ps_upper_bound": 0.388
-
-        },
-        "model": {
-        "name": "acic",
-            "activation": "gelu",
-        "network_width": 120,
-        "input_layer_depth": 16,
-        "num_layers": 2,
-        "dropout_rate": 0.0001,
-        "embedding_dim": 256,
-        "feedforward_dim": 512,
-        "num_heads": 2,
-        "encoder_weight": 0.2
-        }
+     "aipw": {
+    "model": {
+      "network_width": 40,
+      "embedding_dim": 10,
+      "feedforward_dim": 20,
+      "num_heads": 1,
+      "num_layers": 1,
+      "dropout_rate": 0.001,
+      "activation": "relu",
+      "use_layernorm": false,
+      "input_layer_depth": 3,
+      "encoder_weight": 0.1
     },
-     "ipw": {
-        "training": {
-            "n_epochs": 15,
-            "batch_size": 256,
-            "log_metrics": "False",
-            "learning_rate": 0.001,
-            "l2_penalty": 3e-05,
-            "loss_type": "ipw-loss",
-            "dag_attention_mask": "True"
-        },
-        "model": {
-        "name": "lalonde_cps",
-            "activation": "gelu",
-        "network_width": 80,
-        "input_layer_depth": 8,
-        "num_layers": 2,
-        "dropout_rate": 0.0001,
-        "embedding_dim": 40,
-        "feedforward_dim": 80,
-        "num_heads": 2,
-        "encoder_weight": 0.2
-        }
+    "training": {
+      "n_epochs": 100,
+      "batch_size": 64,
+      "learning_rate": 0.000001,
+      "l2_penalty": 1e-7,
+      "dag_attention_mask": true
+    }
+  },
+      "ipw": {
+    "model": {
+      "network_width": 80,
+      "embedding_dim": 40,
+      "feedforward_dim": 80,
+      "num_heads": 1,
+      "num_layers": 1,
+      "dropout_rate": 0.001,
+      "activation": "relu",
+      "use_layernorm": false,
+      "input_layer_depth": 4,
+      "encoder_weight": 0
     },
+    "training": {
+      "n_epochs": 10,
+      "batch_size": 64,
+      "learning_rate": 0.001,
+      "l2_penalty": 1e-4,
+      "dag_attention_mask": false
+    }
+  },
     "random_seed": 42,
     "sample_id": 5
 }

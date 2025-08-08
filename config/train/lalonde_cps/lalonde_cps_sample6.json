@@ -9,88 +9,72 @@
         "data_val_file": "data/lalonde/ldw_cps/sample6/val_data_6.csv",
         "data_test_file": "data/lalonde/ldw_cps/sample6/test_data_6.csv",
         "pseudo_ate_file": "src/train/lalonde/lalonde_cps/aipw_grf_pseudo_ate.csv",
-        "predictions_g-formula": "experiments/predict/lalonde_cps/predictions_g_formula_sample6.csv",
-        "predictions_ipw": "experiments/predict/lalonde_cps/predictions_ipw_sample6.csv",
-        "predictions_aipw": "experiments/predict/lalonde_cps/predictions_aipw_sample6.csv"
+        "predictions_g-formula": "experiments/results/lalonde_cps/predictions_g_formula_sample6.csv",
+        "predictions_ipw": "experiments/results/lalonde_cps/predictions_ipw_sample6.csv",
+        "predictions_aipw": "experiments/results/lalonde_cps/predictions_aipw_sample6.csv"
     },
-    "loss_type": {
-        "g-formula-loss": "g-formula-loss",
-        "ipw-loss": "ipw-loss",
-        "cfcv": "cfcv"
-    },
-    "g-formula": {
-        "training": {
-            "n_epochs": 8,
-            "batch_size": 32,
-            "log_metrics": "False",
-            "learning_rate": 0.001,
-            "l2_penalty": 3e-03,
-            "alpha": 0,
-            "loss_type": "g-formula-loss",
-            "dag_attention_mask": "True",
-            "imbalance_loss_weight": 0,
-            "prop_score_threshold": 0.1
-        },
-        "model": {
-        "name": "lalonde_cps",
-            "activation": "gelu",
-        "network_width": 80,
-        "input_layer_depth": 4,
-        "num_layers": 4,
-        "dropout_rate": 0.0001,
-        "embedding_dim": 40,
-        "feedforward_dim": 80,
-        "num_heads": 2,
-        "encoder_weight": 0.02
-        }
-    },
-     "aipw": {
-       "training": {
-            "n_epochs": 11,
-            "batch_size": 32,
-            "log_metrics": "False",
-            "learning_rate": 0.001,
-            "l2_penalty": 3e-03,
-            "alpha": 0,
-            "loss_type": "aipw-loss",
-            "dag_attention_mask": "True"
-        },
-        "model": {
-        "name": "lalonde_cps",
-            "activation": "gelu",
-        "network_width": 80,
-        "input_layer_depth": 4,
-        "num_layers": 2,
-        "dropout_rate": 0.0001,
-        "embedding_dim": 40,
-        "feedforward_dim": 80,
-        "num_heads": 2,
-        "encoder_weight": 0.02
-        }},
-     "ipw": {
-        "training": {
-            "n_epochs": 10,
-            "batch_size": 32,
-            "log_metrics": "False",
-            "learning_rate": 0.001,
-            "l2_penalty": 3e-05,
-            "alpha": 0,
-            "loss_type": "ipw-loss",
-            "dag_attention_mask": "True"
-        },
-        "model": {
-        "name": "lalonde_cps",
-            "activation": "gelu",
-        "network_width": 80,
-        "input_layer_depth": 1,
-        "num_layers": 1,
-        "dropout_rate": 0.001,
-        "embedding_dim": 40,
-        "feedforward_dim": 80,
-        "num_heads": 1,
-        "encoder_weight": 0.02
-        }
-     },
     "random_seed": 42,
-    "sample_id": 6
+  "aipw": {
+    "model": {
+      "network_width": 512,
+      "embedding_dim": 256,
+      "feedforward_dim": 1024,
+      "num_heads": 1,
+      "num_layers": 1,
+      "dropout_rate": 0.001,
+      "activation": "relu",
+      "use_layernorm": false,
+      "input_layer_depth": 1,
+      "encoder_weight": 0
+    },
+    "training": {
+      "n_epochs": 100,
+      "batch_size": 256,
+      "learning_rate": 0.001,
+      "l2_penalty": 1e-6,
+      "dag_attention_mask": false
+    }
+  },
+  "g-formula": {
+    "model": {
+      "network_width": 512,
+      "embedding_dim": 256,
+      "feedforward_dim": 1024,
+      "num_heads": 1,
+      "num_layers": 1,
+      "dropout_rate": 0.001,
+      "activation": "relu",
+      "use_layernorm": false,
+      "input_layer_depth": 4,
+      "encoder_weight": 0
+    },
+    "training": {
+      "n_epochs": 100,
+      "batch_size": 256,
+      "learning_rate": 0.001,
+      "l2_penalty": 1e-6,
+      "dag_attention_mask": false
+    }
+  },
+  "ipw": {
+    "model": {
+      "network_width": 512,
+      "embedding_dim": 256,
+      "feedforward_dim": 1024,
+      "num_heads": 1,
+      "num_layers": 2,
+      "dropout_rate": 0.001,
+      "activation": "relu",
+      "use_layernorm": false,
+      "input_layer_depth": 2,
+      "encoder_weight": 0.01
+    },
+    "training": {
+      "n_epochs": 5,
+      "batch_size": 64,
+      "learning_rate": 0.001,
+      "l2_penalty": 1e-6,
+      "dag_attention_mask": true
+    }
+  }
 }

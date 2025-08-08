@@ -124,7 +124,7 @@ if __name__ == "__main__":
     # print current directory
     print(os.getcwd())
     # Load the configurations from the JSON file
-    with open(Path("config/train/proximal/nmmr_u_z_transformer_n50000.json"), "r") as f:
+    with open(Path("config/train/proximal/nmmr_u_z_transformer_n1000.json"), "r") as f:
         config = json.load(f)
 
     # Extract the data and model configurations

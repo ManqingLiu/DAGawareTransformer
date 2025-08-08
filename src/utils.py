@@ -23,9 +23,9 @@ import hashlib
 import time
 import os
 
-from src.model import DAGTransformer, causal_loss_fun
+#from src.models import DAGTransformer, causal_loss_fun
 from src.dataset import *
-from src.predict import *
+#from src.predict import *
 
 def extract_number(filepath):
     match = re.search(r'_(\d+)_', filepath)

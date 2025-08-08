@@ -39,7 +39,7 @@ def calculate_val_metrics(
     estimator: str,
     prefix: str
 ) -> Dict[str, float]:
-    pseudo_ate_value = pseudo_ate.iloc[sample_id]["ate"]
+    pseudo_ate_value = pseudo_ate.iloc[sample_id]["rmse_ate"]
     if estimator == "g-formula":
         std_nrmse_ = std_nrmse(predictions['pred_y_A0'], predictions['pred_y_A1'], pseudo_ate_value)
         return {

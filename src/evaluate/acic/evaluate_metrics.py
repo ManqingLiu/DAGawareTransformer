@@ -56,9 +56,7 @@ def calculate_test_metrics_acic(
     predictions: np.array,
     ite: np.array,
     prefix: str,
-    estimator: str,
-    ps_lower_bound: float = 0.15,
-    ps_upper_bound: float = 0.33
+    estimator: str
 ) -> Dict[str, float]:
     if estimator == "g-formula":
         ate_std, std_nrmse_ = std_nrmse(predictions['pred_y_A0'], predictions['pred_y_A1'], ite)

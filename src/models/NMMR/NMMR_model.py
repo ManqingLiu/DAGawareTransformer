@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Dict
 import math
+from src.models.pure_dag_transformer import CustomTransformerEncoderLayer
 
 
 class DAGTransformer(nn.Module):
@@ -68,14 +69,13 @@ class DAGTransformer(nn.Module):
         self.input_embedding = nn.Linear(1, embedding_dim)
 
         # Create encoder layers
-        encoder_layer = nn.TransformerEncoderLayer(
+        encoder_layer = CustomTransformerEncoderLayer(
             d_model=self.embedding_dim,
             nhead=self.num_heads,
             dim_feedforward=self.feedforward_dim,
             dropout=self.dropout_rate,
             activation=self.activation,
-            batch_first=True,
-            norm_first=True
+            batch_first=True
         )
 
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
